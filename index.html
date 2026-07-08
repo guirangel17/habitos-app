@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pampulha</title>
+  <meta name="description" content="Painel de execução do protocolo de hábitos — rumo à Volta da Pampulha 18k">
+  <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f9f9f7" media="(prefers-color-scheme: light)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topo">
+    <span class="chip-dia" id="chip-dia"></span>
+    <span class="countdown" id="countdown"></span>
+  </header>
+
+  <main id="conteudo"></main>
+
+  <button class="sos-fab" id="sos-fab">SOS</button>
+
+  <nav class="abas">
+    <button data-aba="hoje" class="ativa"><span class="icone">☀️</span>Hoje</button>
+    <button data-aba="evolucao"><span class="icone">📈</span>Evolução</button>
+    <button data-aba="ajustes"><span class="icone">⚙️</span>Ajustes</button>
+  </nav>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
