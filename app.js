@@ -3,7 +3,7 @@ import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
   FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
-  CORRIDAS, TIPO_CORRIDA_ICONE,
+  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_TREINOS, GYM_FASE_POR_MES, CORRIDA_GUIA,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -704,26 +704,6 @@ function renderTreino(root) {
   const plano = D.treinoDoDia(key);
   const feito = D.workoutsDoDia(st.events, key);
 
-  // hoje
-  const cardHoje = el('<div class="card"><h2>Treino de hoje</h2><div style="display:grid;gap:8px" id="tr"></div></div>');
-  const tr = cardHoje.querySelector('#tr');
-  const linhaTreino = (kind, icone, nome) => {
-    const ok = !!feito[kind];
-    const b = el(`<button class="check-passo ${ok ? 'feito' : ''}">
-      <span class="caixa">${ok ? '✓' : ''}</span>
-      <span><span class="t">${icone} ${esc(nome)}</span></span>
-    </button>`);
-    b.onclick = () => {
-      const e = S.addEvent({ type: 'workout', date: key, kind, done: !ok });
-      if (!ok) snackbar('Treino no papel. 👊', () => S.removeEvent(e.id));
-    };
-    return b;
-  };
-  if (plano.corrida) tr.append(linhaTreino('corrida', TIPO_CORRIDA_ICONE[plano.corrida.tipo], plano.corrida.nome));
-  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym));
-  if (!plano.corrida && !plano.gym) tr.append(el('<p style="font-size:.85rem;color:var(--muted)">Descanso — hoje o treino é dormir 7–8h. Metade da recuperação acontece dormindo.</p>'));
-  root.append(cardHoje);
-
   // semana
   const sem = D.semanaTreino(st.events, key);
   const cardSem = el(`<div class="card"><h2>Semana <small>· ${fmtData(sem.ini)} – ${fmtData(D.addDays(sem.ini, 6))}</small></h2>
@@ -744,6 +724,30 @@ function renderTreino(root) {
     semWrap.append(col);
   });
   root.append(cardSem);
+
+  // treino de hoje (entre a semana e o cronograma)
+  const cardHoje = el('<div class="card"><h2>Treino de hoje</h2><div style="display:grid;gap:8px" id="tr"></div></div>');
+  const tr = cardHoje.querySelector('#tr');
+  const linhaTreino = (kind, icone, nome) => {
+    const ok = !!feito[kind];
+    const row = el(`<div class="treino-row ${ok ? 'feito' : ''}">
+      <button class="check-passo tr-check ${ok ? 'feito' : ''}">
+        <span class="caixa">${ok ? '✓' : ''}</span>
+        <span><span class="t">${icone} ${esc(nome)}</span></span>
+      </button>
+      <button class="tr-ver" aria-label="ver treino completo">›</button>
+    </div>`);
+    row.querySelector('.tr-check').onclick = () => {
+      const e = S.addEvent({ type: 'workout', date: key, kind, done: !ok });
+      if (!ok) snackbar('Treino no papel. 👊', () => S.removeEvent(e.id));
+    };
+    row.querySelector('.tr-ver').onclick = () => sheetTreinoDetalhe(kind, plano, key);
+    return row;
+  };
+  if (plano.corrida) tr.append(linhaTreino('corrida', TIPO_CORRIDA_ICONE[plano.corrida.tipo], plano.corrida.nome));
+  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym));
+  if (!plano.corrida && !plano.gym) tr.append(el('<p style="font-size:.85rem;color:var(--muted)">Descanso — hoje o treino é dormir 7–8h. Metade da recuperação acontece dormindo.</p>'));
+  root.append(cardHoje);
 
   // cronograma completo de corridas
   const stats = D.corridasStats(st.events, key);
@@ -777,6 +781,131 @@ function renderTreino(root) {
   if (alvoScroll) setTimeout(() => alvoScroll.scrollIntoView({ block: 'center' }), 40);
 }
 
+// sheet: o treino completo do dia (exercícios da academia / guia de pace da corrida)
+function sheetTreinoDetalhe(kind, plano, key) {
+  let box;
+  if (kind === 'gym') {
+    const exercicios = GYM_TREINOS[D.parseKey(key).getDay()] || [];
+    const fase = GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1];
+    box = el(`<div><h3>🏋️ ${esc(plano.gym)}</h3>
+      ${fase ? `<p class="detalhe-fase">${esc(fase)}</p>` : ''}
+      <div class="exercicios">${exercicios.map(([ex, sr, obs], i) => `
+        <div class="exercicio">
+          <span class="ex-num num">${i + 1}</span>
+          <span class="ex-nome">${esc(ex)}${obs ? `<small>${esc(obs)}</small>` : ''}</span>
+          <span class="ex-series num">${esc(sr)}</span>
+        </div>`).join('')}</div></div>`);
+  } else {
+    const c = plano.corrida;
+    const g = CORRIDA_GUIA[c.tipo] || {};
+    box = el(`<div><h3>${TIPO_CORRIDA_ICONE[c.tipo]} ${esc(c.nome)}</h3>
+      <div class="exercicios">
+        <div class="exercicio"><span class="ex-num">⏱</span><span class="ex-nome">Pace alvo<small>${esc(g.pace || '—')}</small></span></div>
+        <div class="exercicio"><span class="ex-num">❤️</span><span class="ex-nome">Frequência cardíaca<small>${esc(g.fc || '—')}</small></span></div>
+        <div class="exercicio"><span class="ex-num">🗣</span><span class="ex-nome">Sensação<small>${esc(g.sensacao || '—')}</small></span></div>
+        ${g.extra ? `<div class="exercicio"><span class="ex-num">☝️</span><span class="ex-nome">Execução<small>${esc(g.extra)}</small></span></div>` : ''}
+      </div></div>`);
+  }
+  abrirSheet(box);
+}
+
+// ================================================================
+// JARDIM DO TEMPO LIMPO — recompensa viva e determinística
+// cada dia limpo cresce a planta · cada marco vira flor · cada onda surfada vira estrela
+// ================================================================
+function jardimSVG(plantas, estrelas) {
+  const W = 420, H = 200, CHAO = 168;
+  const marcosFlor = [3, 7, 14, 21, 30, 45, 60, 90, 120];
+  let out = '';
+
+  // céu: estrelas (ondas surfadas), posições determinísticas
+  const nEst = Math.min(estrelas, 14);
+  for (let i = 0; i < nEst; i++) {
+    const x = 24 + ((i * 89) % 372);
+    const y = 14 + ((i * 53) % 76);
+    const r = 1.4 + ((i * 7) % 3) * 0.55;
+    out += `<circle class="estrela" style="animation-delay:${(i % 5) * 0.7}s" cx="${x}" cy="${y}" r="${r}" fill="var(--jardim-estrela)"/>`;
+  }
+
+  // chão
+  out += `<ellipse cx="${W / 2}" cy="${CHAO + 42}" rx="${W * 0.62}" ry="52" fill="var(--jardim-solo)"/>`;
+
+  // grama: cresce com o total de dias
+  const totalDias = plantas.reduce((s, p) => s + p.dias, 0);
+  const nGrama = Math.min(6 + totalDias, 46);
+  for (let i = 0; i < nGrama; i++) {
+    const x = 18 + ((i * 61) % 384);
+    const h = 5 + ((i * 13) % 8);
+    const dx = ((i * 17) % 7) - 3;
+    out += `<path d="M${x},${CHAO + 6} q${dx},-${h} ${dx * 1.6},-${h + 3}" stroke="var(--jardim-folha)" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.6"/>`;
+  }
+
+  // plantas
+  plantas.forEach((p, pi) => {
+    const cx = W * (plantas.length === 1 ? 0.5 : pi === 0 ? 0.34 : 0.66);
+    const d = Math.max(0, p.dias);
+    const altura = 22 + Math.min(d, 30) / 30 * 92;
+    const topo = CHAO - altura;
+    const curva = pi === 0 ? -10 : 10;
+    let g = `<g>`;
+    g += `<path d="M${cx},${CHAO + 4} Q${cx + curva},${CHAO - altura * 0.55} ${cx + curva * 0.6},${topo}" stroke="var(--jardim-caule)" stroke-width="${3 + Math.min(d, 30) / 18}" fill="none" stroke-linecap="round"/>`;
+
+    // folhas: uma a cada 2 dias
+    const nFolhas = Math.min(2 + Math.floor(d / 2), 10);
+    for (let i = 0; i < nFolhas; i++) {
+      const frac = 0.22 + (i / nFolhas) * 0.66;
+      const fy = CHAO - altura * frac;
+      const fx = cx + curva * frac * 0.8;
+      const lado = i % 2 ? 1 : -1;
+      const tam = 7 + Math.min(d, 30) / 6 + (i % 3);
+      const ang = lado === 1 ? -28 : 208;
+      g += `<ellipse cx="${fx + lado * tam * 0.75}" cy="${fy}" rx="${tam}" ry="${tam * 0.42}"
+        transform="rotate(${ang} ${fx} ${fy})" fill="var(--jardim-folha)" opacity="${0.75 + (i % 2) * 0.2}"/>`;
+    }
+
+    // flores: uma por marco atingido
+    const nFlores = marcosFlor.filter((m) => d >= m).length;
+    for (let i = 0; i < nFlores; i++) {
+      const principal = i === 0;
+      const frac = principal ? 1 : 0.35 + ((i * 29) % 55) / 100;
+      const fy = CHAO - altura * frac - (principal ? 6 : 0);
+      const fx = cx + curva * frac * 0.7 + (principal ? 0 : (i % 2 ? 16 : -16));
+      const r = principal ? 8 : 5.5;
+      if (!principal) g += `<path d="M${cx + curva * frac * 0.8},${CHAO - altura * frac} L${fx},${fy}" stroke="var(--jardim-caule)" stroke-width="1.8" fill="none"/>`;
+      for (let pt = 0; pt < 6; pt++) {
+        const a = (Math.PI / 3) * pt + (i * 0.5);
+        g += `<circle cx="${fx + Math.cos(a) * r}" cy="${fy + Math.sin(a) * r}" r="${r * 0.62}" fill="var(--jardim-petala-${pi + 1})"/>`;
+      }
+      g += `<circle cx="${fx}" cy="${fy}" r="${r * 0.5}" fill="var(--jardim-miolo)"/>`;
+    }
+
+    // broto recém-plantado
+    if (d === 0) {
+      g += `<ellipse cx="${cx - 5}" cy="${CHAO - 6}" rx="6" ry="3" transform="rotate(-30 ${cx - 5} ${CHAO - 6})" fill="var(--jardim-folha)"/>
+        <ellipse cx="${cx + 5}" cy="${CHAO - 6}" rx="6" ry="3" transform="rotate(30 ${cx + 5} ${CHAO - 6})" fill="var(--jardim-folha)"/>`;
+    }
+    g += '</g>';
+    out += g;
+
+    // etiqueta da planta
+    out += `<text x="${cx}" y="${H - 4}" text-anchor="middle" font-size="10.5" fill="var(--ink-2)" font-weight="600">${p.icone} ${p.dias}d</text>`;
+  });
+
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="jardim">${out}</svg>`;
+}
+
+function dadosJardim(st, key) {
+  const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
+  const dias = (type) => Math.floor(D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), Date.now()).totalDias);
+  return {
+    plantas: [
+      { icone: '🛵', dias: dias('delivery') },
+      { icone: '🍫', dias: dias('sweet') },
+    ],
+    estrelas: D.ondasSurfadas(st.events),
+  };
+}
+
 // ================================================================
 // CONTADORES — overlay estilo SugarCut (anel + tempo vivo)
 // ================================================================
@@ -788,10 +917,12 @@ function contadoresOverlay() {
   const key = hojeKey();
   const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
 
+  const jardim = dadosJardim(st, key);
   const tela = el(`<div class="sos-tela">
     <button class="fechar">✕</button>
     <h2>Tempo limpo</h2>
-    <p class="nomeacao">Contando ao vivo desde o último deslize — e um deslize isolado não zera a streak resiliente.</p>
+    <p class="nomeacao">Cada dia limpo cresce o jardim · cada marco vira flor · cada onda surfada vira estrela.</p>
+    ${jardimSVG(jardim.plantas, jardim.estrelas)}
     <div class="aneis" id="aneis"></div>
   </div>`);
   tela.querySelector('.fechar').onclick = () => { clearInterval(contadorTimer); tela.remove(); };
@@ -967,33 +1098,44 @@ function renderEvolucao(root) {
   const fase = D.fase(key);
   const faseTxt = { deficit: `cutting leve até ${fmtData(FIM_DEFICIT)} · depois manutenção`, manutencao: 'manutenção — pico de corrida', carga: '★ semana da prova — carga de carbo', prova: '🏁 dia de prova' }[fase];
 
-  // rota até a Pampulha: cada semana revisada/cumprida pinta um segmento
-  root.append(el(`<div class="card">
-    <h2>Rota até a Pampulha <small>· ${D.semanasAteProva(key)} semanas restantes · ${esc(faseTxt)}</small></h2>
-    <div class="grafico-wrap">${rotaSVG(st, key)}</div>
+  // hero: rumo à Pampulha (mesma linguagem visual do hero da home)
+  root.append(el(`<div class="card hero-refeicao hero-evo">
+    <div class="hero-rotulo">RUMO À PAMPULHA · 06/12</div>
+    <h1>${D.semanasAteProva(key)} <span class="hora">semanas restantes</span></h1>
+    <p class="ajuste-dia">${esc(faseTxt)}</p>
+    <div class="grafico-wrap" style="margin-top:8px">${rotaSVG(st, key)}</div>
     <div class="legenda">
-      <span class="item"><span class="faixa" style="background:var(--serie-1)"></span>semana fechada com revisão</span>
+      <span class="item"><span class="faixa" style="background:var(--serie-1)"></span>semana fechada</span>
       <span class="item"><span class="ponto" style="background:var(--serie-1)"></span>você está aqui</span>
     </div>
   </div>`));
 
-  // painel de identidade: a frase + as evidências
+  // jardim do tempo limpo (toque → contadores ao vivo)
+  const jardim = dadosJardim(st, key);
+  const cardJardim = el(`<button class="card card-jardim">
+    <h2>Jardim do tempo limpo <small>· toque para ver ao vivo →</small></h2>
+    ${jardimSVG(jardim.plantas, jardim.estrelas)}
+  </button>`);
+  cardJardim.onclick = contadoresOverlay;
+  root.append(cardJardim);
+
+  // identidade
   const ident = D.identidadeAssinada(st.events, key);
   const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
   const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
-  root.append(el(`<div class="card">
-    <h2>Quem os dados dizem que eu sou</h2>
+  root.append(el('<div class="secao">IDENTIDADE</div>'));
+  root.append(el(`<div class="card ${ident.assinada ? 'card-assinado' : ''}">
     <p class="frase-identidade ${ident.assinada ? 'assinada' : ''}">“${FRASE_IDENTIDADE}”</p>
     <p class="frase-status">${ident.assinada ? '✍️ Assinada — 4 domingos de revisão seguidos.' : `Assinatura: ${ident.progresso}/4 domingos de revisão seguidos.`}</p>
     <div class="agregados">
       <div class="contador"><div class="rotulo">🌊 Ondas surfadas</div><div class="valor num">${D.ondasSurfadas(st.events)}</div><div class="sub">cravings que passaram sem vencer você</div></div>
       <div class="contador"><div class="rotulo">🁢 Dominós quebrados</div><div class="valor num">${D.dominosQuebrados(st.events, key)}</div><div class="sub">ressacas que NÃO viraram dia perdido</div></div>
-      <div class="contador"><div class="rotulo">🛵 Sem iFood impulso</div><div class="valor num">${cDeliv.streak}<small> dias</small></div><div class="sub">recorde ${cDeliv.recorde} · ${cDeliv.limpos30}/${cDeliv.janela} dias limpos</div></div>
-      <div class="contador"><div class="rotulo">🍫 Sem doce fora</div><div class="valor num">${cDoce.streak}<small> dias</small></div><div class="sub">recorde ${cDoce.recorde} · ${cDoce.limpos30}/${cDoce.janela} dias limpos</div></div>
       <div class="contador"><div class="rotulo">↩︎ Recuperações</div><div class="valor num">${cDeliv.recuperacoes + cDoce.recuperacoes}</div><div class="sub">deslizes que não viraram dois</div></div>
       <div class="contador"><div class="rotulo">📋 Revisões feitas</div><div class="valor num">${D.semanasComRevisao(st.events).size}</div><div class="sub">domingos de 5 minutos</div></div>
     </div>
   </div>`));
+
+  root.append(el('<div class="secao">CORPO</div>'));
 
   // peso
   const pesos = D.serie(st.events, 'weight');
@@ -1038,6 +1180,7 @@ function renderEvolucao(root) {
   // métricas semanais do protocolo §4
   const m = D.metricasSemana(st.events, key);
   const b = st.settings.baseline;
+  root.append(el('<div class="secao">HÁBITOS DA SEMANA</div>'));
   root.append(el(`<div class="card"><h2>Semana atual <small>· metas de 30 dias do protocolo</small></h2>
     <div class="tiles">
       ${tileMetrica('Delivery por impulso', m.delivery, b.delivery, 'delivery')}
@@ -1048,6 +1191,7 @@ function renderEvolucao(root) {
   </div>`));
 
   // constância: uma linha legível por semana, meta = 80% (28/35), não perfeição
+  root.append(el('<div class="secao">CONSTÂNCIA</div>'));
   const hm = D.heatmapConstancia(st.events, key, 8);
   const cardHm = el(`<div class="card"><h2>Constância <small>· refeições no plano · meta da semana: 28/35 (80%)</small></h2>
     <div class="const-cab"><span></span>${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((l) => `<span>${l}</span>`).join('')}<span></span></div>
@@ -1065,6 +1209,7 @@ function renderEvolucao(root) {
   root.append(cardHm);
 
   // última revisão (o que foi decidido no domingo)
+  root.append(el('<div class="secao">PADRÕES</div>'));
   const revs = st.events.filter((e) => e.type === 'review').sort((a, x) => (a.week < x.week ? -1 : 1));
   const ultRev = revs[revs.length - 1];
   if (ultRev && ultRev.ajuste) {
@@ -1407,6 +1552,7 @@ if (params.get('ressaca') && !D.ressacaDoDia(S.getState().events, hojeKey()).on)
   S.addEvent({ type: 'hangover_on', date: hojeKey() });
 }
 if (params.get('contadores')) contadoresOverlay();
+if (params.get('detalhe')) sheetTreinoDetalhe(params.get('detalhe'), D.treinoDoDia(hojeKey()), hojeKey());
 if (params.get('wizard') === 'revisao') {
   wizardRevisao(D.revisaoPendente(S.getState().events, hojeKey(), 20) || D.addDays(D.inicioSemana(hojeKey()), -7));
 }

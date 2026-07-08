@@ -234,3 +234,70 @@ export const TIPO_CORRIDA_ICONE = { prova: '🏅', longo: '🏃', tiros: '⚡', 
 
 // Marcos dos contadores (estilo SugarCut: próximo marco vira a meta do anel)
 export const MARCOS_DIAS = [1, 3, 7, 14, 21, 30, 45, 60, 90, 120, 150];
+
+// Treinos de musculação completos (Seção 2 do plano) — por dia da semana
+export const GYM_TREINOS = {
+  2: [
+    ['Supino Reto (barra ou halter)', '4 × 9-11'],
+    ['Supino Inclinado (halteres)', '3 × 9-11'],
+    ['Desenvolvimento Máquina', '3 × 9-11'],
+    ['Elevação Lateral (halteres)', '3 × 10-12'],
+    ['Tríceps Pulley (barra reta)', '3 × 9-11'],
+    ['Tríceps Testa', '3 × 9-11'],
+  ],
+  3: [
+    ['Barra Fixa ou Puxada Alta', '4 × 9-11', 'RIR 1-2, sem falha'],
+    ['Remada Baixa (triângulo)', '3 × 9-11'],
+    ['Remada Máquina (apoiada)', '3 × 9-11'],
+    ['Crucifixo Inverso', '3 × 10-12'],
+    ['Rosca Direta (halteres)', '3 × 9-11'],
+    ['Rosca Martelo', '2 × 10-12'],
+  ],
+  4: [
+    ['V-Squat ou Leg Press', '4 × 8-10', 'RIR 2'],
+    ['Elevação Pélvica', '3 × 8-12'],
+    ['Afundo com Step ou Búlgaro', '3 × 10-12', 'o mais transferível para corrida — não pule'],
+    ['Cadeira Flexora', '3 × 10-12'],
+    ['Stiff', '2-3 × 10-12', 'RIR 3 nas semanas de tiro forte'],
+    ['Panturrilha em Pé', '3 × 10-12'],
+    ['Tibial Anterior', '3 × 15-20'],
+  ],
+  5: [
+    ['Crossover ou Supino Inclinado (halteres)', '3 × 10-15'],
+    ['Desenvolvimento com Halteres', '3 × 8-10'],
+    ['Elevação Lateral (polia)', '3 × 12-15'],
+    ['Face Pull', '3 × 12-15'],
+    ['Tríceps Francês (corda)', '2 × 10-12'],
+    ['Rosca Scott', '2 × 10-12'],
+    ['Core: Abdominal Polia', '3 × 12-15'],
+    ['Core: Pallof Press', '3 × 10/lado'],
+  ],
+  6: [
+    ['Abdução de Quadril ou Monster Walk', '3 × 12-15', 'protege o joelho'],
+    ['Copenhagen Plank (joelho apoiado)', '3 × 20-30 s/lado', 'adutores e púbis'],
+    ['Cadeira Extensora leve', '2 × 12-15', 'tendão patelar'],
+    ['Panturrilha Sentado', '4 × 12-15', 'sóleo — o músculo mais exigido na corrida'],
+    ['Tibial Anterior', '3 × 15-20', 'canela'],
+    ['Prancha Lateral com Abdução', '3 × 30 s/lado', 'glúteo médio + core'],
+  ],
+};
+
+// Periodização da musculação (Seção 3) — nota por mês
+export const GYM_FASE_POR_MES = {
+  7: 'Fase: Hipertrofia (8-12 reps).',
+  8: 'Fase: Hipertrofia (8-12 reps). Deload na semana de 31/08: mesmas cargas, metade das séries.',
+  9: 'Fase: Força Máxima — compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2; isoladores 10-12. Deload na semana de 28/09.',
+  10: 'Fase: Manutenção + Potência — compostos 3 × 3-5 pesado (volume −40%) + pliometria leve 2×/sem (40-60 contatos).',
+  11: 'Fase: Polimento — 1-2 sessões curtas e pesadas, sem falha, sem DOMS. Última sessão pesada de perna: 23-24/11.',
+  12: 'Semana da prova: ZERO perna. Upper leve até quarta 02/12 no máximo.',
+};
+
+// Paces e execução por tipo de corrida (Seções 4 e 5 do plano)
+export const CORRIDA_GUIA = {
+  longo: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm — a FC manda, não o pace', sensacao: 'Conversa completa possível', extra: 'Nos longões com ritmo de prova: 6:15–6:30 nos km indicados.' },
+  social: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm', sensacao: 'Conversa completa — é social de verdade', extra: 'Strides (quando indicados): 100 m progressivos até ~90% e solta.' },
+  leve: { pace: '6:50–7:15 /km ou mais leve', fc: '≤ 152 bpm', sensacao: 'Regenerativo — errar para baixo', extra: null },
+  tempo: { pace: '6:05–6:20 /km contínuo', fc: '~163–170 (logo abaixo do limiar)', sensacao: 'Só frases curtas, não uma conversa', extra: 'Aquecimento: 10 min de trote. Desaquecimento: 8-10 min muito leve.' },
+  tiros: { pace: '400 m: 5:35–5:50 · 800 m–1 km: 5:45–6:00 · 1,5 km: 5:55–6:05', fc: 'Mande pelo pace (FC atrasa no tiro); 9/10 no último', sensacao: 'Forte, mas não é sprint', extra: 'Aquecimento INEGOCIÁVEL: 15 min trote + 4 × 100 m progressivos. NUNCA fique parado entre tiros — descanso ativo (trote/caminhada). Desaquecimento 8-10 min.' },
+  prova: { pace: 'Alvo 6:15–6:30 /km (Meta A: 1h52–1h55)', fc: 'Km 0–4: corra por pace, SEM olhar a FC (adrenalina infla 10-20 bpm). Do km 5 em diante: segure ≤ ~165 até o km 10, depois libere', sensacao: 'Prova de 18 km não se ganha no km 2 — se perde lá', extra: 'Gel nos km 6 e 12. Nada de novidade no dia da prova.' },
+};

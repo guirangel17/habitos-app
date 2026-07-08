@@ -16,7 +16,13 @@
 - ✅ Tiles de resumo do peso (média 7d atual, Δ30d, Δ total) acima do gráfico.
 - ✅ Polimento visual: gradiente azul→aqua nos botões primários/SOS/anéis, hero com wash, raio 16px.
 
-# v4 — ideias futuras
+# Feito na v4 (jul/2026)
+
+- ✅ Aba Treino reordenada (Semana → Treino de hoje → Cronograma) com botão › em cada treino abrindo o treino completo: exercícios com séries × reps + fase da periodização (academia) ou pace/FC/sensação/execução do plano (corrida).
+- ✅ Jardim do tempo limpo: SVG generativo e determinístico — cada dia limpo cresce a planta, cada marco vira flor, cada onda surfada vira estrela piscando. Vive no overlay de contadores e como card na Evolução.
+- ✅ Redesign da Evolução: hero com gradiente (rota dentro), rótulos de seção (IDENTIDADE/CORPO/HÁBITOS/CONSTÂNCIA/PADRÕES), card de identidade com borda em gradiente quando assinada, títulos de card em small caps em todo o app.
+
+# v5 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
 - Gráfico de aderência semanal × ritmo de perda (correlação visível).

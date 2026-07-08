@@ -20,7 +20,7 @@ python3 -m http.server 8741
 # http://localhost:8741
 ```
 
-Parâmetros de dev: `?hoje=2026-07-07&agora=15:30` (simular data/hora), `?seed=1` (dados de demonstração num store vazio), `?aba=evolucao`, `?tema=dark|light`, `?sos=doce&passo=3`, `?ressaca=1`, `?wizard=revisao`, `?contrato=1`, `?contadores=1`, `?aba=treino`.
+Parâmetros de dev: `?hoje=2026-07-07&agora=15:30` (simular data/hora), `?seed=1` (dados de demonstração num store vazio), `?aba=evolucao`, `?tema=dark|light`, `?sos=doce&passo=3`, `?ressaca=1`, `?wizard=revisao`, `?contrato=1`, `?contadores=1`, `?aba=treino`, `?detalhe=gym|corrida`.
 
 Testes das funções de derivação: `node test/test-derive.mjs`.
 

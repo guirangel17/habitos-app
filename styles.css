@@ -18,8 +18,33 @@
   --seq-1: #cde2fb; --seq-2: #9ec5f4; --seq-3: #6da7ec; --seq-4: #3987e5; --seq-5: #1c5cab;
   --grad: linear-gradient(135deg, #2a78d6 0%, #1baf7a 100%);
   --radius: 16px;
+  --jardim-solo: #e7efdf;
+  --jardim-caule: #2c8a52;
+  --jardim-folha: #1baf7a;
+  --jardim-petala-1: #3987e5;
+  --jardim-petala-2: #e87ba4;
+  --jardim-miolo: #eda100;
+  --jardim-estrela: #b9922a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="light"]) {
+    --jardim-solo: #16241a;
+    --jardim-caule: #1e9e63;
+    --jardim-folha: #199e70;
+    --jardim-petala-1: #5598e7;
+    --jardim-petala-2: #d55181;
+    --jardim-miolo: #c98500;
+    --jardim-estrela: #e8d28a;
+  }
 }
 :root[data-tema="dark"] {
+  --jardim-solo: #16241a;
+  --jardim-caule: #1e9e63;
+  --jardim-folha: #199e70;
+  --jardim-petala-1: #5598e7;
+  --jardim-petala-2: #d55181;
+  --jardim-miolo: #c98500;
+  --jardim-estrela: #e8d28a;
   --page: #0d0d0d;
   --surface: #1a1a19;
   --ink: #ffffff;
@@ -87,8 +112,15 @@ main { padding: 0 14px; display: grid; gap: 12px; }
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 14px;
 }
-.card h2 { font-size: 0.8rem; font-weight: 600; color: var(--ink-2); margin-bottom: 10px; }
-.card h2 small { font-weight: 400; color: var(--muted); }
+.card h2 {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--ink-2); margin-bottom: 10px;
+}
+.card h2 small { font-weight: 400; color: var(--muted); text-transform: none; letter-spacing: 0; font-size: 0.68rem; }
+.secao {
+  font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; color: var(--muted);
+  padding: 6px 4px 0;
+}
 
 /* ---------- anel + resumo do dia ---------- */
 .dia-resumo { display: flex; align-items: center; gap: 14px; }
@@ -255,6 +287,33 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .const-label { font-size: 0.66rem; color: var(--muted); }
 .const-total { font-size: 0.7rem; color: var(--muted); text-align: right; }
 .const-total.verde { color: var(--good-text); font-weight: 700; }
+
+/* ---------- treino: linha com detalhe + exercícios ---------- */
+.treino-row { display: grid; grid-template-columns: 1fr 44px; gap: 6px; align-items: stretch; }
+.treino-row .tr-check { margin: 0; }
+.tr-ver {
+  border: 1px solid var(--border); border-radius: 12px; color: var(--muted);
+  font-size: 1.3rem; display: grid; place-items: center;
+}
+.detalhe-fase { font-size: 0.75rem; color: var(--serie-1); margin: -4px 0 10px; line-height: 1.4; }
+.exercicios { display: grid; gap: 6px; }
+.exercicio {
+  display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center;
+  border: 1px solid var(--grid); border-radius: 10px; padding: 9px 11px; font-size: 0.82rem;
+}
+.exercicio .ex-num { color: var(--muted); font-size: 0.78rem; text-align: center; }
+.exercicio .ex-nome small { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 1px; line-height: 1.35; }
+.exercicio .ex-series { color: var(--serie-1); font-weight: 650; font-size: 0.78rem; white-space: nowrap; }
+
+/* ---------- jardim ---------- */
+.jardim { display: block; }
+.estrela { animation: piscar 3.5s ease-in-out infinite; }
+@keyframes piscar { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.card-jardim { text-align: left; width: 100%; padding-bottom: 6px; }
+.hero-evo h1 .hora { font-size: 1rem; }
+.card-assinado { border-color: transparent; background:
+  linear-gradient(var(--surface), var(--surface)) padding-box,
+  var(--grad) border-box; border: 1.5px solid transparent; }
 
 /* ---------- identidade + mapa de gatilhos ---------- */
 .frase-identidade { font-size: 1.05rem; font-weight: 650; line-height: 1.4; color: var(--muted); }
