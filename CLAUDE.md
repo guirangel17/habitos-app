@@ -27,7 +27,7 @@ Vanilla JS com ES modules. **Zero build, zero dependências, zero backend.** pt-
 
 | Arquivo | Papel |
 |---|---|
-| `index.html` | shell: header (chip do dia + countdown + ⚙️ Ajustes), `#conteudo`, FAB SOS, nav de 5 abas (Hoje·Dieta·Treino·Evolução·Relatório) |
+| `index.html` | shell: header (chip do dia + ⚙️ Ajustes — o countdown saiu na v6.2: a strip da Pampulha na Hoje faz esse papel), `#conteudo`, FAB SOS, nav de 5 abas (Hoje·Dieta·Treino·Evolução·Relatório) |
 | `styles.css` | tokens de cor (paleta validada p/ daltonismo, claro+escuro), todos os componentes |
 | `data.js` | constantes do plano: refeições, tipos de dia, corridas, treinos gym, paces, scripts SOS |
 | `derive.js` | **funções puras** (sem DOM/storage) — toda regra de negócio derivável. Testável via node |

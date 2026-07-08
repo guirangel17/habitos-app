@@ -1,5 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '6.1'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '6.2'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -1901,7 +1901,6 @@ function render() {
   const faseAtual = D.fase(key);
   const metas = (faseAtual === 'deficit' ? METAS_DIA.deficit : METAS_DIA.manutencao)[tipo];
   $('#chip-dia').innerHTML = `<span class="tipo">${tipo}</span><span class="metas num">${metas.kcal} · P ${metas.p}</span>`;
-  $('#countdown').innerHTML = `<b class="num">${D.semanasAteProva(key)} sem</b><br>até a Pampulha`;
 
   const root = $('#conteudo');
   root.innerHTML = '';

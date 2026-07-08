@@ -43,6 +43,10 @@
 - ✅ Hero da refeição compactado (h1 menor, botões lado a lado) — dieta vira um bloco entre iguais.
 - ✅ Legenda do jardim com miniaturas SVG (folha/flor/estrela) + "próxima flor: marco de N — faltam Xd" por planta, no overlay e no card da Evolução; o marco agora DIZ o que entrega ("→ flor nova no jardim").
 
+# Feito na v6.2 (jul/2026)
+
+- ✅ Countdown "N sem até a Pampulha" removido do header — redundante com a strip da prova no dashboard; o header ficou só chip do dia + ⚙️.
+
 # v7 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
