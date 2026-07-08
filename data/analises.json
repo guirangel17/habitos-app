@@ -1,5 +1,171 @@
 {
  "schema": 1,
- "atualizadoEm": null,
- "analises": []
+ "atualizadoEm": "2026-07-08T11:16:07-03:00",
+ "analises": [
+  {
+   "date": "2026-07-05",
+   "activityId": 23487128352,
+   "geradoEm": "2026-07-08T11:16:30-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-07-05 08:22:20",
+    "distanciaKm": 4.86,
+    "duracaoMin": 31.7,
+    "paceMedio": "6:31",
+    "fcMedia": 158,
+    "fcMax": 172,
+    "cadencia": 161,
+    "elevacaoM": 81,
+    "trainingEffect": {
+     "aerobico": 3.8,
+     "anaerobico": 0.0,
+     "label": "LACTATE_THRESHOLD",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 29.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:08",
+      "fc": 148
+     },
+     {
+      "km": 2,
+      "pace": "6:30",
+      "fc": 158
+     },
+     {
+      "km": 3,
+      "pace": "6:26",
+      "fc": 160
+     },
+     {
+      "km": 4,
+      "pace": "6:21",
+      "fc": 162
+     },
+     {
+      "km": 5,
+      "pace": "6:07",
+      "fc": 163
+     }
+    ],
+    "zonasFc": {
+     "z1": 3,
+     "z2": 9,
+     "z3": 73,
+     "z4": 15,
+     "z5": 0
+    }
+   },
+   "plano": {
+    "tipo": "prova",
+    "nome": "PROVA 5 km ⚡ — soltar o corpo, sem cobrança de pace",
+    "paceAlvo": "Alvo 6:15–6:30 /km (Meta A: 1h52–1h55)",
+    "fcAlvo": "Km 0–4: corra por pace, SEM olhar a FC (adrenalina infla 10-20 bpm). Do km 5 em diante: segure ≤ ~165 até o km 10, depois libere",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:52",
+    "paceZ2Ha8Sem": "8:01"
+   },
+   "ia": {
+    "resumo": "Você completou uma prova de 5 km com um ritmo progressivo, focando em soltar o corpo conforme o planejado. A corrida foi executada com inteligência, aumentando o esforço de forma gradual e controlada.",
+    "comparacao_plano": "A corrida de 4.86 km foi realizada como uma prova de 5 km, seguindo a orientação de 'soltar o corpo, sem cobrança de pace'. O pace médio de 6:31/km e a FC média de 158 bpm (predominantemente em Z3) refletem um esforço controlado e progressivo, adequado para o estímulo do dia. As faixas de pace e FC mencionadas no plano eram para a prova-alvo de 18 km, não para esta corrida de 5 km.",
+    "pontos_fortes": [
+     "Excelente execução do ritmo progressivo, começando mais lento (7:08/km) e acelerando de forma consistente até o final (6:07/km), o que é ideal para 'soltar o corpo' em uma prova.",
+     "A cadência de 161 spm está dentro da sua faixa de referência atual, mostrando um bom ritmo de passadas.",
+     "Apesar da temperatura elevada (29°C), a frequência cardíaca foi bem gerenciada, com a FC média em Z3 e picos em Z4, indicando uma resposta fisiológica esperada ao esforço e ao calor."
+    ],
+    "pontos_atencao": [
+     "Continue observando como seu corpo responde ao calor em treinos futuros, especialmente em dias de temperatura elevada, para ajustar o ritmo e manter a FC nas zonas adequadas ao estímulo."
+    ],
+    "proxima_dica": "No seu próximo treino leve de 5 km, concentre-se em manter a frequência cardíaca nas zonas Z1-Z2 e busque conscientemente uma cadência um pouco mais alta, visando 165+ spm, sem forçar o pace.",
+    "nota_execucao": 9
+   }
+  },
+  {
+   "date": "2026-07-02",
+   "activityId": 23459764700,
+   "geradoEm": "2026-07-08T11:16:17-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-07-02 20:46:18",
+    "distanciaKm": 6.02,
+    "duracaoMin": 48.3,
+    "paceMedio": "8:02",
+    "fcMedia": 127,
+    "fcMax": 163,
+    "cadencia": 93,
+    "elevacaoM": 129,
+    "trainingEffect": {
+     "aerobico": 2.8,
+     "anaerobico": 0.4,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 29.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:28",
+      "fc": 123
+     },
+     {
+      "km": 2,
+      "pace": "7:12",
+      "fc": 121
+     },
+     {
+      "km": 3,
+      "pace": "7:34",
+      "fc": 130
+     },
+     {
+      "km": 4,
+      "pace": "8:16",
+      "fc": 134
+     },
+     {
+      "km": 5,
+      "pace": "9:51",
+      "fc": 124
+     },
+     {
+      "km": 6,
+      "pace": "7:51",
+      "fc": 134
+     }
+    ],
+    "zonasFc": {
+     "z1": 60,
+     "z2": 37,
+     "z3": 3,
+     "z4": 0,
+     "z5": 0
+    }
+   },
+   "plano": null,
+   "historico": {
+    "paceZ2Atual": "7:52",
+    "paceZ2Ha8Sem": "8:01"
+   },
+   "ia": {
+    "resumo": "Você realizou uma corrida de 6.02 km em 48.3 minutos, com pace médio de 8:02/km e FC média de 127 bpm, em uma noite com temperatura elevada (29°C). O esforço foi predominantemente leve, com a maior parte do tempo em Z1.",
+    "comparacao_plano": "Não havia um treino de corrida planejado para este dia. Esta atividade representa um volume extra na semana, o que pode impactar a recuperação e a qualidade do próximo treino-chave ou da prova de 5 km. É importante gerenciar o volume total para evitar sobrecarga.",
+    "pontos_fortes": [
+     "A frequência cardíaca média de 127 bpm e o tempo significativo em Z1 (<133 bpm) demonstram excelente controle de esforço, especialmente considerando a temperatura de 29°C.",
+     "Mesmo com a elevação de 129 metros, você manteve a FC em zonas baixas, indicando que o corpo priorizou a intensidade correta para um esforço leve."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 93 spm está bastante abaixo da sua referência (~160-165 spm). Verifique se houve alguma interrupção na corrida (caminhada) ou se o sensor de cadência funcionou corretamente. Uma cadência mais próxima do seu ideal pode otimizar a eficiência da corrida.",
+     "Embora o volume extra seja bem-vindo em alguns momentos, é importante considerar o impacto na recuperação para a prova de 5 km que se aproxima. Avalie como o corpo respondeu a este esforço adicional."
+    ],
+    "proxima_dica": "Para a prova de 5 km, concentre-se em soltar o corpo e desfrutar da corrida, sem se preocupar excessivamente com o pace. Comece em um ritmo confortável e deixe o corpo ditar a intensidade, aproveitando a experiência sem cobranças.",
+    "nota_execucao": null
+   }
+  }
+ ]
 }

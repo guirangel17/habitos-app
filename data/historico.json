@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-08T11:08:04-03:00",
+ "atualizadoEm": "2026-07-08T11:16:07-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -24,16 +24,881 @@
    999
   ]
  },
- "corridas": [],
- "tendencias": {
-  "paceZ2Serie": [],
-  "paceZ2Atual": null,
-  "paceZ2Ha8Sem": null,
-  "vo2max": {
-   "atual": null,
-   "ha8Sem": null
+ "corridas": [
+  {
+   "date": "2026-01-12",
+   "activityId": 21526917590,
+   "distanciaKm": 5.02,
+   "paceMedio": "6:53",
+   "paceSeg": 413,
+   "fcMedia": 158,
+   "fcMax": 171,
+   "cadencia": 149,
+   "vo2max": 43.0,
+   "teAerobico": 4.0,
+   "tipoPlano": null
   },
-  "cadencia4Sem": null,
-  "kmPorSemana4Sem": 0.0
+  {
+   "date": "2026-01-14",
+   "activityId": 21549852591,
+   "distanciaKm": 3.05,
+   "paceMedio": "7:14",
+   "paceSeg": 434,
+   "fcMedia": 152,
+   "fcMax": 173,
+   "cadencia": 152,
+   "vo2max": null,
+   "teAerobico": 3.4,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-01-15",
+   "activityId": 21561129564,
+   "distanciaKm": 6.18,
+   "paceMedio": "7:26",
+   "paceSeg": 446,
+   "fcMedia": 139,
+   "fcMax": 173,
+   "cadencia": 82,
+   "vo2max": 45.0,
+   "teAerobico": 3.5,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-01-19",
+   "activityId": 21601976512,
+   "distanciaKm": 6.03,
+   "paceMedio": "7:22",
+   "paceSeg": 442,
+   "fcMedia": 146,
+   "fcMax": 156,
+   "cadencia": 149,
+   "vo2max": 46.0,
+   "teAerobico": 3.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-01-21",
+   "activityId": 21624682705,
+   "distanciaKm": 2.79,
+   "paceMedio": "6:58",
+   "paceSeg": 418,
+   "fcMedia": 164,
+   "fcMax": 177,
+   "cadencia": 156,
+   "vo2max": null,
+   "teAerobico": 3.4,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-01-24",
+   "activityId": 21652544469,
+   "distanciaKm": 2.22,
+   "paceMedio": "8:49",
+   "paceSeg": 529,
+   "fcMedia": 134,
+   "fcMax": 151,
+   "cadencia": 133,
+   "vo2max": null,
+   "teAerobico": 2.2,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-01-26",
+   "activityId": 21674242874,
+   "distanciaKm": 7.03,
+   "paceMedio": "7:26",
+   "paceSeg": 446,
+   "fcMedia": 150,
+   "fcMax": 158,
+   "cadencia": 154,
+   "vo2max": 46.0,
+   "teAerobico": 2.9,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-01-28",
+   "activityId": 21695456281,
+   "distanciaKm": 3.02,
+   "paceMedio": "6:18",
+   "paceSeg": 378,
+   "fcMedia": 162,
+   "fcMax": 174,
+   "cadencia": 162,
+   "vo2max": 46.0,
+   "teAerobico": 3.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-02-02",
+   "activityId": 21745147901,
+   "distanciaKm": 7.03,
+   "paceMedio": "7:23",
+   "paceSeg": 443,
+   "fcMedia": 151,
+   "fcMax": 160,
+   "cadencia": 151,
+   "vo2max": 46.0,
+   "teAerobico": 3.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-02-04",
+   "activityId": 21766983725,
+   "distanciaKm": 4.02,
+   "paceMedio": "6:27",
+   "paceSeg": 387,
+   "fcMedia": 169,
+   "fcMax": 177,
+   "cadencia": 161,
+   "vo2max": 46.0,
+   "teAerobico": 3.4,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-02-05",
+   "activityId": 21778215585,
+   "distanciaKm": 5.11,
+   "paceMedio": "7:38",
+   "paceSeg": 458,
+   "fcMedia": 146,
+   "fcMax": 167,
+   "cadencia": 119,
+   "vo2max": 46.0,
+   "teAerobico": 3.2,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-02-23",
+   "activityId": 21963525283,
+   "distanciaKm": 3.81,
+   "paceMedio": "7:30",
+   "paceSeg": 450,
+   "fcMedia": 145,
+   "fcMax": 155,
+   "cadencia": 148,
+   "vo2max": 47.0,
+   "teAerobico": 2.7,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-02-25",
+   "activityId": 21986369564,
+   "distanciaKm": 3.51,
+   "paceMedio": "6:55",
+   "paceSeg": 415,
+   "fcMedia": 151,
+   "fcMax": 170,
+   "cadencia": 156,
+   "vo2max": 47.0,
+   "teAerobico": 3.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-02-26",
+   "activityId": 21998357097,
+   "distanciaKm": 5.04,
+   "paceMedio": "7:01",
+   "paceSeg": 421,
+   "fcMedia": 146,
+   "fcMax": 167,
+   "cadencia": 101,
+   "vo2max": 47.0,
+   "teAerobico": 3.4,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-01",
+   "activityId": 22023322651,
+   "distanciaKm": 10.13,
+   "paceMedio": "6:42",
+   "paceSeg": 402,
+   "fcMedia": 161,
+   "fcMax": 174,
+   "cadencia": 162,
+   "vo2max": 45.0,
+   "teAerobico": 4.2,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-05",
+   "activityId": 22076459461,
+   "distanciaKm": 7.01,
+   "paceMedio": "7:45",
+   "paceSeg": 465,
+   "fcMedia": 142,
+   "fcMax": 169,
+   "cadencia": 119,
+   "vo2max": 47.0,
+   "teAerobico": 3.3,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-08",
+   "activityId": 22102636865,
+   "distanciaKm": 9.89,
+   "paceMedio": "7:01",
+   "paceSeg": 421,
+   "fcMedia": 166,
+   "fcMax": 188,
+   "cadencia": 155,
+   "vo2max": 48.0,
+   "teAerobico": 4.5,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-16",
+   "activityId": 22196480837,
+   "distanciaKm": 7.03,
+   "paceMedio": "7:37",
+   "paceSeg": 457,
+   "fcMedia": 147,
+   "fcMax": 165,
+   "cadencia": 146,
+   "vo2max": 47.0,
+   "teAerobico": 3.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-18",
+   "activityId": 22220004805,
+   "distanciaKm": 4.02,
+   "paceMedio": "6:38",
+   "paceSeg": 398,
+   "fcMedia": 156,
+   "fcMax": 171,
+   "cadencia": 164,
+   "vo2max": 46.0,
+   "teAerobico": 3.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-19",
+   "activityId": 22232763585,
+   "distanciaKm": 6.56,
+   "paceMedio": "7:56",
+   "paceSeg": 476,
+   "fcMedia": 137,
+   "fcMax": 154,
+   "cadencia": 118,
+   "vo2max": 47.0,
+   "teAerobico": 3.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-25",
+   "activityId": 22299476447,
+   "distanciaKm": 0.67,
+   "paceMedio": "9:26",
+   "paceSeg": 566,
+   "fcMedia": 118,
+   "fcMax": 152,
+   "cadencia": 80,
+   "vo2max": null,
+   "teAerobico": 1.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-26",
+   "activityId": 22311668029,
+   "distanciaKm": 5.15,
+   "paceMedio": "8:07",
+   "paceSeg": 487,
+   "fcMedia": 141,
+   "fcMax": 164,
+   "cadencia": 114,
+   "vo2max": 48.0,
+   "teAerobico": 3.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-03-29",
+   "activityId": 22337152041,
+   "distanciaKm": 10.23,
+   "paceMedio": "7:02",
+   "paceSeg": 422,
+   "fcMedia": 165,
+   "fcMax": 179,
+   "cadencia": 161,
+   "vo2max": 47.0,
+   "teAerobico": 4.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-04",
+   "activityId": 22405286046,
+   "distanciaKm": 4.03,
+   "paceMedio": "7:11",
+   "paceSeg": 431,
+   "fcMedia": 150,
+   "fcMax": 163,
+   "cadencia": 157,
+   "vo2max": 48.0,
+   "teAerobico": 2.9,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-06",
+   "activityId": 22432420084,
+   "distanciaKm": 10.03,
+   "paceMedio": "7:17",
+   "paceSeg": 437,
+   "fcMedia": 151,
+   "fcMax": 163,
+   "cadencia": 154,
+   "vo2max": 47.0,
+   "teAerobico": 3.5,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-08",
+   "activityId": 22458808060,
+   "distanciaKm": 4.03,
+   "paceMedio": "6:10",
+   "paceSeg": 370,
+   "fcMedia": 156,
+   "fcMax": 168,
+   "cadencia": 165,
+   "vo2max": 48.0,
+   "teAerobico": 3.5,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-09",
+   "activityId": 22472169024,
+   "distanciaKm": 5.54,
+   "paceMedio": "8:21",
+   "paceSeg": 501,
+   "fcMedia": 141,
+   "fcMax": 157,
+   "cadencia": 101,
+   "vo2max": 48.0,
+   "teAerobico": 3.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-15",
+   "activityId": 22533356831,
+   "distanciaKm": 12.03,
+   "paceMedio": "7:15",
+   "paceSeg": 435,
+   "fcMedia": 150,
+   "fcMax": 159,
+   "cadencia": 151,
+   "vo2max": 47.0,
+   "teAerobico": 3.6,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-16",
+   "activityId": 22553686327,
+   "distanciaKm": 4.9,
+   "paceMedio": "8:11",
+   "paceSeg": 491,
+   "fcMedia": 135,
+   "fcMax": 157,
+   "cadencia": 107,
+   "vo2max": 48.0,
+   "teAerobico": 2.7,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-21",
+   "activityId": 22608863515,
+   "distanciaKm": 10.02,
+   "paceMedio": "7:28",
+   "paceSeg": 448,
+   "fcMedia": 152,
+   "fcMax": 165,
+   "cadencia": 150,
+   "vo2max": 48.0,
+   "teAerobico": 3.4,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-04-23",
+   "activityId": 22637041811,
+   "distanciaKm": 5.88,
+   "paceMedio": "8:04",
+   "paceSeg": 484,
+   "fcMedia": 142,
+   "fcMax": 175,
+   "cadencia": 97,
+   "vo2max": 48.0,
+   "teAerobico": 3.2,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-04",
+   "activityId": 22765762971,
+   "distanciaKm": 8.03,
+   "paceMedio": "7:15",
+   "paceSeg": 435,
+   "fcMedia": 147,
+   "fcMax": 160,
+   "cadencia": 155,
+   "vo2max": 48.0,
+   "teAerobico": 3.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-05",
+   "activityId": 22779650772,
+   "distanciaKm": 7.81,
+   "paceMedio": "8:34",
+   "paceSeg": 514,
+   "fcMedia": 129,
+   "fcMax": 156,
+   "cadencia": 90,
+   "vo2max": 48.0,
+   "teAerobico": 3.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-07",
+   "activityId": 22803224814,
+   "distanciaKm": 5.69,
+   "paceMedio": "8:01",
+   "paceSeg": 481,
+   "fcMedia": 130,
+   "fcMax": 157,
+   "cadencia": 105,
+   "vo2max": 49.0,
+   "teAerobico": 2.8,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-11",
+   "activityId": 22847970779,
+   "distanciaKm": 12.02,
+   "paceMedio": "7:29",
+   "paceSeg": 449,
+   "fcMedia": 150,
+   "fcMax": 162,
+   "cadencia": 156,
+   "vo2max": 48.0,
+   "teAerobico": 3.4,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-13",
+   "activityId": 22871765684,
+   "distanciaKm": 5.03,
+   "paceMedio": "5:57",
+   "paceSeg": 357,
+   "fcMedia": 165,
+   "fcMax": 180,
+   "cadencia": 167,
+   "vo2max": 47.0,
+   "teAerobico": 3.8,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-14",
+   "activityId": 22884712123,
+   "distanciaKm": 5.44,
+   "paceMedio": "8:00",
+   "paceSeg": 480,
+   "fcMedia": 133,
+   "fcMax": 157,
+   "cadencia": 108,
+   "vo2max": 48.0,
+   "teAerobico": 2.8,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-15",
+   "activityId": 22895332757,
+   "distanciaKm": 5.64,
+   "paceMedio": "6:50",
+   "paceSeg": 410,
+   "fcMedia": 155,
+   "fcMax": 175,
+   "cadencia": 157,
+   "vo2max": 48.0,
+   "teAerobico": 3.6,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-18",
+   "activityId": 22928426928,
+   "distanciaKm": 15.03,
+   "paceMedio": "7:10",
+   "paceSeg": 430,
+   "fcMedia": 154,
+   "fcMax": 161,
+   "cadencia": 156,
+   "vo2max": 47.0,
+   "teAerobico": 3.9,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-20",
+   "activityId": 22953121415,
+   "distanciaKm": 5.04,
+   "paceMedio": "6:05",
+   "paceSeg": 365,
+   "fcMedia": 149,
+   "fcMax": 164,
+   "cadencia": 158,
+   "vo2max": 48.0,
+   "teAerobico": 3.6,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-21",
+   "activityId": 22966394793,
+   "distanciaKm": 5.48,
+   "paceMedio": "7:47",
+   "paceSeg": 467,
+   "fcMedia": 128,
+   "fcMax": 165,
+   "cadencia": 100,
+   "vo2max": 48.0,
+   "teAerobico": 2.5,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-24",
+   "activityId": 22994193152,
+   "distanciaKm": 10.07,
+   "paceMedio": "6:13",
+   "paceSeg": 373,
+   "fcMedia": 164,
+   "fcMax": 182,
+   "cadencia": 156,
+   "vo2max": 48.0,
+   "teAerobico": 5.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-26",
+   "activityId": 23024690287,
+   "distanciaKm": 7.03,
+   "paceMedio": "6:56",
+   "paceSeg": 416,
+   "fcMedia": 142,
+   "fcMax": 151,
+   "cadencia": 158,
+   "vo2max": 48.0,
+   "teAerobico": 3.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-28",
+   "activityId": 23050531187,
+   "distanciaKm": 5.55,
+   "paceMedio": "8:51",
+   "paceSeg": 531,
+   "fcMedia": 136,
+   "fcMax": 161,
+   "cadencia": 99,
+   "vo2max": 48.0,
+   "teAerobico": 2.7,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-05-31",
+   "activityId": 23079093149,
+   "distanciaKm": 5.11,
+   "paceMedio": "9:33",
+   "paceSeg": 573,
+   "fcMedia": 134,
+   "fcMax": 157,
+   "cadencia": 118,
+   "vo2max": 48.0,
+   "teAerobico": 2.1,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-01",
+   "activityId": 23096612524,
+   "distanciaKm": 18.28,
+   "paceMedio": "7:06",
+   "paceSeg": 426,
+   "fcMedia": 153,
+   "fcMax": 163,
+   "cadencia": 159,
+   "vo2max": 47.0,
+   "teAerobico": 4.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-02",
+   "activityId": 23110215453,
+   "distanciaKm": 4.86,
+   "paceMedio": "8:05",
+   "paceSeg": 485,
+   "fcMedia": 139,
+   "fcMax": 172,
+   "cadencia": 95,
+   "vo2max": 47.0,
+   "teAerobico": 2.7,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-08",
+   "activityId": 23180406250,
+   "distanciaKm": 15.03,
+   "paceMedio": "6:51",
+   "paceSeg": 411,
+   "fcMedia": 145,
+   "fcMax": 153,
+   "cadencia": 159,
+   "vo2max": 46.0,
+   "teAerobico": 3.7,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-11",
+   "activityId": 23217801792,
+   "distanciaKm": 4.76,
+   "paceMedio": "8:02",
+   "paceSeg": 482,
+   "fcMedia": 134,
+   "fcMax": 167,
+   "cadencia": 90,
+   "vo2max": 46.0,
+   "teAerobico": 2.8,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-15",
+   "activityId": 23262677665,
+   "distanciaKm": 10.02,
+   "paceMedio": "6:50",
+   "paceSeg": 410,
+   "fcMedia": 148,
+   "fcMax": 157,
+   "cadencia": 156,
+   "vo2max": 46.0,
+   "teAerobico": 3.6,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-22",
+   "activityId": 23344586313,
+   "distanciaKm": 5.02,
+   "paceMedio": "7:11",
+   "paceSeg": 431,
+   "fcMedia": 142,
+   "fcMax": 149,
+   "cadencia": 153,
+   "vo2max": 46.0,
+   "teAerobico": 2.8,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-25",
+   "activityId": 23380933083,
+   "distanciaKm": 6.36,
+   "paceMedio": "8:24",
+   "paceSeg": 504,
+   "fcMedia": 140,
+   "fcMax": 175,
+   "cadencia": 94,
+   "vo2max": 47.0,
+   "teAerobico": 3.2,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-06-28",
+   "activityId": 23407363227,
+   "distanciaKm": 21.39,
+   "paceMedio": "6:58",
+   "paceSeg": 418,
+   "fcMedia": 169,
+   "fcMax": 188,
+   "cadencia": 158,
+   "vo2max": 46.0,
+   "teAerobico": 5.0,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-07-02",
+   "activityId": 23459764700,
+   "distanciaKm": 6.02,
+   "paceMedio": "8:02",
+   "paceSeg": 482,
+   "fcMedia": 127,
+   "fcMax": 163,
+   "cadencia": 93,
+   "vo2max": 48.0,
+   "teAerobico": 2.8,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-07-05",
+   "activityId": 23487128352,
+   "distanciaKm": 4.86,
+   "paceMedio": "6:31",
+   "paceSeg": 391,
+   "fcMedia": 158,
+   "fcMax": 172,
+   "cadencia": 161,
+   "vo2max": 48.0,
+   "teAerobico": 3.8,
+   "tipoPlano": "prova"
+  }
+ ],
+ "tendencias": {
+  "paceZ2Serie": [
+   {
+    "date": "2026-01-14",
+    "seg": 434
+   },
+   {
+    "date": "2026-01-15",
+    "seg": 446
+   },
+   {
+    "date": "2026-01-19",
+    "seg": 442
+   },
+   {
+    "date": "2026-01-26",
+    "seg": 446
+   },
+   {
+    "date": "2026-02-02",
+    "seg": 443
+   },
+   {
+    "date": "2026-02-05",
+    "seg": 458
+   },
+   {
+    "date": "2026-02-23",
+    "seg": 450
+   },
+   {
+    "date": "2026-02-25",
+    "seg": 415
+   },
+   {
+    "date": "2026-02-26",
+    "seg": 421
+   },
+   {
+    "date": "2026-03-05",
+    "seg": 465
+   },
+   {
+    "date": "2026-03-16",
+    "seg": 457
+   },
+   {
+    "date": "2026-03-19",
+    "seg": 476
+   },
+   {
+    "date": "2026-03-26",
+    "seg": 487
+   },
+   {
+    "date": "2026-04-04",
+    "seg": 431
+   },
+   {
+    "date": "2026-04-06",
+    "seg": 437
+   },
+   {
+    "date": "2026-04-09",
+    "seg": 501
+   },
+   {
+    "date": "2026-04-15",
+    "seg": 435
+   },
+   {
+    "date": "2026-04-16",
+    "seg": 491
+   },
+   {
+    "date": "2026-04-21",
+    "seg": 448
+   },
+   {
+    "date": "2026-04-23",
+    "seg": 484
+   },
+   {
+    "date": "2026-05-04",
+    "seg": 435
+   },
+   {
+    "date": "2026-05-05",
+    "seg": 514
+   },
+   {
+    "date": "2026-05-07",
+    "seg": 481
+   },
+   {
+    "date": "2026-05-11",
+    "seg": 449
+   },
+   {
+    "date": "2026-05-14",
+    "seg": 480
+   },
+   {
+    "date": "2026-05-20",
+    "seg": 365
+   },
+   {
+    "date": "2026-05-21",
+    "seg": 467
+   },
+   {
+    "date": "2026-05-26",
+    "seg": 416
+   },
+   {
+    "date": "2026-05-28",
+    "seg": 531
+   },
+   {
+    "date": "2026-05-31",
+    "seg": 573
+   },
+   {
+    "date": "2026-06-02",
+    "seg": 485
+   },
+   {
+    "date": "2026-06-08",
+    "seg": 411
+   },
+   {
+    "date": "2026-06-11",
+    "seg": 482
+   },
+   {
+    "date": "2026-06-15",
+    "seg": 410
+   },
+   {
+    "date": "2026-06-22",
+    "seg": 431
+   },
+   {
+    "date": "2026-06-25",
+    "seg": 504
+   },
+   {
+    "date": "2026-07-02",
+    "seg": 482
+   }
+  ],
+  "paceZ2Atual": "7:52",
+  "paceZ2Ha8Sem": "8:01",
+  "vo2max": {
+   "atual": 48.0,
+   "ha8Sem": 47.0
+  },
+  "cadencia4Sem": 129,
+  "kmPorSemana4Sem": 14.6
  }
 }
