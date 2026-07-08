@@ -1,4 +1,10 @@
-# Pampulha — contexto completo para manutenção e novas funcionalidades
+# Rotina — contexto completo para manutenção e novas funcionalidades
+
+> **Nome**: o app se chama **Rotina** desde a v7.1 (antes "Pampulha" — renomeado porque o nome
+> não expressava o que o app faz; "Pampulha" agora se refere só à prova). Os identificadores
+> internos continuam `pampulha` de propósito (localStorage `pampulha.v1`, `app: 'pampulha'` no
+> export JSON, `.card-pampulha`, sentinela do history) — NÃO renomeie: a chave do storage
+> carrega todos os dados do usuário.
 
 > Leia este arquivo INTEIRO antes de mexer em qualquer coisa. Ele existe porque o app foi
 > construído em várias iterações com decisões de design deliberadas — várias coisas que

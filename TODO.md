@@ -62,6 +62,12 @@
 - ✅ Ajustes: campo do PAT + status do pipeline; sw.js network-first para /data/.
 - Riscos documentados no CLAUDE.md (garth deprecado, token ~1 ano com runbook, quota Gemini).
 
+# Feito na v7.1 (jul/2026) — rename + polish
+
+- ✅ Hero da refeição: "✓ Feita" agora ocupa a largura toda e "substituições / pulei" virou linha discreta embaixo (feedback: lado a lado ficava feio).
+
+- ✅ App renomeado **Pampulha → Rotina** (feedback: "Pampulha não expressa o que o app faz"). Mudou só o nome voltado ao usuário: manifest (name/short_name), `<title>`, rodapé de Ajustes, nome do arquivo de backup. Menções à Volta da Pampulha (prova) ficam. Identificadores internos NÃO mudam: localStorage `pampulha.v1`, `app: 'pampulha'` no export, classe `.card-pampulha`, sentinela do history — renomear a chave do storage arriscaria os dados do usuário sem ganho.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

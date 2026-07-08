@@ -1,5 +1,5 @@
-// Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.0'; // manter em sincronia com VERSAO do sw.js
+// Rotina — painel de execução do Protocolo de Hábitos
+const VERSAO_APP = '7.1'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -2021,7 +2021,7 @@ function renderAjustes(root) {
     <p style="font-size:.7rem;color:var(--muted);margin-top:8px" id="storage-status"></p></div>`);
   cardBk.querySelector('#exp').onclick = async () => {
     const json = S.exportJSON();
-    const nome = `pampulha-backup-${hojeKey()}.json`;
+    const nome = `rotina-backup-${hojeKey()}.json`;
     const file = new File([json], nome, { type: 'application/json' });
     try {
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -2120,7 +2120,7 @@ function renderAjustes(root) {
   };
   root.append(cardUpd);
 
-  root.append(el(`<div class="rodape-nota">Pampulha v${VERSAO_APP} · executa o Protocolo de Hábitos + Plano Nutricional (jul/2026).<br>
+  root.append(el(`<div class="rodape-nota">Rotina v${VERSAO_APP} · executa o Protocolo de Hábitos + Plano Nutricional (jul/2026).<br>
     Meta é tendência, não perfeição. Nunca duas vezes seguidas.</div>`));
 }
 
