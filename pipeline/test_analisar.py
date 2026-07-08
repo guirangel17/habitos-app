@@ -2,6 +2,7 @@
 """Testes das funções puras do pipeline (sem rede): python3 pipeline/test_analisar.py"""
 import unittest
 
+from clima import extrair_janelas
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, corrida_do_dia,
     deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg, proxima_corrida,
@@ -83,6 +84,34 @@ class TestPuras(unittest.TestCase):
         self.assertEqual(tipo_atividade({"typeKey": "running"}), "running")  # forma achatada
         self.assertNotIn(tipo_atividade({"activityType": {"typeKey": "cycling"}}), TIPOS_CORRIDA)
         self.assertIsNone(tipo_atividade({}))
+
+    def test_extrair_janelas_clima(self):
+        horas = [f"2026-07-08T{h:02d}:00" for h in range(24)] + [f"2026-07-09T{h:02d}:00" for h in range(24)]
+        hourly = {
+            "time": horas,
+            "temperature_2m": [15 + i * 0.5 for i in range(48)],
+            "precipitation_probability": list(range(48)),
+            "relative_humidity_2m": [60] * 48,
+        }
+        j = extrair_janelas(hourly, "2026-07-08")
+        self.assertEqual([p["quando"] for p in j],
+                         ["2026-07-08T06:00", "2026-07-08T19:00", "2026-07-09T06:00", "2026-07-09T19:00"])
+        self.assertEqual(j[0], {"quando": "2026-07-08T06:00", "temp": 18, "chuvaPct": 6, "umidade": 60})
+        self.assertEqual(j[2]["temp"], 30)  # índice 30 → 15 + 15
+        self.assertEqual(extrair_janelas({}, "2026-07-08"), [])
+
+    def test_projecao_18k(self):
+        corridas = [
+            {"date": "2026-05-13", "paceSeg": 360, "fcMedia": 165, "distanciaKm": 5.0},  # melhor esforço
+            {"date": "2026-06-20", "paceSeg": 415, "fcMedia": 147, "distanciaKm": 12},   # Z2, não conta
+        ]
+        p = calcular_tendencias(corridas, "2026-07-08")["projecao18k"]
+        self.assertEqual(p["base"], {"date": "2026-05-13", "km": 5.0, "pace": "6:00"})
+        self.assertEqual(p["otimista"], {"tempo": "1h57", "pace": "6:29"})
+        self.assertEqual(p["conservador"], {"tempo": "2h03", "pace": "6:49"})
+        # esforço com mais de 12 semanas não serve de base → sem projeção
+        velho = [{"date": "2026-03-01", "paceSeg": 360, "fcMedia": 165, "distanciaKm": 5.0}]
+        self.assertIsNone(calcular_tendencias(velho, "2026-07-08")["projecao18k"])
 
     def test_deriva_cardiaca(self):
         # 10 km a 6:00/km: 1ª metade FC 145, 2ª metade FC 152 no mesmo pace →

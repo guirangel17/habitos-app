@@ -186,7 +186,10 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .linha-streaks .seta { margin-left: auto; color: var(--muted); }
 
 /* linha do treino de hoje (dashboard v6) */
-.linha-treino { gap: 10px; }
+.linha-treino { gap: 10px; flex-wrap: wrap; }
+.linha-treino .lt-itens { flex: 1; }
+.linha-treino .tr-ver { order: 2; }
+.linha-treino .lt-clima { order: 3; }
 .linha-treino .lt-itens { display: flex; flex-wrap: wrap; gap: 6px 16px; flex: 1; align-items: center; }
 .lt-check { display: inline-flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--ink-2); padding: 4px 0; }
 .lt-check .caixa {
@@ -398,6 +401,13 @@ main { padding: 0 14px; display: grid; gap: 12px; }
   font-size: 0.78rem; color: var(--ink-2); line-height: 1.4;
 }
 .escudo-sos b { color: var(--warning); }
+
+/* slot do checkpoint: mesma anatomia do card-revisao, com a cor do dado protagonista */
+.card-checkpoint { border-color: var(--serie-1); background: var(--serie-1-wash); }
+
+/* previsão do tempo na linha do treino */
+.lt-clima { flex-basis: 100%; font-size: 0.72rem; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+.lt-clima b { color: var(--ink-2); }
 
 /* ---------- contadores estilo SugarCut ---------- */
 .aneis { display: grid; gap: 22px; padding: 12px 0; }

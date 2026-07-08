@@ -1,0 +1,23 @@
+{
+ "atualizadoEm": "2026-07-08T13:50:58-03:00",
+ "janelas": [
+  {
+   "quando": "2026-07-08T19:00",
+   "temp": 23,
+   "chuvaPct": 10,
+   "umidade": 55
+  },
+  {
+   "quando": "2026-07-09T06:00",
+   "temp": 17,
+   "chuvaPct": 0,
+   "umidade": 70
+  },
+  {
+   "quando": "2026-07-09T19:00",
+   "temp": 29,
+   "chuvaPct": 60,
+   "umidade": 45
+  }
+ ]
+}

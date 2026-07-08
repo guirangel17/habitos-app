@@ -1,10 +1,10 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.2'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.3'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
   FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
-  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_TREINOS, GYM_FASE_POR_MES, CORRIDA_GUIA,
+  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_TREINOS, GYM_FASE_POR_MES, CORRIDA_GUIA, CHECKPOINTS,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -272,6 +272,14 @@ function renderHoje(root) {
   } else {
     itens.append(el('<span style="color:var(--muted)">😴 Descanso — o treino de hoje é dormir 7–8h</span>'));
   }
+  // previsão da próxima janela de treino (pipeline → data/clima.json); só em dia com corrida
+  const cli = planoT.corrida ? climaProximaJanela(key) : null;
+  if (cli) {
+    const quente = cli.temp >= 28;
+    const chuva = (cli.chuvaPct ?? 0) >= 50;
+    const dica = quente ? ' — calor infla a FC; o pace é consequência' : chuva ? ' — se chover, esteira ou remarca sem culpa' : '';
+    linhaT.append(el(`<small class="lt-clima">${quente ? '🥵' : chuva ? '🌧' : '🌤'} <b class="num">${cli.temp}°C</b> às ${esc(cli.rotulo)}${cli.chuvaPct != null ? ` · chuva ${cli.chuvaPct}%` : ''}${dica}</small>`));
+  }
   linhaT.querySelector('.tr-ver').onclick = () => { diaTreinoSel = null; abaAtiva = 'treino'; render(); };
   root.append(linhaT);
 
@@ -384,6 +392,26 @@ function slotContextual(st, key) {
       </div></div>`);
     c.querySelector('#fechar').onclick = () => S.addEvent({ type: 'night_out', date: ontem, drinks: ctOntem.drinks });
     c.querySelector('#editar').onclick = () => sheetNoite(ontem, ctOntem.drinks);
+    return [c];
+  }
+
+  // 2c. checkpoint do plano — o treino que recalibra os paces: véspera (≥17h) e o dia.
+  // Vem antes da revisão de propósito: a véspera cai sempre em terça, mesmo dia em que a
+  // revisão pendente ainda mora no slot — e o checkpoint tem hora marcada.
+  const cpHoje = CHECKPOINTS.find((c) => c.date === key);
+  if (cpHoje && D.workoutsDoDia(st.events, key).corrida === undefined) {
+    const c = el(`<button class="card card-revisao card-checkpoint">
+      <span><b>🎯 Hoje: ${esc(cpHoje.titulo)}</b><br><small>O dia que define ${esc(cpHoje.define)}. Como executar — 2 min de leitura</small></span>
+      <span class="seta">→</span></button>`);
+    c.onclick = () => sheetCheckpoint(cpHoje);
+    return [c];
+  }
+  const cpAmanha = CHECKPOINTS.find((c) => c.date === D.addDays(key, 1));
+  if (cpAmanha && horaAgora >= 17) {
+    const c = el(`<button class="card card-revisao card-checkpoint">
+      <span><b>📌 Amanhã: ${esc(cpAmanha.titulo)}</b><br><small>${esc(cpAmanha.vespera)}</small></span>
+      <span class="seta">→</span></button>`);
+    c.onclick = () => sheetCheckpoint(cpAmanha);
     return [c];
   }
 
@@ -835,6 +863,18 @@ function iniciarOnda(corpo) {
 const REPO_API = 'https://api.github.com/repos/guirangel17/habitos-app';
 let dadosAnalises = null;   // { doc, porData: {date: [entradas]} }
 let dadosHistorico = null;
+let dadosClima = null;      // { atualizadoEm, janelas: [{quando, temp, chuvaPct, umidade}] }
+
+// próxima janela de treino com previsão (6h/19h) a partir de agora; null sem dado fresco
+function climaProximaJanela(key) {
+  const j = dadosClima?.janelas || [];
+  const agoraIso = `${key}T${String(agora().getHours()).padStart(2, '0')}:00`;
+  const p = j.find((x) => x.quando >= agoraIso);
+  if (!p) return null;
+  const [d, h] = p.quando.split('T');
+  const rotulo = `${d === key ? '' : 'amanhã '}${parseInt(h, 10)}h`;
+  return { ...p, rotulo };
+}
 let analisesCarregando = null; // promise em voo do fetch, ou null
 let analisesTentou = false;
 let analiseAguardando = false; // polling pós-disparo em andamento
@@ -865,9 +905,10 @@ function carregarAnalises(force = false) {
   if ((dadosAnalises || analisesTentou) && !force) return Promise.resolve();
   analisesCarregando = (async () => {
     const antes = dadosAnalises?.doc?.atualizadoEm ?? null;
-    const [an, hist] = await Promise.all([fetchDados('analises.json'), fetchDados('historico.json')]);
+    const [an, hist, cli] = await Promise.all([fetchDados('analises.json'), fetchDados('historico.json'), fetchDados('clima.json')]);
     analisesTentou = true;
     if (hist) dadosHistorico = hist;
+    if (cli) dadosClima = cli;
     if (an) {
       const porData = {};
       for (const x of an.analises || []) (porData[x.date] = porData[x.date] || []).push(x);
@@ -939,6 +980,17 @@ function analisePendenteConfirmacao(st, key) {
     return { date, analise: lista[0] };
   }
   return null;
+}
+
+// guia de execução do checkpoint — ensina a distribuir o esforço (o teste se perde no km 1)
+function sheetCheckpoint(cp) {
+  const box = el(`<div><h3>🎯 ${esc(cp.titulo)}</h3>
+    <p class="detalhe-fase">${esc(cp.porque)}</p>
+    <div class="exercicios">${cp.passos.map(([ic, t, d]) => `
+      <div class="exercicio"><span class="ex-num">${ic}</span><span class="ex-nome">${esc(t)}<small>${esc(d)}</small></span></div>`).join('')}</div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:12px;line-height:1.45">Terminou? A análise chega sozinha no app (✨ no cronograma) e ${esc(cp.define)} se recalibram a partir do resultado — inclusive a projeção da Pampulha na Evolução.</p>
+  </div>`);
+  abrirSheet(box);
 }
 
 const ROTULO_TE = {
@@ -1186,6 +1238,13 @@ function sheetTreinoDetalhe(kind, plano, key) {
         <div class="exercicio"><span class="ex-num">🗣</span><span class="ex-nome">Sensação<small>${esc(g.sensacao || '—')}</small></span></div>
         ${g.extra ? `<div class="exercicio"><span class="ex-num">☝️</span><span class="ex-nome">Execução<small>${esc(g.extra)}</small></span></div>` : ''}
       </div></div>`);
+    // checkpoint do plano: o sheet do dia ganha o guia de execução completo
+    const cp = CHECKPOINTS.find((x) => x.date === key);
+    if (cp) {
+      const b = el('<button class="acao-primaria" style="margin-top:12px">🎯 Plano do checkpoint — como executar ›</button>');
+      b.onclick = () => sheetCheckpoint(cp);
+      box.append(b);
+    }
     // análise da corrida executada (pipeline Garmin → IA), quando existir para o dia
     for (const a of analisesDoDia(key)) box.append(blocoAnalise(a));
   }
@@ -1663,6 +1722,19 @@ function renderEvolucao(root) {
         </div>
       </div>`));
     }
+
+    // projeção da prova: Riegel do melhor esforço recente — recalibra sozinha a cada teste
+    if (tend.projecao18k) {
+      const pj = tend.projecao18k;
+      const proxCp = CHECKPOINTS.find((c) => c.date > key);
+      root.append(el(`<div class="card"><h2>Projeção Pampulha 18k <small>· se a prova fosse hoje</small></h2>
+        <div class="tiles" style="margin-bottom:10px">
+          <div class="tile"><div class="l">Faixa de chegada</div><div class="v num">${pj.otimista.tempo}–${pj.conservador.tempo}</div></div>
+          <div class="tile"><div class="l">Pace</div><div class="v num">${pj.otimista.pace}–${pj.conservador.pace}<small> /km</small></div></div>
+        </div>
+        <p style="font-size:.75rem;color:var(--muted);line-height:1.5">Fórmula de Riegel sobre seu melhor esforço recente (${String(pj.base.km).replace('.', ',')} km a ${pj.base.pace}/km em ${fmtData(pj.base.date)}). Meta A: 1h52–1h55 (6:15–6:25). A faixa recalibra sozinha a cada teste${proxCp ? ` — o próximo (🎯 ${fmtData(proxCp.date)}) deixa ela mais precisa` : ''}.</p>
+      </div>`));
+    }
   }
 
   // métricas semanais do §4 moraram aqui até a v5 — hoje vivem na aba Dieta ("Semana")
@@ -1849,6 +1921,13 @@ function fmtData(key) {
 
 // gráfico do pace em Z2 (serie = [{date, seg}]): pontos crus esmaecidos + média móvel 7d;
 // eixo Y em m:ss/km (menor = mais rápido — linha descendo é evolução)
+// linhas verticais dos checkpoints do plano (quando caem no domínio do gráfico)
+function marcasCheckpoint(x, d0, d1, padT, yFim) {
+  return CHECKPOINTS.filter((c) => c.date > d0 && c.date <= d1)
+    .map((c) => `<line x1="${x(c.date).toFixed(1)}" x2="${x(c.date).toFixed(1)}" y1="${padT}" y2="${yFim}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="3 4"/>
+      <text x="${x(c.date).toFixed(1)}" y="${padT - 3}" text-anchor="middle" font-size="8" fill="var(--muted)">🎯 ${fmtData(c.date)}</text>`).join('');
+}
+
 function graficoPaceZ2(serie, hojeKey) {
   const pontos = serie.map((p) => ({ date: p.date, valor: p.seg }));
   const mm = D.mediaMovel7(pontos);
@@ -1876,7 +1955,7 @@ function graficoPaceZ2(serie, hojeKey) {
   const eixoX = `<text x="${padL}" y="${h - 6}" font-size="9" fill="var(--muted)">${fmtData(d0)}</text>
     <text x="${w - padR}" y="${h - 6}" font-size="9" fill="var(--muted)" text-anchor="end">${fmtData(d1)}</text>`;
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:300px">
-    ${grid}${dots}
+    ${grid}${marcasCheckpoint(x, d0, d1, padT, h - padB)}${dots}
     <path d="${path}" fill="none" stroke="var(--serie-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     ${rotuloFim}${eixoX}
   </svg>`;
@@ -1908,7 +1987,7 @@ function graficoEF(serie, hojeKey) {
   const eixoX = `<text x="${padL}" y="${h - 6}" font-size="9" fill="var(--muted)">${fmtData(d0)}</text>
     <text x="${w - padR}" y="${h - 6}" font-size="9" fill="var(--muted)" text-anchor="end">${fmtData(d1)}</text>`;
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:300px">
-    ${grid}${dots}
+    ${grid}${marcasCheckpoint(x, d0, d1, padT, h - padB)}${dots}
     <path d="${path}" fill="none" stroke="var(--serie-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     ${rotuloFim}${eixoX}
   </svg>`;
@@ -1939,6 +2018,30 @@ function graficoVolume(kmSemanas) {
   const eixoX = `<text x="${padL}" y="${h - 6}" font-size="9" fill="var(--muted)">${fmtData(kmSemanas[0].semana)}</text>
     <text x="${w - padR}" y="${h - 6}" font-size="9" fill="var(--muted)" text-anchor="end">semana atual</text>`;
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:300px">${grid}${barras}${eixoX}</svg>`;
+}
+
+// resumo do mês vigente em texto compartilhável — só evidência, nada de decoração
+function textoResumoMensal(st, key) {
+  const ini = key.slice(0, 8) + '01';
+  const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  const r = D.resumoPeriodo(st.events, ini, key);
+  const bl = st.settings.baseline || {};
+  const v = (x, casas = 1) => x.toFixed(casas).replace('.', ',');
+  const linhas = [`📊 Rotina — ${MESES[+key.slice(5, 7) - 1]} (até ${fmtData(key)})`];
+  if (r.diasObs) linhas.push(`🍽 Adesão: ${Math.round(r.adesao * 100)}% (${Math.round(r.adesao * r.diasObs * 5)}/${r.diasObs * 5} refeições)`);
+  linhas.push(`🛵 iFood: ${r.delivery}${bl.delivery ? ` (baseline era ${bl.delivery}/sem)` : ''} · 🍫 doces: ${r.sweet}`);
+  if (r.saidas) linhas.push(`🍻 Saídas: ${r.saidas} · média ${v(r.drinksMedia)} drinks (meta ≤ 3)`);
+  if (r.treinoPlan) linhas.push(`💪 Treinos: ${r.treinoFeito}/${r.treinoPlan}`);
+  const corr = (dadosHistorico?.corridas || []).filter((c) => c.date >= ini && c.date <= key);
+  if (corr.length) {
+    const km = corr.reduce((s, c) => s + (c.distanciaKm || 0), 0);
+    linhas.push(`🏃 Corridas: ${corr.length} · ${v(km)} km · maior: ${v(Math.max(...corr.map((c) => c.distanciaKm || 0)))} km`);
+  }
+  const t = dadosHistorico?.tendencias;
+  if (t?.efAtual && t?.efHa8Sem) linhas.push(`⚡ Eficiência aeróbica: ${v(t.efAtual, 2)} m/bat (há 8 sem: ${v(t.efHa8Sem, 2)})`);
+  if (r.pesoDelta !== null) linhas.push(`⚖️ Peso: ${r.pesoDelta > 0 ? '+' : ''}${v(r.pesoDelta)} kg no mês (média 7d)`);
+  linhas.push(`🏁 Volta da Pampulha: faltam ${D.semanasAteProva(key)} semanas`);
+  return linhas.join('\n');
 }
 
 // ================================================================
@@ -2056,6 +2159,15 @@ function renderRelatorio(root) {
       <p style="font-size:.75rem;color:var(--ink-2);margin-top:8px">${letras[pior]} é o seu dia mais vulnerável — vale pré-decidir o jantar desse dia no domingo (1B).</p>
     </div>`));
   }
+
+  // resumo do mês em texto — pro "me cobra!" funcionar também no macro
+  const share = el('<button class="acao-primaria" style="margin-top:4px">📤 Compartilhar resumo do mês</button>');
+  share.onclick = async () => {
+    const texto = textoResumoMensal(st, key);
+    if (navigator.share) { try { await navigator.share({ text: texto }); } catch { /* cancelado */ } }
+    else { await navigator.clipboard.writeText(texto); snackbar('Resumo copiado 📋'); }
+  };
+  root.append(share);
 
   // totais desde o início
   const tudo = D.resumoPeriodo(st.events, inicio, key);
@@ -2350,6 +2462,10 @@ if (params.get('contrato') && !D.contratoAtivo(S.getState().events, hojeKey(), a
 }
 if (params.get('posalmoco')) { // dev: estado "acabei de almoçar" pro escudo pós-almoço
   ['cafe', 'lanche1', 'almoco'].forEach((m) => S.addEvent({ type: 'meal', date: hojeKey(), meal: m, status: 'ok' }));
+}
+if (params.get('checkpoint')) { // dev: abre o guia do próximo checkpoint
+  const cp = CHECKPOINTS.find((c) => c.date >= hojeKey()) || CHECKPOINTS[CHECKPOINTS.length - 1];
+  sheetCheckpoint(cp);
 }
 
 // service worker + atualização

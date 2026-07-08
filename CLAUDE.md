@@ -97,8 +97,9 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
    linhas de altura única (fresh start de segunda, treino de hoje, anel do marco, peso matinal)
    + slot contextual. **Esse layout é o teto — nenhuma funcionalidade nova ganha card ou linha
    permanente na Hoje**; tudo condicional disputa o *slot contextual único* (prioridade:
-   ressaca > contrato > fechar contrato de ontem > revisão pendente > corrida do Garmin a
-   confirmar), no máximo 1 visível por vez. A trilha das 5 refeições e o cardápio moram na aba
+   ressaca > contrato > fechar contrato de ontem > checkpoint do plano (véspera ≥17h/dia —
+   antes da revisão de propósito: a véspera cai sempre em terça, onde a revisão pendente ainda
+   mora) > revisão pendente > corrida do Garmin a confirmar), no máximo 1 visível por vez. A trilha das 5 refeições e o cardápio moram na aba
    Dieta.
 3. **Sem gestos escondidos.** O usuário reclamou de toque longo — toda ação secundária tem
    affordance visível (botão `›`, sheet). Toque simples = ação primária óbvia.
@@ -188,6 +189,10 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   um PAT fine-grained (repo habitos-app, Actions RW + Contents R) salvo em `settings.garminPat`
   (SÓ no aparelho, nunca commitado). Sem PAT, tudo degrada pros crons + fetch via Pages.
 - **Pegadinha**: `sw.js` faz network-first para `/data/` (cache-first congelaria as análises).
+- **v7.3**: `tendencias.projecao18k` = Riegel (k 1.06–1.10) do melhor esforço de prova das
+  últimas 12 semanas (limpa, ≥4 km, FC média ≥155) — recalibra sozinha quando teste/prova nova
+  chega; `pipeline/clima.py` (open-meteo BH, sem chave) grava `data/clima.json` com as janelas
+  6h/19h de hoje+amanhã no mesmo workflow — o app mostra a PRÓXIMA janela na linha do treino.
 - Confirmação de treino feito é SEMPRE 1 toque (slot contextual, prioridade mais baixa) — nunca
   automática. Dispensa fica em `settings.garminDispensado_{date}`.
 
@@ -206,7 +211,8 @@ lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto 
 `?tema=dark|light`, `?sos=ifood|doce&passo=N`, `?ressaca=1`, `?wizard=revisao`, `?contadores=1`,
 `?contrato=1`, `?detalhe=gym|corrida`, `?dia=YYYY-MM-DD` (dia selecionado na semana do Treino),
 `?posalmoco=1` (registra café/lanche1/almoço agora → escudo pós-almoço no hero; use `hoje` = data
-REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo).
+REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo),
+`?checkpoint=1` (abre o guia do próximo checkpoint — CHECKPOINTS em data.js).
 
 **Screenshots headless** (o Chrome clampa janela em ~500px; o truque é scale factor 2):
 ```bash

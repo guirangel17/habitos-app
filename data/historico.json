@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-08T13:31:52-03:00",
+ "atualizadoEm": "2026-07-08T13:50:58-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1152,6 +1152,21 @@
     "km": 6.02,
     "date": "2026-07-02"
    }
-  ]
+  ],
+  "projecao18k": {
+   "base": {
+    "date": "2026-05-13",
+    "km": 5.03,
+    "pace": "5:57"
+   },
+   "otimista": {
+    "tempo": "1h56",
+    "pace": "6:25"
+   },
+   "conservador": {
+    "tempo": "2h02",
+    "pace": "6:46"
+   }
+  }
  }
 }

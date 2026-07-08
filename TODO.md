@@ -77,6 +77,13 @@
 - ✅ Barra de zonas de FC: cores por matiz (`--zona-1..5`: cinza→azul→aqua→âmbar→laranja; Z2 = azul protagonista de propósito) e legenda com chips e espaço — era tudo azul e apertado.
 - ✅ **Escudo pós-almoço**: 90 min após registrar o almoço, o hero ganha borda âmbar + botão de 1 toque pro SOS doce (mesmo botão aparece no escudo das 15h). Dev: `?posalmoco=1`.
 
+# Feito na v7.3 (jul/2026) — checkpoint, projeção, clima e resumo
+
+- ✅ **Checkpoint como evento especial** (`CHECKPOINTS` em data.js: TESTE 29/07 + Tempo Run 23/09): slot contextual na véspera ≥17h (acima da revisão — a véspera cai sempre em terça) e no dia; sheet de ensino com a distribuição do esforço ("o teste se perde no km 1"); botão do guia no sheet do treino do dia; linha tracejada 🎯 nos gráficos de pace Z2 e EF. Dev: `?checkpoint=1`.
+- ✅ **Projeção Pampulha 18k** (pedido dele, ciente da margem pré-teste): Riegel k=1.06–1.10 sobre o melhor esforço de prova das últimas 12 semanas (limpa, ≥4 km, FC ≥155) → faixa 1h56–2h02 hoje; recalibra sozinha a cada teste. Card fecha a seção CORRIDA.
+- ✅ **Clima das janelas de treino**: `pipeline/clima.py` (open-meteo, sem chave, janelas 6h/19h hoje+amanhã) → `data/clima.json`; linha do treino no Hoje mostra a próxima janela com dica de calor (≥28°C: "FC infla, pace é consequência") e chuva (≥50%).
+- ✅ **Resumo do mês compartilhável** no Relatório (adesão, deslizes vs baseline, treinos, corridas/km do historico, EF, peso, semanas até a prova) — navigator.share com fallback de clipboard.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

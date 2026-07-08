@@ -113,6 +113,41 @@ def pace_seg(dist_m, dur_s):
     return dur_s / (dist_m / 1000.0)
 
 
+def fmt_tempo(seg):
+    """7000 → '1h57'; 2400 → '40 min'."""
+    if not seg or seg <= 0:
+        return None
+    h, m = int(seg // 3600), round((seg % 3600) / 60)
+    if m == 60:
+        h, m = h + 1, 0
+    return f"{h}h{m:02d}" if h else f"{m} min"
+
+
+def projecao_18k(corridas, hoje):
+    """Riegel (t2 = t1·(d2/d1)^k) a partir do melhor esforço de prova das últimas 12 semanas
+    (limpa, ≥4 km, FC média ≥155). Faixa k=1.06 (otimista) a 1.10 (conservador — o salto de
+    distância é grande). Recalibra sozinha quando um teste/prova mais recente e rápido chega."""
+    corte = (datetime.strptime(hoje, "%Y-%m-%d") - timedelta(days=84)).strftime("%Y-%m-%d")
+    cands = [c for c in corridas
+             if eh_corrida_limpa(c) and c.get("paceSeg") and c["date"] >= corte
+             and (c.get("fcMedia") or 0) >= 155 and (c.get("distanciaKm") or 0) >= 4]
+    if not cands:
+        return None
+    base = min(cands, key=lambda c: c["paceSeg"])
+    t_base = base["paceSeg"] * base["distanciaKm"]
+    fator = 18 / base["distanciaKm"]
+
+    def proj(k):
+        t = t_base * fator ** k
+        return {"tempo": fmt_tempo(t), "pace": fmt_pace(t / 18)}
+
+    return {
+        "base": {"date": base["date"], "km": base["distanciaKm"], "pace": fmt_pace(base["paceSeg"])},
+        "otimista": proj(1.06),
+        "conservador": proj(1.10),
+    }
+
+
 def zonas_de_pontos(pontos):
     """pontos = [(fc, ts_ms|None), ...] → {'z1': %, ..., 'z5': %} somando 100, ou None.
     Peso de cada amostra = intervalo até a próxima (uniforme sem timestamp; buracos
@@ -310,6 +345,7 @@ def calcular_tendencias(corridas, hoje):
         "efHa8Sem": ef_media(ef_antigas[-3:]),
         "kmSemanas": km_semanas,
         "longaoMes": [longao[m] for m in sorted(longao)],
+        "projecao18k": projecao_18k(corridas, hoje),
     }
 
 

@@ -301,3 +301,35 @@ export const CORRIDA_GUIA = {
   tiros: { pace: '400 m: 5:35–5:50 · 800 m–1 km: 5:45–6:00 · 1,5 km: 5:55–6:05', fc: 'Mande pelo pace (FC atrasa no tiro); 9/10 no último', sensacao: 'Forte, mas não é sprint', extra: 'Aquecimento INEGOCIÁVEL: 15 min trote + 4 × 100 m progressivos. NUNCA fique parado entre tiros — descanso ativo (trote/caminhada). Desaquecimento 8-10 min.' },
   prova: { pace: 'Alvo 6:15–6:30 /km (Meta A: 1h52–1h55)', fc: 'Km 0–4: corra por pace, SEM olhar a FC (adrenalina infla 10-20 bpm). Do km 5 em diante: segure ≤ ~165 até o km 10, depois libere', sensacao: 'Prova de 18 km não se ganha no km 2 — se perde lá', extra: 'Gel nos km 6 e 12. Nada de novidade no dia da prova.' },
 };
+
+// Checkpoints do plano (plano-hibrido-pampulha.md, seção de paces): os dias que recalibram tudo.
+// O app trata como evento especial — slot na véspera/dia + guia de execução + marcador nos gráficos.
+export const CHECKPOINTS = [
+  {
+    date: '2026-07-29',
+    titulo: 'TESTE 5 km contrarrelógio',
+    define: 'os paces de agosto',
+    porque: 'Seu 5 km real está subestimado (o recorde 5:58/km foi submáximo, no meio do volume da meia). O teste é o árbitro final: vindo em 5:30–5:44/km, os tiros descem um degrau inteiro.',
+    passos: [
+      ['🔥', 'Aquecimento inegociável', '15 min de trote + 4 × 100 m progressivos. Contrarrelógio sem aquecer = km 1 mentiroso.'],
+      ['🐢', 'Km 1: o difícil é SEGURAR', 'Comece no 5:45–5:50, mesmo parecendo fácil — vai parecer. Teste não se ganha no km 1; se perde lá (igual à prova).'],
+      ['⚙️', 'Km 2–3: firme e constante', 'Segure o ritmo. Frases curtas impossíveis — é assim mesmo.'],
+      ['📈', 'Km 4: aperta', 'Se ainda tem perna, desce 5–10 s no pace. Se não tem, manter já é o teste certo.'],
+      ['🚀', 'Último km + 400 m finais: tudo', 'Esvazia o tanque. Bônus: o pico de FC nesses 400 m revela sua FCmax REAL — depois confira no Garmin se bate com 190 e corrija se preciso.'],
+    ],
+    vespera: 'Hoje: jantar com carbo e dormir 7–8h. E leia o plano do teste — 2 minutos que valem o mês.',
+  },
+  {
+    date: '2026-09-23',
+    titulo: 'Tempo Run 6 km — checkpoint do alvo',
+    define: 'o alvo da Pampulha',
+    porque: 'É o teste de fogo do ritmo de prova: sustentar 6:10–6:20 confortável aqui trava a Meta A (6:15–6:25) para os 18 km.',
+    passos: [
+      ['🔥', 'Aquecimento', '10 min de trote leve.'],
+      ['🎯', '6 km contínuos a 6:05–6:20', 'Logo abaixo do limiar (FC ~163–170). Só frases curtas.'],
+      ['🧠', 'A pergunta do dia', 'Está CONFORTÁVEL nesse pace? Confortável = alvo da prova travado. Sofrido = ajustamos sem drama — checkpoint existe pra isso.'],
+      ['🧊', 'Desaquecimento', '8–10 min muito leve.'],
+    ],
+    vespera: 'Hoje: jantar com carbo e sono em dia — o dado só vale se o corpo chegar inteiro.',
+  },
+];
