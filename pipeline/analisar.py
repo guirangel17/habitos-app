@@ -168,6 +168,12 @@ def resumir_splits(lap_dtos):
     return out
 
 
+def tipo_atividade(a):
+    """typeKey da atividade — na API crua vem aninhado em activityType.typeKey."""
+    t = a.get("activityType")
+    return (t.get("typeKey") if isinstance(t, dict) else t) or a.get("typeKey")
+
+
 def corrida_do_dia(date, corridas):
     """CORRIDAS é lista de [data, tipo, nome]; retorna dict ou None."""
     for d, tipo, nome in corridas:
@@ -368,7 +374,7 @@ def main():
         processados = {x["activityId"] for x in doc["analises"]}
 
         atividades = garmin_get("/activitylist-service/activities/search/activities", limit=200, start=0, activityType="running")
-        atividades = [a for a in atividades if a.get("typeKey") in TIPOS_CORRIDA]
+        atividades = [a for a in atividades if tipo_atividade(a) in TIPOS_CORRIDA]
         atividades.sort(key=lambda a: a.get("startTimeLocal") or "")
         print(f"{len(atividades)} corridas no Garmin")
 

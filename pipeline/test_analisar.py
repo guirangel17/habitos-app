@@ -3,9 +3,9 @@
 import unittest
 
 from analisar import (
-    ZONAS_FC, calcular_tendencias, compactar_atividade, corrida_do_dia, eh_corrida_z2,
-    extrair_fc_details, fmt_pace, pace_seg, proxima_corrida, resumir_splits, validar_ia,
-    zonas_de_pontos,
+    TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, corrida_do_dia,
+    eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg, proxima_corrida, resumir_splits,
+    tipo_atividade, validar_ia, zonas_de_pontos,
 )
 
 CORRIDAS = [
@@ -74,6 +74,15 @@ class TestPuras(unittest.TestCase):
         s = resumir_splits(laps)
         self.assertEqual(len(s), 2)
         self.assertEqual(s[0], {"km": 1, "pace": "6:45", "fc": 148})
+
+    def test_tipo_atividade(self):
+        # forma CRUA da API (a que o Actions recebe): typeKey aninhado em activityType —
+        # foi o bug que zerava o filtro e deixava historico/analises vazios
+        self.assertEqual(tipo_atividade({"activityType": {"typeKey": "running"}}), "running")
+        self.assertIn(tipo_atividade({"activityType": {"typeKey": "treadmill_running"}}), TIPOS_CORRIDA)
+        self.assertEqual(tipo_atividade({"typeKey": "running"}), "running")  # forma achatada
+        self.assertNotIn(tipo_atividade({"activityType": {"typeKey": "cycling"}}), TIPOS_CORRIDA)
+        self.assertIsNone(tipo_atividade({}))
 
     def test_corrida_do_dia_e_proxima(self):
         self.assertEqual(corrida_do_dia("2026-07-08", CORRIDAS)["tipo"], "leve")
