@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.3'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.3.1'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -1690,7 +1690,7 @@ function renderEvolucao(root) {
     if (tend.efSerie?.length >= 3) {
       const fmtEf = (x) => (x == null ? '–' : x.toFixed(2).replace('.', ','));
       root.append(el(`<div class="card"><h2>Eficiência aeróbica <small>· metros por batimento · corridas até Z3 · ↑ = motor melhor</small></h2>
-        <div class="tiles" style="margin-bottom:12px">
+        <div class="tiles" style="grid-template-columns:1fr 1fr;margin-bottom:12px">
           <div class="tile"><div class="l">Agora</div><div class="v num">${fmtEf(tend.efAtual)}<small> m/bat</small></div></div>
           <div class="tile"><div class="l">Há 8 semanas</div><div class="v num">${fmtEf(tend.efHa8Sem)}<small> m/bat</small></div></div>
         </div>
@@ -1728,7 +1728,7 @@ function renderEvolucao(root) {
       const pj = tend.projecao18k;
       const proxCp = CHECKPOINTS.find((c) => c.date > key);
       root.append(el(`<div class="card"><h2>Projeção Pampulha 18k <small>· se a prova fosse hoje</small></h2>
-        <div class="tiles" style="margin-bottom:10px">
+        <div class="tiles" style="grid-template-columns:1fr 1fr;margin-bottom:10px">
           <div class="tile"><div class="l">Faixa de chegada</div><div class="v num">${pj.otimista.tempo}–${pj.conservador.tempo}</div></div>
           <div class="tile"><div class="l">Pace</div><div class="v num">${pj.otimista.pace}–${pj.conservador.pace}<small> /km</small></div></div>
         </div>
