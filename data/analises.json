@@ -1,7 +1,91 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-08T11:16:07-03:00",
+ "atualizadoEm": "2026-07-08T18:45:40-03:00",
  "analises": [
+  {
+   "date": "2026-07-08",
+   "activityId": 23528695939,
+   "geradoEm": "2026-07-08T18:45:48-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Rodagem 5km leve",
+    "inicio": "2026-07-08 18:02:46",
+    "distanciaKm": 5.02,
+    "duracaoMin": 34.1,
+    "paceMedio": "6:48",
+    "fcMedia": 150,
+    "fcMax": 156,
+    "cadencia": 159,
+    "elevacaoM": 15,
+    "trainingEffect": {
+     "aerobico": 3.1,
+     "anaerobico": 0.0,
+     "label": "TEMPO",
+     "carga": null
+    },
+    "vo2max": 47.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:33",
+      "fc": 143
+     },
+     {
+      "km": 2,
+      "pace": "6:36",
+      "fc": 150
+     },
+     {
+      "km": 3,
+      "pace": "6:37",
+      "fc": 152
+     },
+     {
+      "km": 4,
+      "pace": "6:54",
+      "fc": 150
+     },
+     {
+      "km": 5,
+      "pace": "7:23",
+      "fc": 153
+     }
+    ],
+    "zonasFc": {
+     "z1": 3,
+     "z2": 69,
+     "z3": 28,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "leve",
+    "nome": "5 km leve — cadência 165+ spm",
+    "paceAlvo": "6:50–7:15 /km ou mais leve",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:56",
+    "paceZ2Ha8Sem": "7:24"
+   },
+   "ia": {
+    "resumo": "Guilherme completou uma rodagem leve de 5 km em Belo Horizonte, enfrentando uma temperatura elevada de 30°C. A corrida focou em manter o esforço leve, com a frequência cardíaca média dentro da Zona 2.",
+    "comparacao_plano": "O treino planejado era uma corrida leve de 5 km com pace entre 6:50-7:15/km e FC alvo de ≤ 152 bpm, além de uma cadência de 165+ spm. Guilherme executou 5.02 km com pace médio de 6:48/km e FC média de 150 bpm. A FC média ficou dentro do alvo, o que é um ponto positivo considerando o calor. O pace inicial foi um pouco mais rápido, mas ajustou-se nos quilômetros finais. A cadência ficou ligeiramente abaixo do alvo, em 159 spm.",
+    "pontos_fortes": [
+     "A frequência cardíaca média de 150 bpm ficou bem controlada dentro da Zona 2 (Z2), demonstrando excelente adaptação fisiológica ao estímulo leve, mesmo com a temperatura de 30°C.",
+     "O ritmo foi ajustado nos quilômetros finais (4 e 5), priorizando a manutenção da FC em um patamar adequado para uma corrida leve, o que é uma resposta inteligente ao calor e ao cansaço."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 159 spm ficou um pouco abaixo da meta de 165+ spm para este tipo de treino.",
+     "O início da corrida teve um pace um pouco mais acelerado (6:33-6:37/km) para uma rodagem leve em alta temperatura, resultando em 28% do tempo em Z3. Em dias quentes, começar mais conservador ajuda a manter a FC mais estável."
+    ],
+    "proxima_dica": "Na sua Social Run de 5 km regenerativa amanhã, concentre-se em manter a frequência cardíaca consistentemente na Zona 1-2 e tente aumentar a cadência para mais perto dos 165 spm, com passos mais curtos e leves.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-07-05",
    "activityId": 23487128352,
