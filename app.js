@@ -1,4 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
+const VERSAO_APP = '4.2'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -1478,7 +1479,23 @@ function renderAjustes(root) {
   cardLem.querySelector('#t-revisao').onclick = (e) => liga('revisao', e.currentTarget);
   root.append(cardLem);
 
-  root.append(el(`<div class="rodape-nota">Pampulha · executa o Protocolo de Hábitos + Plano Nutricional (jul/2026).<br>
+  // versão + atualização manual (o CDN do Pages pode atrasar ~10 min)
+  const cardUpd = el(`<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+    <div><h2 style="margin-bottom:2px">Versão do app</h2>
+    <div style="font-size:.85rem;color:var(--ink-2)">v${VERSAO_APP}</div></div>
+    <button class="acao-primaria" style="width:auto;margin:0;padding:11px 16px" id="upd">Buscar atualização</button>
+  </div>`);
+  cardUpd.querySelector('#upd').onclick = async (e) => {
+    e.target.textContent = 'Buscando…';
+    try {
+      const reg = await navigator.serviceWorker?.getRegistration();
+      if (reg) await reg.update();
+    } catch { /* offline */ }
+    setTimeout(() => location.reload(), 1200);
+  };
+  root.append(cardUpd);
+
+  root.append(el(`<div class="rodape-nota">Pampulha v${VERSAO_APP} · executa o Protocolo de Hábitos + Plano Nutricional (jul/2026).<br>
     Meta é tendência, não perfeição. Nunca duas vezes seguidas.</div>`));
 }
 
