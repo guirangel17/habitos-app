@@ -185,5 +185,52 @@ ok(D.ultimoSlipTs([], 'delivery', 5) === 5, 'ultimoSlipTs usa fallback sem desli
 const marco = D.proximoMarco(4.5);
 ok(marco.alvo === 7 && Math.abs(marco.frac - 0.375) < 1e-9, 'próximo marco: 7 dias, 37,5% do trecho 3→7');
 
+// ---- v5: relatório ----
+const mk = (type, date, extra = {}) => ({ id: type + date + Math.random(), ts: D.parseKey(date).getTime() + 12 * 3600e3, type, date, ...extra });
+const meals5 = (date, n) => ['cafe', 'lanche1', 'almoco', 'lanche2', 'jantar'].slice(0, n).map((meal) => mk('meal', date, { meal, status: 'ok' }));
+
+// insightLancheDoce: 4 dias com lanche (1 doce), 3 dias sem lanche (2 doces)
+const ldEvs = [
+  ...['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04'].flatMap((d) => meals5(d, 4)), // inclui lanche2
+  ...['2026-07-05', '2026-07-06', '2026-07-07'].flatMap((d) => meals5(d, 3)), // sem lanche2
+  mk('sweet', '2026-07-01'), mk('sweet', '2026-07-05'), mk('sweet', '2026-07-06'),
+];
+const ld = D.insightLancheDoce(ldEvs, '2026-07-07', 30);
+ok(ld && ld.com.dias === 4 && ld.sem.dias === 3, `lanche×doce: grupos 4/3 (veio ${ld && ld.com.dias}/${ld && ld.sem.dias})`);
+ok(ld && Math.abs(ld.taxaCom - 0.25) < 1e-9 && Math.abs(ld.taxaSem - 2 / 3) < 1e-9, 'lanche×doce: taxas 25% vs 67%');
+ok(D.insightLancheDoce(ldEvs.slice(0, 8), '2026-07-07', 30) === null, 'lanche×doce: guarda de amostra mínima');
+
+// insightDomino: 2 saídas, dias seguintes com adesão menor
+const dmEvs = [
+  mk('night_out', '2026-07-01', { drinks: 4 }), mk('night_out', '2026-07-04', { drinks: 3 }),
+  ...meals5('2026-07-02', 2), ...meals5('2026-07-05', 3), // pós-saída: 2/5 e 3/5
+  ...meals5('2026-07-03', 5), ...meals5('2026-07-06', 5), ...meals5('2026-07-07', 4),
+  ...meals5('2026-06-30', 5), ...meals5('2026-06-29', 5), ...meals5('2026-06-28', 4),
+];
+const dm = D.insightDomino(dmEvs, '2026-07-07');
+ok(dm && Math.abs(dm.pos - 0.5) < 1e-9 && dm.nSaidas === 2, `dominó: adesão pós-saída 50% (veio ${dm && dm.pos})`);
+ok(dm && dm.normal > 0.9, `dominó: adesão normal ~93% (veio ${dm && dm.normal.toFixed(2)})`);
+
+// deslizesPorDiaSemana: 5 deslizes, quarta (01/07/2026 é quarta) com 2
+const dsEvs = [
+  mk('delivery', '2026-07-01'), mk('sweet', '2026-07-01'),
+  mk('delivery', '2026-07-06'), mk('sweet', '2026-07-03'), mk('delivery', '2026-06-24'),
+];
+const ds = D.deslizesPorDiaSemana(dsEvs, '2026-07-07', 90);
+ok(ds && ds[2].delivery + ds[2].sweet === 3 && ds[0].delivery === 1, 'deslizes por dia da semana (qua=3, seg=1)');
+ok(D.deslizesPorDiaSemana(dsEvs.slice(0, 3), '2026-07-07', 90) === null, 'deslizes/semana: guarda ≥5');
+
+// sosTaxa
+ok(D.sosTaxa([mk('sos', '2026-07-01', { outcome: 'surfed' }), mk('sos', '2026-07-02', { outcome: 'surfed' }), mk('sos', '2026-07-03', { outcome: 'gave_in' })]).surfed === 2, 'sosTaxa 2/3');
+ok(D.sosTaxa([mk('sos', '2026-07-01', { outcome: 'surfed' })]) === null, 'sosTaxa: guarda ≥3');
+
+// resumoPeriodo
+const rp = D.resumoPeriodo([...meals5('2026-07-02', 4), ...meals5('2026-07-03', 5), mk('delivery', '2026-07-02'), mk('night_out', '2026-07-03', { drinks: 2 })], '2026-07-01', '2026-07-07');
+ok(rp.delivery === 1 && rp.diasObs === 2 && Math.abs(rp.adesao - 0.9) < 1e-9 && rp.drinksMedia === 2, `resumoPeriodo (adesão ${rp.adesao})`);
+
+// economiaEstimada
+const eco = D.economiaEstimada([mk('delivery', '2026-07-05')], { baseline: { delivery: 4 }, startKey: '2026-06-23' }, '2026-07-07');
+ok(eco && eco.evitados === 7 && eco.valor === 315, `economia: 7 pedidos evitados, R$315 (veio ${eco && eco.evitados}/${eco && eco.valor})`);
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);

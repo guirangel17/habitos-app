@@ -1,5 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '4.2'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '5.0'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -34,7 +34,8 @@ function el(html) {
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-let abaAtiva = ['hoje', 'treino', 'evolucao', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
+let abaAtiva = ['hoje', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
+let periodoRelatorio = 30; // 30 | 90 | 0 (tudo)
 
 // ---------- seed de demonstração (dev/testes: ?seed=1 com store vazio) ----------
 if (params.get('seed') && S.getState().events.length === 0) {
@@ -53,6 +54,7 @@ if (params.get('seed') && S.getState().events.length === 0) {
   S.addEvent({ type: 'delivery', date: D.addDays(key, -9), trigger: 'preguiça', ts: tsEm(D.addDays(key, -9), 20) });
   S.addEvent({ type: 'sweet', date: D.addDays(key, -15), trigger: '15h', ts: tsEm(D.addDays(key, -15), 15) });
   S.addEvent({ type: 'sweet', date: D.addDays(key, -4), trigger: 'bug', ts: tsEm(D.addDays(key, -4), 17) });
+  S.addEvent({ type: 'sweet', date: D.addDays(key, -25), trigger: 'tédio', ts: tsEm(D.addDays(key, -25), 16) });
   S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -3), trigger: '15h', ts: tsEm(D.addDays(key, -3), 15) });
   S.addEvent({ type: 'sos', kind: 'ifood', outcome: 'surfed', date: D.addDays(key, -2), trigger: 'preguiça', ts: tsEm(D.addDays(key, -2), 21) });
   S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -10), trigger: 'call tensa', ts: tsEm(D.addDays(key, -10), 11) });
@@ -1376,6 +1378,136 @@ function fmtData(key) {
 }
 
 // ================================================================
+// TELA RELATÓRIO — o mês em números + cruzamentos que testam o protocolo
+// ================================================================
+function renderRelatorio(root) {
+  const st = S.getState();
+  const key = hojeKey();
+  const inicio = st.settings.startKey || key;
+
+  // seletor de período
+  const chips = el(`<div class="chips" style="padding:2px 4px">${[[30, '30 dias'], [90, '90 dias'], [0, 'Tudo']]
+    .map(([v, l]) => `<button data-v="${v}" class="${periodoRelatorio === v ? 'sel' : ''}">${l}</button>`).join('')}</div>`);
+  chips.querySelectorAll('button').forEach((b) => {
+    b.onclick = () => { periodoRelatorio = Number(b.dataset.v); render(); };
+  });
+  root.append(chips);
+
+  const dias = periodoRelatorio || Math.max(1, D.diffDays(inicio, key) + 1);
+  const ini = periodoRelatorio ? D.addDays(key, -dias + 1) : inicio;
+  const agora_ = D.resumoPeriodo(st.events, ini, key);
+  const antes = periodoRelatorio ? D.resumoPeriodo(st.events, D.addDays(ini, -dias), D.addDays(ini, -1)) : null;
+
+  // placar do período — delta vs período anterior (verde quando na direção certa)
+  const delta = (v, vAnt, bomQuandoCai, fmt = (x) => x) => {
+    if (v === null || v === undefined) return '<small class="rel-delta">–</small>';
+    if (!antes || vAnt === null || vAnt === undefined) return '';
+    const d = v - vAnt;
+    if (Math.abs(d) < 1e-9) return '<small class="rel-delta">=</small>';
+    const bom = bomQuandoCai ? d < 0 : d > 0;
+    return `<small class="rel-delta ${bom ? 'bom' : 'ruim'}">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d))}</small>`;
+  };
+  const pct = (v) => (v === null ? '–' : Math.round(v * 100));
+  const num1 = (v) => (v === null || v === undefined ? '–' : (Math.round(v * 10) / 10).toFixed(1).replace('.', ','));
+  root.append(el('<div class="secao">PLACAR · ' + (periodoRelatorio ? `ÚLTIMOS ${dias} DIAS VS ${dias} ANTERIORES` : 'DESDE O INÍCIO') + '</div>'));
+  root.append(el(`<div class="card"><div class="tiles" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="tile"><div class="l">🛵 iFood impulso</div><div class="v num">${agora_.delivery}</div>${delta(agora_.delivery, antes?.delivery, true)}</div>
+    <div class="tile"><div class="l">🍫 Doces fora</div><div class="v num">${agora_.sweet}</div>${delta(agora_.sweet, antes?.sweet, true)}</div>
+    <div class="tile"><div class="l">🍻 Drinks/saída</div><div class="v num">${num1(agora_.drinksMedia)}</div>${delta(agora_.drinksMedia, antes?.drinksMedia, true, num1)}</div>
+    <div class="tile"><div class="l">🍽 Adesão refeições</div><div class="v num">${pct(agora_.adesao)}<small>%</small></div>${delta(agora_.adesao, antes?.adesao, false, (x) => Math.round(x * 100) + 'pp')}</div>
+    <div class="tile"><div class="l">👟 Treinos feitos</div><div class="v num">${agora_.treinoPlan ? Math.round((agora_.treinoFeito / agora_.treinoPlan) * 100) : '–'}<small>%</small></div><small class="rel-delta">${agora_.treinoFeito}/${agora_.treinoPlan}</small></div>
+    <div class="tile"><div class="l">⚖️ Peso (média 7d)</div><div class="v num">${agora_.pesoDelta === null ? '–' : (agora_.pesoDelta > 0 ? '+' : '') + num1(agora_.pesoDelta)}<small> kg</small></div></div>
+  </div></div>`));
+
+  // insights — só aparecem com amostra mínima; é aqui que o protocolo é testado com dados reais
+  root.append(el('<div class="secao">INSIGHTS · TESTANDO O PROTOCOLO COM OS SEUS DADOS</div>'));
+  const insights = [];
+
+  const ld = D.insightLancheDoce(st.events, key, 90);
+  if (ld) {
+    const razao = ld.taxaCom > 0 ? ld.taxaSem / ld.taxaCom : null;
+    insights.push(`🛡 <b>O escudo das 16h ${ld.taxaSem > ld.taxaCom ? 'funciona' : 'ainda não aparece nos dados'}:</b>
+      em dias SEM o lanche da tarde você comeu doce em <b>${Math.round(ld.taxaSem * 100)}%</b> dos dias (${ld.sem.doces}/${ld.sem.dias});
+      com o lanche feito, <b>${Math.round(ld.taxaCom * 100)}%</b> (${ld.com.doces}/${ld.com.dias})${razao && razao >= 1.5 ? ` — <b>${num1(razao)}× mais risco</b> sem o lanche, exatamente o que o protocolo (2C) previa` : ''}.`);
+  }
+
+  const dm = D.insightDomino(st.events, key);
+  if (dm) {
+    insights.push(`🁢 <b>O dominó de 36h ${dm.pos < dm.normal - 0.1 ? 'é real nos seus dados' : 'está sob controle'}:</b>
+      sua adesão no dia seguinte a uma saída é <b>${Math.round(dm.pos * 100)}%</b> vs <b>${Math.round(dm.normal * 100)}%</b> nos demais dias (${dm.nSaidas} manhãs pós-saída observadas)${dm.pos >= dm.normal - 0.1 ? ' — o protocolo de ressaca está segurando a onda' : ' — vale caprichar no Modo Ressaca'}.`);
+  }
+
+  const stx = D.sosTaxa(st.events);
+  if (stx) {
+    insights.push(`🌊 <b>O timer de 10 minutos venceu ${Math.round((stx.surfed / stx.total) * 100)}% das vezes:</b>
+      de ${stx.total} SOS com desfecho, ${stx.surfed} ondas passaram sem você ceder. O §0 do protocolo em números.`);
+  }
+
+  const svp = D.insightSemanaVerdePeso(st.events, key);
+  if (svp) {
+    insights.push(`✅ <b>Semana verde mexe na balança:</b> nas ${svp.verdes.n} semanas com ≥80% de adesão a média móvel variou
+      <b>${num1(svp.verdes.delta)} kg/sem</b>; nas outras ${svp.outras.n}, <b>${num1(svp.outras.delta)} kg/sem</b>.`);
+  }
+
+  const eco = D.economiaEstimada(st.events, st.settings, key);
+  if (eco && eco.evitados > 0) {
+    insights.push(`💰 <b>~R$ ${eco.valor} que não viraram delivery:</b> no ritmo do seu baseline (${st.settings.baseline.delivery}/sem)
+      seriam ~${eco.esperado} pedidos em ${eco.semanas} semanas — foram ${eco.reais}. Estimativa a R$ ${D.PRECO_DELIVERY}/pedido.`);
+  }
+
+  if (insights.length) {
+    for (const i of insights) root.append(el(`<div class="card insight">${i}</div>`));
+  } else {
+    root.append(el(`<div class="card" style="font-size:.82rem;color:var(--muted);line-height:1.5">
+      Os insights nascem dos cruzamentos (lanche das 16h × doce, saída × dia seguinte, semana verde × balança…)
+      e só aparecem quando há amostra suficiente para não mentir. Continue registrando — em 2-3 semanas isso aqui acorda.</div>`));
+  }
+
+  // deslizes por dia da semana
+  const ds = D.deslizesPorDiaSemana(st.events, key, 90);
+  if (ds) {
+    const max = Math.max(...ds.map((d) => d.delivery + d.sweet), 1);
+    const letras = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    const pior = ds.reduce((im, d, i) => (d.delivery + d.sweet > ds[im].delivery + ds[im].sweet ? i : im), 0);
+    const W = 420, H = 130, padB = 22, bw = 34, gap = (W - 7 * bw) / 8;
+    let barras = '';
+    ds.forEach((d, i) => {
+      const x = gap + i * (bw + gap);
+      const hDel = ((H - padB - 14) * d.delivery) / max;
+      const hSwe = ((H - padB - 14) * d.sweet) / max;
+      const yDel = H - padB - hDel;
+      const ySwe = yDel - 2 - hSwe;
+      if (d.delivery) barras += `<rect x="${x}" y="${yDel}" width="${bw}" height="${hDel}" rx="4" fill="var(--serie-1)"/>`;
+      if (d.sweet) barras += `<rect x="${x}" y="${ySwe}" width="${bw}" height="${hSwe}" rx="4" fill="var(--jardim-petala-2)"/>`;
+      const tot = d.delivery + d.sweet;
+      if (tot) barras += `<text x="${x + bw / 2}" y="${ySwe > yDel ? yDel : ySwe - 4}" text-anchor="middle" font-size="10" fill="var(--ink-2)" class="num">${tot}</text>`;
+      barras += `<text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle" font-size="9.5" fill="${i === pior ? 'var(--ink)' : 'var(--muted)'}" font-weight="${i === pior ? 700 : 400}">${letras[i]}</text>`;
+    });
+    root.append(el(`<div class="card"><h2>Deslizes por dia da semana <small>· últimos 90 dias</small></h2>
+      <svg viewBox="0 0 ${W} ${H}" width="100%">
+        <line x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1"/>
+        ${barras}</svg>
+      <div class="legenda"><span class="item"><span class="faixa" style="background:var(--serie-1)"></span>delivery</span>
+        <span class="item"><span class="faixa" style="background:var(--jardim-petala-2)"></span>doce</span></div>
+      <p style="font-size:.75rem;color:var(--ink-2);margin-top:8px">${letras[pior]} é o seu dia mais vulnerável — vale pré-decidir o jantar desse dia no domingo (1B).</p>
+    </div>`));
+  }
+
+  // totais desde o início
+  const tudo = D.resumoPeriodo(st.events, inicio, key);
+  const cs = D.corridasStats(st.events, key);
+  root.append(el('<div class="secao">DESDE O INÍCIO · ' + fmtData(inicio) + '</div>'));
+  root.append(el(`<div class="card"><div class="tiles" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="tile"><div class="l">Refeições no plano</div><div class="v num">${Math.round((tudo.adesao || 0) * tudo.diasObs * 5)}</div></div>
+    <div class="tile"><div class="l">Corridas feitas</div><div class="v num">${cs.feitas}<small>/${cs.passadas}</small></div></div>
+    <div class="tile"><div class="l">Dias registrados</div><div class="v num">${tudo.diasObs}</div></div>
+    <div class="tile"><div class="l">🌊 Ondas surfadas</div><div class="v num">${D.ondasSurfadas(st.events)}</div></div>
+    <div class="tile"><div class="l">🁢 Dominós quebrados</div><div class="v num">${D.dominosQuebrados(st.events, key)}</div></div>
+    <div class="tile"><div class="l">📋 Revisões</div><div class="v num">${D.semanasComRevisao(st.events).size}</div></div>
+  </div></div>`));
+}
+
+// ================================================================
 // TELA AJUSTES
 // ================================================================
 function renderAjustes(root) {
@@ -1551,6 +1683,7 @@ function render() {
   if (abaAtiva === 'hoje') renderHoje(root);
   else if (abaAtiva === 'treino') renderTreino(root);
   else if (abaAtiva === 'evolucao') renderEvolucao(root);
+  else if (abaAtiva === 'relatorio') renderRelatorio(root);
   else renderAjustes(root);
 
   document.querySelectorAll('nav.abas button').forEach((b) => b.classList.toggle('ativa', b.dataset.aba === abaAtiva));

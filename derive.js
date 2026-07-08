@@ -361,6 +361,143 @@ export function proximoMarco(totalDias) {
   return { alvo, frac: Math.min(1, (totalDias - anterior) / (alvo - anterior)) };
 }
 
+// ================================================================
+// RELATÓRIO — agregações e cruzamentos (cada insight tem guarda de amostra mínima)
+// ================================================================
+
+export function slipsNoPeriodo(events, ini, fim, type) {
+  return events.filter((e) => {
+    const d = e.date || dateKey(new Date(e.ts));
+    if (d < ini || d > fim) return false;
+    return e.type === type
+      || (type === 'delivery' && e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in')
+      || (type === 'sweet' && e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in');
+  }).length;
+}
+
+// dia "observado" = dia com pelo menos 1 registro de refeição (evita contar dias sem uso do app)
+export function diasObservados(events, ini, fim) {
+  const s = new Set();
+  for (const e of events) if (e.type === 'meal' && e.date >= ini && e.date <= fim) s.add(e.date);
+  return [...s].sort();
+}
+
+export function resumoPeriodo(events, ini, fim) {
+  const obs = diasObservados(events, ini, fim);
+  let refFeitas = 0;
+  for (const d of obs) refFeitas += mealsDone(mealsOfDay(events, d));
+  const saidas = events.filter((e) => e.type === 'night_out' && e.date >= ini && e.date <= fim);
+  let treinoPlan = 0, treinoFeito = 0;
+  for (let d = ini; d <= fim; d = addDays(d, 1)) {
+    const plano = treinoDoDia(d);
+    const feito = workoutsDoDia(events, d);
+    if (plano.corrida) { treinoPlan++; if (feito.corrida) treinoFeito++; }
+    if (plano.gym) { treinoPlan++; if (feito.gym) treinoFeito++; }
+  }
+  const mm = mediaMovel7(serie(events, 'weight').filter((p) => p.date <= fim));
+  const mmIni = [...mm].reverse().find((p) => p.date <= ini);
+  const mmFim = mm[mm.length - 1];
+  return {
+    delivery: slipsNoPeriodo(events, ini, fim, 'delivery'),
+    sweet: slipsNoPeriodo(events, ini, fim, 'sweet'),
+    saidas: saidas.length,
+    drinksMedia: saidas.length ? saidas.reduce((s, e) => s + (e.drinks || 0), 0) / saidas.length : null,
+    diasObs: obs.length,
+    adesao: obs.length ? refFeitas / (obs.length * 5) : null,
+    treinoPlan, treinoFeito,
+    pesoDelta: mmIni && mmFim && mmFim.date > mmIni.date ? mmFim.valor - mmIni.valor : null,
+  };
+}
+
+// Tese do protocolo 2C: pular o lanche da tarde prediz o ataque de doce. Guarda: ≥3 dias em cada grupo.
+export function insightLancheDoce(events, hojeKey, dias = 90) {
+  const ini = addDays(hojeKey, -dias + 1);
+  const obs = diasObservados(events, ini, hojeKey);
+  const doceEm = new Set(events.filter((e) => e.type === 'sweet' || (e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in')).map((e) => e.date || dateKey(new Date(e.ts))));
+  const grupo = { com: { dias: 0, doces: 0 }, sem: { dias: 0, doces: 0 } };
+  for (const d of obs) {
+    const lanche = mealsOfDay(events, d).lanche2;
+    const g = lanche === 'ok' || lanche === 'sub' ? grupo.com : grupo.sem;
+    g.dias++;
+    if (doceEm.has(d)) g.doces++;
+  }
+  if (grupo.com.dias < 3 || grupo.sem.dias < 3) return null;
+  return {
+    ...grupo,
+    taxaCom: grupo.com.doces / grupo.com.dias,
+    taxaSem: grupo.sem.doces / grupo.sem.dias,
+  };
+}
+
+// Tese do protocolo 3 (dominó de 36h): adesão no dia seguinte a uma saída vs dias normais. Guarda: ≥2 saídas.
+export function insightDomino(events, hojeKey) {
+  const saidas = new Set(events.filter((e) => e.type === 'night_out').map((e) => e.date || dateKey(new Date(e.ts))));
+  const posSaida = new Set([...saidas].map((d) => addDays(d, 1)));
+  const obs = diasObservados(events, addDays(hojeKey, -364), hojeKey);
+  const g = { pos: { dias: 0, soma: 0 }, normal: { dias: 0, soma: 0 } };
+  for (const d of obs) {
+    const grupo = posSaida.has(d) ? g.pos : g.normal;
+    grupo.dias++;
+    grupo.soma += mealsDone(mealsOfDay(events, d)) / 5;
+  }
+  if (g.pos.dias < 2 || g.normal.dias < 5) return null;
+  return { pos: g.pos.soma / g.pos.dias, normal: g.normal.soma / g.normal.dias, nSaidas: g.pos.dias };
+}
+
+// Em qual dia da semana os deslizes acontecem? Guarda: ≥5 deslizes no total. [0]=Seg … [6]=Dom
+export function deslizesPorDiaSemana(events, hojeKey, dias = 90) {
+  const ini = addDays(hojeKey, -dias + 1);
+  const out = Array.from({ length: 7 }, () => ({ delivery: 0, sweet: 0 }));
+  let total = 0;
+  for (const e of events) {
+    const d = e.date || dateKey(new Date(e.ts));
+    if (d < ini || d > hojeKey) continue;
+    const tipo = e.type === 'delivery' || (e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in') ? 'delivery'
+      : e.type === 'sweet' || (e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in') ? 'sweet' : null;
+    if (!tipo) continue;
+    out[(parseKey(d).getDay() + 6) % 7][tipo]++;
+    total++;
+  }
+  return total >= 5 ? out : null;
+}
+
+// O timer de 10 min funciona? Guarda: ≥3 SOS com desfecho.
+export function sosTaxa(events) {
+  const s = events.filter((e) => e.type === 'sos' && (e.outcome === 'surfed' || e.outcome === 'gave_in'));
+  if (s.length < 3) return null;
+  return { total: s.length, surfed: s.filter((e) => e.outcome === 'surfed').length };
+}
+
+// Semana verde (≥28/35 refeições) × variação da média móvel de peso. Guarda: ≥2 semanas em cada grupo.
+export function insightSemanaVerdePeso(events, hojeKey) {
+  const mm = mediaMovel7(serie(events, 'weight'));
+  const mmEm = (dk) => { let r = null; for (const p of mm) { if (p.date <= dk) r = p; else break; } return r; };
+  const g = { verdes: [], outras: [] };
+  for (let s = inicioSemana(addDays(hojeKey, -7 * 16)); addDays(s, 6) < hojeKey; s = addDays(s, 7)) {
+    let ref = 0;
+    for (let i = 0; i < 7; i++) ref += mealsDone(mealsOfDay(events, addDays(s, i)));
+    if (ref === 0) continue; // semana sem uso
+    const a = mmEm(s), b = mmEm(addDays(s, 6));
+    if (!a || !b || diffDays(a.date, b.date) < 4) continue; // sem pesagens suficientes na semana
+    (ref >= 28 ? g.verdes : g.outras).push(b.valor - a.valor);
+  }
+  if (g.verdes.length < 2 || g.outras.length < 2) return null;
+  const media = (arr) => arr.reduce((x, y) => x + y, 0) / arr.length;
+  return { verdes: { n: g.verdes.length, delta: media(g.verdes) }, outras: { n: g.outras.length, delta: media(g.outras) } };
+}
+
+// Pedidos evitados vs baseline × preço médio (recompensa em R$ — estimativa honesta, rotulada como tal)
+export const PRECO_DELIVERY = 45;
+export function economiaEstimada(events, settings, hojeKey) {
+  const base = settings.baseline?.delivery;
+  if (base == null || !settings.startKey) return null;
+  const semanas = Math.max(1, diffDays(settings.startKey, hojeKey) / 7);
+  const esperado = Math.round(base * semanas);
+  const reais = slipsNoPeriodo(events, settings.startKey, hojeKey, 'delivery');
+  const evitados = Math.max(0, esperado - reais);
+  return { evitados, reais, esperado, valor: evitados * PRECO_DELIVERY, semanas: Math.round(semanas) };
+}
+
 // ---- Gatilhos ----
 export function gatilhosFrequentes(events, dias = 14, hojeKey) {
   const ini = addDays(hojeKey, -dias + 1);

@@ -27,7 +27,7 @@ Vanilla JS com ES modules. **Zero build, zero dependências, zero backend.** pt-
 
 | Arquivo | Papel |
 |---|---|
-| `index.html` | shell: header (chip do dia + countdown), `#conteudo`, FAB SOS, nav de 4 abas |
+| `index.html` | shell: header (chip do dia + countdown), `#conteudo`, FAB SOS, nav de 5 abas |
 | `styles.css` | tokens de cor (paleta validada p/ daltonismo, claro+escuro), todos os componentes |
 | `data.js` | constantes do plano: refeições, tipos de dia, corridas, treinos gym, paces, scripts SOS |
 | `derive.js` | **funções puras** (sem DOM/storage) — toda regra de negócio derivável. Testável via node |
@@ -111,11 +111,13 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
 ## Deploy e ambiente — PEGADINHAS IMPORTANTES
 
 - **Hospedagem**: GitHub Pages do repo público `guirangel17/habitos-app` (conta PESSOAL
-  guirangel17 — **NUNCA** usar o GitHub da Adtran/`github.adtran.com` para este projeto).
+  guirangel17 — nunca usar contas/servidores GitHub corporativos para este projeto).
   URL: `https://guirangel17.github.io/habitos-app/`. Branch `main`, raiz.
-- **O firewall da Adtran (rede do servidor) bloqueia**: `api.github.com` (logo `gh` CLI NÃO
-  funciona para github.com), SSH (22 e 443) e `*.github.io` (não dá para verificar a URL daqui —
-  o teste é no celular do usuário). **Funciona**: git via HTTPS para `github.com`.
+- **Atenção à rede**: o servidor onde este app foi criado ficava numa rede restritiva que
+  bloqueava `api.github.com` (logo o `gh` CLI não funcionava para github.com), SSH (22 e 443) e
+  `*.github.io`. Se os mesmos sintomas aparecerem (connection reset nesses hosts), o caminho que
+  funciona é git puro via HTTPS para `github.com` — e a verificação da URL publicada é feita no
+  celular do usuário. Em rede normal, nada disso se aplica e o `gh` pode ser usado à vontade.
 - **Push**: credencial (fine-grained PAT) em `~/.git-credentials` via credential.helper store.
   Se expirar (criado ~jul/2026, 90 dias), o usuário gera outro token no navegador
   (Settings → Developer settings → fine-grained, repo `habitos-app`, Contents: RW) e refaz:
@@ -153,7 +155,7 @@ google-chrome --headless=new --disable-gpu --no-sandbox --force-device-scale-fac
 gerados com PIL (`python3` + Pillow disponíveis). Sempre olhe o screenshot antes de publicar —
 os dois temas se a mudança mexe em CSS.
 
-## Mapa do app (v4.2, jul/2026)
+## Mapa do app (v5, jul/2026)
 
 - **Hoje**: slot contextual (máx 1) → hero da refeição da vez (badge anti-doce 16h, badge ouro
   domingo, ajuste por tipo de dia) → trilha de 5 marcadores → aviso never-miss-twice (só quando
@@ -170,6 +172,7 @@ os dois temas se a mudança mexe em CSS.
   de anéis ao vivo) → IDENTIDADE (frase + 4 evidências) → CORPO (tiles + gráficos peso/cintura)
   → HÁBITOS DA SEMANA (3 métricas §4) → CONSTÂNCIA (linhas semanais, ✓ verde a 28/35) → PADRÕES
   (ajuste da última revisão + gatilho×período quando ≥2 sem de dados, senão barras).
+- **Relatório**: seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
 - **Ajustes**: baseline, override do tipo de dia, backup export/import, lembretes opt-in
   (best-effort, sem push server — dependem do app aberto), versão + buscar atualização.
 - **Wizard de revisão** (domingo ≥18h até terça): 5 passos — métricas prontas → gatilhos →

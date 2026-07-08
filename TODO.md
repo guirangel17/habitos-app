@@ -22,7 +22,11 @@
 - ✅ Jardim do tempo limpo: SVG generativo e determinístico — cada dia limpo cresce a planta, cada marco vira flor, cada onda surfada vira estrela piscando. Vive no overlay de contadores e como card na Evolução.
 - ✅ Redesign da Evolução: hero com gradiente (rota dentro), rótulos de seção (IDENTIDADE/CORPO/HÁBITOS/CONSTÂNCIA/PADRÕES), card de identidade com borda em gradiente quando assinada, títulos de card em small caps em todo o app.
 
-# v5 — ideias futuras
+# Feito na v5 (jul/2026)
+
+- ✅ Aba Relatório: placar do período (30/90/tudo) com deltas vs período anterior; insights automáticos com guarda de amostra mínima que testam o protocolo com os dados reais (escudo das 16h × doce, dominó pós-saída, taxa de sucesso do SOS, semana verde × balança, R$ economizados vs baseline); deslizes por dia da semana; totais desde o início.
+
+# v6 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
 - Gráfico de aderência semanal × ritmo de perda (correlação visível).

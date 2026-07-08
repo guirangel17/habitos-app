@@ -1,5 +1,5 @@
 // Service worker — cache-first do app shell, com versionamento para updates.
-const VERSAO = 'pampulha-v4.2';
+const VERSAO = 'pampulha-v5';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './data.js', './derive.js',
   './store.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
