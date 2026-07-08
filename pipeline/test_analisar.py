@@ -112,8 +112,8 @@ class TestPuras(unittest.TestCase):
             {"date": "2026-04-15", "paceSeg": 440, "fcMedia": 148, "distanciaKm": 12, "cadencia": 159, "vo2max": 46},
             {"date": "2026-06-20", "paceSeg": 415, "fcMedia": 147, "distanciaKm": 12, "cadencia": 162, "vo2max": 48},
             {"date": "2026-07-01", "paceSeg": 410, "fcMedia": 146, "distanciaKm": 14, "cadencia": 163, "vo2max": 48},
-            {"date": "2026-07-06", "paceSeg": 590, "fcMedia": 170, "distanciaKm": 5, "cadencia": 165, "vo2max": 48},  # não-Z2
             {"date": "2026-07-02", "paceSeg": 481, "fcMedia": 127, "distanciaKm": 6, "cadencia": 120, "vo2max": 47, "paradoPct": 27},  # social
+            {"date": "2026-07-06", "paceSeg": 590, "fcMedia": 170, "distanciaKm": 5, "cadencia": 165, "vo2max": 48},  # não-Z2
         ]
         t = calcular_tendencias(corridas, "2026-07-08")
         self.assertEqual(len(t["paceZ2Serie"]), 4)  # FC 170 e a social (27% parada) ficam fora
