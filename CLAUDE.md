@@ -152,6 +152,17 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
   A versão instalada aparece em Ajustes.
 - Dados do usuário ficam SÓ no aparelho dele (localStorage) — deploy nunca afeta dados. Backup =
   export JSON em Ajustes.
+- **Debug de "app preso na versão velha" (aprendido na v7.1)**: (1) da rede restritiva dá para
+  verificar o deploy SEM acessar *.github.io: as páginas web de `github.com` funcionam via
+  WebFetch — `…/actions/workflows/pages/pages-build-deployment` lista os builds e a página de
+  um run individual mostra o commit deployado. (2) Pedir ao usuário para CLICAR num link do
+  escopo do app não testa nada: o Android abre o link dentro do PWA instalado (service worker
+  velho responde) — o teste válido é **guia anônima** no Chrome (não usa SW) abrindo
+  `…/habitos-app/sw.js`. (3) Se o SW travar mesmo com o servidor certo:
+  `chrome://serviceworker-internals` → Unregister no escopo do app é seguro (não toca no
+  localStorage); fechar e reabrir o app com internet reconstrói tudo. NUNCA "limpar dados do
+  site" — apaga os dados do usuário. (4) Lembrar que o update chegando com sheet/overlay
+  aberto não recarrega sozinho (só snackbar) — testar atualização parado na aba Hoje.
 
 ## Pipeline de análise de corridas (v7) — Garmin → Gemini → data/*.json
 
