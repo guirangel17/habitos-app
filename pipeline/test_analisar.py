@@ -98,9 +98,13 @@ class TestPuras(unittest.TestCase):
         self.assertEqual(c["date"], "2026-07-05")
         self.assertEqual(c["tipoPlano"], "prova")
         self.assertEqual(c["paceMedio"], "6:31")
+        self.assertEqual(c["paradoPct"], 0)  # 1900.4s em movimento de 1903s totais
         self.assertFalse(eh_corrida_z2(c))  # FC 158 > 152
         c2 = dict(c, fcMedia=145, distanciaKm=10.0)
         self.assertTrue(eh_corrida_z2(c2))
+        # corrida social: FC baixa e distância ok, mas 27% parado — fora da curva Z2
+        self.assertFalse(eh_corrida_z2(dict(c2, paradoPct=27)))
+        self.assertTrue(eh_corrida_z2(dict(c2, paradoPct=None)))  # sem movingDuration = confia
 
     def test_tendencias(self):
         corridas = [
@@ -109,9 +113,11 @@ class TestPuras(unittest.TestCase):
             {"date": "2026-06-20", "paceSeg": 415, "fcMedia": 147, "distanciaKm": 12, "cadencia": 162, "vo2max": 48},
             {"date": "2026-07-01", "paceSeg": 410, "fcMedia": 146, "distanciaKm": 14, "cadencia": 163, "vo2max": 48},
             {"date": "2026-07-06", "paceSeg": 590, "fcMedia": 170, "distanciaKm": 5, "cadencia": 165, "vo2max": 48},  # não-Z2
+            {"date": "2026-07-02", "paceSeg": 481, "fcMedia": 127, "distanciaKm": 6, "cadencia": 120, "vo2max": 47, "paradoPct": 27},  # social
         ]
         t = calcular_tendencias(corridas, "2026-07-08")
-        self.assertEqual(len(t["paceZ2Serie"]), 4)  # a de FC 170 fica fora
+        self.assertEqual(len(t["paceZ2Serie"]), 4)  # FC 170 e a social (27% parada) ficam fora
+        self.assertEqual(t["cadencia4Sem"], round((162 + 163 + 165) / 3))  # social não derruba a cadência
         self.assertEqual(t["paceZ2Ha8Sem"], fmt_pace((450 + 440) / 2))  # só as ≤ 2026-05-13
         self.assertIsNotNone(t["paceZ2Atual"])
         self.assertEqual(t["vo2max"]["atual"], 48)

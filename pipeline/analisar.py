@@ -39,6 +39,8 @@ FC_MAX = 190
 ZONAS_FC = [("z1", 0, 132), ("z2", 133, 152), ("z3", 153, 165), ("z4", 166, 177), ("z5", 178, 999)]
 
 TIPOS_CORRIDA = {"running", "trail_running", "track_running", "treadmill_running"}
+PARADO_MAX_PCT = 10    # corrida social (quintas) tem 15-40% de tempo parado e pace de grupo —
+                       # fica fora das tendências de pace/cadência; treino de verdade para <4%
 MAX_POR_RUN = 3        # protege a quota do Gemini; o resto fica pro próximo cron
 JANELA_DIAS = 7        # só analisa corridas dos últimos N dias
 DIST_MINIMA_M = 1000   # ignora atividades-teste
@@ -206,12 +208,15 @@ def compactar_atividade(a, corridas):
         "cadencia": round(a["averageRunningCadenceInStepsPerMinute"]) if a.get("averageRunningCadenceInStepsPerMinute") else None,
         "vo2max": a.get("vO2MaxValue"),
         "teAerobico": round(a["aerobicTrainingEffect"], 1) if a.get("aerobicTrainingEffect") is not None else None,
+        "paradoPct": round(100 * (1 - a["movingDuration"] / a["duration"])) if a.get("movingDuration") and a.get("duration") else None,
         "tipoPlano": plano["tipo"] if plano else None,
     }
 
 
 def eh_corrida_z2(c):
-    return bool(c.get("fcMedia")) and c["fcMedia"] <= 152 and (c.get("distanciaKm") or 0) >= 3 and c.get("paceSeg")
+    return (bool(c.get("fcMedia")) and c["fcMedia"] <= 152
+            and (c.get("distanciaKm") or 0) >= 3 and bool(c.get("paceSeg"))
+            and (c.get("paradoPct") or 0) <= PARADO_MAX_PCT)
 
 
 def media_pace(corridas):
@@ -229,7 +234,7 @@ def calcular_tendencias(corridas, hoje):
     ha8sem = media_pace(antigas[-3:]) if antigas else None
     corte4sem = (datetime.strptime(hoje, "%Y-%m-%d") - timedelta(days=28)).strftime("%Y-%m-%d")
     ult4 = [c for c in corridas if c["date"] >= corte4sem]
-    cad = [c["cadencia"] for c in ult4 if c.get("cadencia")]
+    cad = [c["cadencia"] for c in ult4 if c.get("cadencia") and (c.get("paradoPct") or 0) <= PARADO_MAX_PCT]
     vo2 = [c["vo2max"] for c in corridas if c.get("vo2max")]
     vo2_antigas = [c["vo2max"] for c in corridas if c.get("vo2max") and c["date"] <= ref]
     return {
