@@ -15,15 +15,16 @@
 PWA pessoal (usuário único: Guilherme, Tech Lead frontend, 31 anos, BH) que **executa** dois
 documentos — não os substitui:
 
-- `~/habitos/Protocolo-Habitos.md` — protocolo de engenharia de hábitos (Fogg B=MAP, Atomic
+- `Protocolo-Habitos.md` — protocolo de engenharia de hábitos (Fogg B=MAP, Atomic
   Habits/Clear, TCC/prevenção de recaída). Três gatilhos: **iFood noturno** (fadiga de decisão),
   **doce por ansiedade no trabalho**, **álcool social + efeito dominó da ressaca de 36h**.
-- `~/dieta/Dieta-Resumo-Rapido.md` + `~/dieta/Plano-Nutricional-Completo.md` — 5 refeições/dia,
+- `Dieta-Resumo-Rapido.md` + `Plano-Nutricional-Completo.md` — 5 refeições/dia,
   tipos de dia por dia da semana, fases do calendário.
-- `~/treino-pampulha/plano-hibrido-pampulha.md` — plano híbrido corrida+musculação rumo à
+- `plano-hibrido-pampulha.md` — plano híbrido corrida+musculação rumo à
   **Volta Internacional da Pampulha 18k em 06/12/2026** (o arco narrativo de tudo).
 
-**Esses MDs são a fonte da verdade.** Os dados deles estão transcritos em `data.js` (cardápio,
+**Esses MDs são a fonte da verdade e estão com o usuário (cópia local no notebook dele — a VM
+onde o app foi criado foi descomissionada em jul/2026; peça a ele os MDs se precisar).** Os dados deles estão transcritos em `data.js` (cardápio,
 calendário de 67 corridas, exercícios de academia, paces). Se o usuário mudar o plano, atualize
 `data.js` a partir dos MDs — nunca invente valores nem crie um "editor de dieta" no app.
 
@@ -42,6 +43,7 @@ Vanilla JS com ES modules. **Zero build, zero dependências, zero backend.** pt-
 | `sw.js` | service worker cache-first; `VERSAO` versiona o cache |
 | `test/test-derive.mjs` | ~55 asserts das funções de `derive.js` — `node test/test-derive.mjs` |
 | `TODO.md` | histórico do que foi feito por versão, ideias futuras e **ideias descartadas de propósito** |
+| `garmin/` | scripts LOCAIS (notebook, não Actions): renovar token do pipeline + criar/limpar treinos estruturados no relógio — ver `garmin/README.md` |
 
 ## Modelo de dados (localStorage `pampulha.v1`)
 
@@ -133,15 +135,16 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
 - **Hospedagem**: GitHub Pages do repo público `guirangel17/habitos-app` (conta PESSOAL
   guirangel17 — nunca usar contas/servidores GitHub corporativos para este projeto).
   URL: `https://guirangel17.github.io/habitos-app/`. Branch `main`, raiz.
-- **Atenção à rede**: o servidor onde este app foi criado ficava numa rede restritiva que
-  bloqueava `api.github.com` (logo o `gh` CLI não funcionava para github.com), SSH (22 e 443) e
-  `*.github.io`. Se os mesmos sintomas aparecerem (connection reset nesses hosts), o caminho que
-  funciona é git puro via HTTPS para `github.com` — e a verificação da URL publicada é feita no
-  celular do usuário. Em rede normal, nada disso se aplica e o `gh` pode ser usado à vontade.
-- **Push**: credencial (fine-grained PAT) em `~/.git-credentials` via credential.helper store.
-  Se expirar (criado ~jul/2026, 90 dias), o usuário gera outro token no navegador
-  (Settings → Developer settings → fine-grained, repo `habitos-app`, Contents: RW) e refaz:
-  `printf "https://guirangel17:TOKEN@github.com\n" > ~/.git-credentials`.
+- **Atenção à rede** (se o ambiente for restritivo — a VM original bloqueava `api.github.com`,
+  SSH e `*.github.io`): com connection reset nesses hosts, o caminho que funciona é git puro
+  via HTTPS para `github.com`, e a verificação da URL publicada é feita no celular do usuário
+  (ou via WebFetch nas páginas web de `github.com`, que rendem status de Actions/deploy).
+  Em rede normal, nada disso se aplica e o `gh` pode ser usado à vontade.
+- **Push**: o usuário gera um fine-grained PAT no navegador (Settings → Developer settings →
+  fine-grained, repo `habitos-app`, Contents: RW) e configura:
+  `printf "https://guirangel17:TOKEN@github.com\n" > ~/.git-credentials` +
+  `git config --global credential.helper store`. Em máquina temporária, prefira token de
+  validade curta e revogue depois.
 - **Commits**: `git -c user.name="Guilherme Moura" -c user.email="guirangel17@users.noreply.github.com" commit`.
 - **A CADA DEPLOY que muda arquivos do shell: bumpar `VERSAO` em `sw.js` E `VERSAO_APP` em
   `app.js` (mantêm-se em sincronia).** Sem isso o service worker cache-first nunca entrega a
@@ -178,15 +181,15 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   o garth auto-autentica pela env `GARTH_TOKEN`. Token OAuth1 vive ~1 ano em teoria, mas a
   Garmin pode invalidar antes (aconteceu em 08/07/2026, dias depois de criado — possivelmente
   pelos IPs variados dos runners). **Runbook quando status=garmin_auth** (validado em 08/07):
-  (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e ver o status; (2) usuário
-  sobe o túnel do notebook de casa: `ssh -R 1080 gmoura@10.54.100.234`; (3) o login é
-  INTERATIVO (getpass) — rodar `python3 ~/treino-pampulha/garmin/login-garmin.py` **no terminal
-  do túnel**, nunca pelo `!` da conversa (não tem stdin → EOFError); (4) gravar o dump num
-  arquivo em vez de imprimir no chat: `python3 -c "import garth; garth.resume('~/.garth');
-  open('/home/gmoura/garmin-token.txt','w').write(garth.client.dumps())"` — usuário copia com
-  `cat` no terminal dele, cola no Secret `GARMIN_TOKEN` no navegador e apaga o arquivo;
-  (5) redisparar e conferir `data/pipeline-status.json` no remoto. Secret `GEMINI_API_KEY` =
-  chave do AI Studio.
+  (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e conferir o status;
+  (2) se persistir, seguir o **`garmin/README.md` deste repo**: em qualquer máquina com
+  internet aberta (o notebook do usuário serve), clonar o repo, `pip install garth`,
+  `python3 garmin/login-garmin.py` (INTERATIVO — precisa de terminal com stdin; nunca pelo `!`
+  da conversa, que dá EOFError), gerar o dump e colar no Secret `GARMIN_TOKEN` no navegador;
+  (3) redisparar e conferir `data/pipeline-status.json` no remoto. Cuidado de higiene: o dump
+  é credencial — nunca imprimir no chat; gravar em arquivo e o usuário copia do terminal dele.
+  Secret `GEMINI_API_KEY` = chave do AI Studio. O guia de problemas em Ajustes (app) resume
+  isso em linguagem de usuário.
 - **Zonas de FC CANÔNICAS** (nunca usar as do Garmin/Connect — variam com a config do relógio):
   FCmax 190 → Z1 <133 · Z2 133–152 · Z3 153–165 · Z4 166–177 · Z5 178+ (const `ZONAS_FC` no
   analisar.py, espelha plano-hibrido-pampulha.md). Calculadas da série temporal de FC

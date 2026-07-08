@@ -96,6 +96,10 @@
 - ✅ **Saúde do sistema** (primeiro card de Ajustes): pipeline (status + idade da execução, alerta >26h), análises pendentes da semana, clima, token, backup — `checarSaude()`. **Bolinha âmbar no ⚙️** quando o pipeline está quebrado/parado >48h (`atualizarBadgeSaude()` no boot e no foco) — métrica velha nunca mais passa despercebida.
 - ✅ **Guia de problemas** (sheet em Ajustes): o que fazer em cada falha em linguagem de usuário — garmin_auth (chamar o Claude, runbook no repo), quota da IA, análise que não chegou, app preso em versão velha (e o alerta de NUNCA limpar dados do site), métricas desatualizadas, troca de celular.
 
+# Feito na v7.5.1 (jul/2026) — repo autossuficiente
+
+- ✅ Pasta `garmin/` no repo: scripts locais de renovação do token (login-garmin.py + garmin_api.py) e de criação dos treinos estruturados (criar.py + treinos_*.py + garmin-criados.json), com README de uso no notebook. A VM onde o app nasceu foi descomissionada — o repo agora carrega tudo que o app precisa pra viver. Fora do repo de propósito: dados brutos de atividade (saúde pessoal, repo é público) e a CA corporativa (o garmin_api.py a detecta como opcional).
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
