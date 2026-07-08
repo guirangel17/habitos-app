@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.3.1'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.4'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -1472,7 +1472,24 @@ function contadoresOverlay() {
 // ================================================================
 // REVISÃO DE DOMINGO — wizard de 5 passos (Protocolo §4)
 // ================================================================
-function wizardRevisao(semanaIni) {
+// export do backup (Ajustes + lembrete mensal no wizard) — share nativo com fallback download
+async function exportarBackup() {
+  const json = S.exportJSON();
+  const nome = `rotina-backup-${hojeKey()}.json`;
+  const file = new File([json], nome, { type: 'application/json' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: nome });
+    } else { throw new Error('share indisponível'); }
+  } catch {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+    a.download = nome; a.click(); URL.revokeObjectURL(a.href);
+  }
+  S.setSetting('lastBackupTs', Date.now());
+}
+
+function wizardRevisao(semanaIni, passoInicial = 0) {
   const st = S.getState();
   const m = D.metricasSemana(st.events, semanaIni);
   const mAnt = D.metricasSemana(st.events, D.addDays(semanaIni, -7));
@@ -1484,7 +1501,7 @@ function wizardRevisao(semanaIni) {
 
   let nota = '';
   let ajuste = null;
-  let passo = 0;
+  let passo = passoInicial;
 
   fecharSOS();
   const tela = el(`<div class="sos-tela">
@@ -1509,7 +1526,7 @@ function wizardRevisao(semanaIni) {
 
   const passos = [
     () => {
-      corpo.innerHTML = `<div class="num-passo">PASSO 1 DE 5 · OS TRÊS NÚMEROS</div>
+      corpo.innerHTML = `<div class="num-passo">PASSO 1 DE 6 · OS TRÊS NÚMEROS</div>
         ${linhaMetrica('🛵 Delivery por impulso', m.delivery, mAnt.delivery, b.delivery != null ? `≤ ${String(b.delivery * 0.5).replace('.', ',')}` : '−50% do baseline', (v) => b.delivery != null && v <= b.delivery * 0.5)}
         ${linhaMetrica('🍫 Doces fora do plano', m.sweet, mAnt.sweet, b.sweet != null ? `≤ ${String(b.sweet * 0.5).replace('.', ',')}` : '−50% do baseline', (v) => b.sweet != null && v <= b.sweet * 0.5)}
         ${linhaMetrica('🍻 Drinks por saída', m.drinks, mAnt.drinks, '≤ 3', (v) => v <= 3)}
@@ -1517,7 +1534,31 @@ function wizardRevisao(semanaIni) {
         <div id="acoes"></div>`;
     },
     () => {
-      corpo.innerHTML = `<div class="num-passo">PASSO 2 DE 5 · O QUE DISPAROU</div>
+      // a semana do atleta — números prontos do Garmin (historico.json) + checks do app
+      const fimSem = D.addDays(semanaIni, 6);
+      const corr = (dadosHistorico?.corridas || []).filter((c) => c.date >= semanaIni && c.date <= fimSem);
+      const km = corr.reduce((s, c) => s + (c.distanciaKm || 0), 0);
+      let gymPlan = 0, gymFeito = 0, corrPlan = 0;
+      for (let d = semanaIni; d <= fimSem; d = D.addDays(d, 1)) {
+        const p = D.treinoDoDia(d), f = D.workoutsDoDia(st.events, d);
+        if (p.gym) { gymPlan++; if (f.gym) gymFeito++; }
+        if (p.corrida) corrPlan++;
+      }
+      const longao = corr.filter((c) => c.tipoPlano === 'longo').sort((a, x) => (x.distanciaKm || 0) - (a.distanciaKm || 0))[0];
+      const efs = corr.filter((c) => c.ef && (c.paradoPct || 0) <= 10 && c.fcMedia && c.fcMedia <= 165);
+      const efSem = efs.length ? (efs.reduce((s, c) => s + c.ef, 0) / efs.length) : null;
+      corpo.innerHTML = `<div class="num-passo">PASSO 2 DE 6 · O ATLETA</div>
+        ${corr.length || gymPlan ? `
+          <div class="rev-metrica"><span>🏃 Corridas</span><span class="num"><b>${corr.length}</b>/${corrPlan} · ${km.toFixed(1).replace('.', ',')} km</span></div>
+          ${longao ? `<div class="rev-metrica"><span>📏 Longão</span><span class="num"><b>${String(longao.distanciaKm).replace('.', ',')} km</b> · ${longao.paceMedio}/km${longao.fcMedia ? ` · FC ${longao.fcMedia}` : ''}</span></div>` : ''}
+          <div class="rev-metrica"><span>🏋️ Academia</span><span class="num"><b>${gymFeito}</b>/${gymPlan}</span></div>
+          ${efSem ? `<div class="rev-metrica"><span>⚡ Eficiência aeróbica</span><span class="num"><b>${efSem.toFixed(2).replace('.', ',')}</b> m/bat</span></div>` : ''}
+          <p style="color:var(--ink-2);font-size:.85rem;margin-top:8px">Treino feito em semana difícil vale dobrado — constância vence volume.</p>`
+          : '<h3>Semana sem treinos registrados</h3><p>O Garmin conta as corridas sozinho; a academia é 1 toque na linha do treino.</p>'}
+        <div id="acoes"></div>`;
+    },
+    () => {
+      corpo.innerHTML = `<div class="num-passo">PASSO 3 DE 6 · O QUE DISPAROU</div>
         ${gatOrd.length
           ? `<div style="display:grid;gap:6px">${gatOrd.map(([g, n]) => `<div class="rev-metrica"><span>${esc(g)}</span><span class="num">${n}×</span></div>`).join('')}</div>
              <p style="color:var(--ink-2);font-size:.85rem;margin-top:8px">Ataque o estressor, não o chocolate.</p>`
@@ -1525,14 +1566,14 @@ function wizardRevisao(semanaIni) {
         <div id="acoes"></div>`;
     },
     () => {
-      corpo.innerHTML = `<div class="num-passo">PASSO 3 DE 5 · UMA LINHA</div>
+      corpo.innerHTML = `<div class="num-passo">PASSO 4 DE 6 · UMA LINHA</div>
         <h3>O que disparou os deslizes da semana?</h3>
         <input class="rev-input" id="nota" maxlength="120" placeholder="opcional — ex.: sprint atrasada, 3 calls seguidas…" value="${esc(nota)}">
         <div id="acoes"></div>`;
       corpo.querySelector('#nota').oninput = (e) => { nota = e.target.value; };
     },
     () => {
-      corpo.innerHTML = `<div class="num-passo">PASSO 4 DE 5 · UM AJUSTE DE AMBIENTE</div>
+      corpo.innerHTML = `<div class="num-passo">PASSO 5 DE 6 · UM AJUSTE DE AMBIENTE</div>
         <h3>Para a próxima semana, mude o ambiente — não a força de vontade.</h3>
         <div class="opcoes" id="ops" style="margin-top:8px"></div>
         <div id="acoes"></div>`;
@@ -1551,11 +1592,15 @@ function wizardRevisao(semanaIni) {
     },
     () => {
       const ident = D.identidadeAssinada([...st.events, { type: 'review', week: semanaIni }], D.addDays(semanaIni, 8));
-      corpo.innerHTML = `<div class="num-passo">PASSO 5 DE 5 · FECHADO</div>
+      const diasBk = st.settings.lastBackupTs ? Math.floor((Date.now() - st.settings.lastBackupTs) / 86400000) : null;
+      const bkVelho = diasBk === null || diasBk > 30;
+      corpo.innerHTML = `<div class="num-passo">PASSO 6 DE 6 · FECHADO</div>
         <h3>“${FRASE_IDENTIDADE}”</h3>
         <p>Mais uma semana de evidência. ${ident.assinada ? 'Frase assinada — 4 domingos seguidos. ✍️' : `Assinatura: ${Math.min(ident.progresso + 1, 4)}/4 domingos de revisão.`}</p>
         ${ajuste ? `<p style="color:var(--ink-2)">Ajuste da semana: <b>${esc(ajuste)}</b></p>` : ''}
+        ${bkVelho ? `<button class="escudo-sos" id="bkp">📥 ${diasBk === null ? 'Seus dados vivem só neste aparelho e ainda não têm backup' : `Último backup há ${diasBk} dias`} — <b>exportar agora</b> (30 s, manda pro seu Drive/WhatsApp) ›</button>` : ''}
         <div id="acoes"></div>`;
+      corpo.querySelector('#bkp')?.addEventListener('click', () => { exportarBackup(); });
     },
   ];
 
@@ -1563,7 +1608,7 @@ function wizardRevisao(semanaIni) {
     passos[passo]();
     const acoes = corpo.querySelector('#acoes');
     if (passo < passos.length - 1) {
-      const btn = el(`<button class="acao-primaria">${passo === 3 && !ajuste ? 'Pular ajuste →' : 'Próximo →'}</button>`);
+      const btn = el(`<button class="acao-primaria">${passo === 4 && !ajuste ? 'Pular ajuste →' : 'Próximo →'}</button>`);
       btn.onclick = () => { passo++; mostrar(); };
       acoes.append(btn);
     } else {
@@ -1719,6 +1764,27 @@ function renderEvolucao(root) {
             <b class="num">${String(m.km).replace('.', ',')}</b>
           </div>`).join('')}
           <div class="longao-prova num">18 km · prova</div>
+        </div>
+      </div>`));
+    }
+
+    // história dos checkpoints: alvo × executado — acende quando o primeiro teste rodar
+    const cpLinhas = CHECKPOINTS.map((cp) => ({
+      cp,
+      run: (dadosHistorico?.corridas || [])
+        .filter((c) => c.date === cp.date && (c.distanciaKm || 0) >= 4)
+        .sort((a, x) => (x.distanciaKm || 0) - (a.distanciaKm || 0))[0],
+    }));
+    if (cpLinhas.some((x) => x.run)) {
+      root.append(el(`<div class="card"><h2>Checkpoints <small>· alvo × executado</small></h2>
+        <div style="display:grid;gap:7px">
+          ${cpLinhas.map(({ cp, run }) => `<div class="rev-metrica">
+            <span>🎯 ${fmtData(cp.date)} · ${esc(cp.titulo.split(' — ')[0])}</span>
+            ${run
+              ? `<span class="num"><b>${run.paceMedio}/km</b>${run.fcMedia ? ` · FC ${run.fcMedia}` : ''} <small style="color:var(--muted)">alvo ${esc(cp.alvo)}</small></span>`
+              : `<span style="color:var(--muted);font-size:.78rem">alvo ${esc(cp.alvo)}</span>`}
+          </div>`).join('')}
+          <div class="rev-metrica"><span>🏁 ${fmtData(PROVA)} · VOLTA DA PAMPULHA 18k</span><span style="color:var(--muted);font-size:.78rem">alvo 6:15–6:30</span></div>
         </div>
       </div>`));
     }
@@ -2235,21 +2301,7 @@ function renderAjustes(root) {
     <button class="acao-secundaria" id="imp">Importar backup</button>
     <input type="file" accept="application/json,.json" id="arquivo" style="display:none">
     <p style="font-size:.7rem;color:var(--muted);margin-top:8px" id="storage-status"></p></div>`);
-  cardBk.querySelector('#exp').onclick = async () => {
-    const json = S.exportJSON();
-    const nome = `rotina-backup-${hojeKey()}.json`;
-    const file = new File([json], nome, { type: 'application/json' });
-    try {
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: nome });
-      } else { throw new Error('share indisponível'); }
-    } catch {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
-      a.download = nome; a.click(); URL.revokeObjectURL(a.href);
-    }
-    S.setSetting('lastBackupTs', Date.now());
-  };
+  cardBk.querySelector('#exp').onclick = exportarBackup;
   const inputArq = cardBk.querySelector('#arquivo');
   cardBk.querySelector('#imp').onclick = () => inputArq.click();
   inputArq.onchange = async () => {
@@ -2452,7 +2504,10 @@ if (params.get('detalhe')) {
   carregarAnalises().then(() => sheetTreinoDetalhe(params.get('detalhe'), D.treinoDoDia(hojeKey()), hojeKey()));
 }
 if (params.get('wizard') === 'revisao') {
-  wizardRevisao(D.revisaoPendente(S.getState().events, hojeKey(), 20) || D.addDays(D.inicioSemana(hojeKey()), -7));
+  carregarAnalises().then(() => wizardRevisao(
+    D.revisaoPendente(S.getState().events, hojeKey(), 20) || D.addDays(D.inicioSemana(hojeKey()), -7),
+    +params.get('passo') || 0,
+  ));
 }
 if (params.get('contrato') && !D.contratoAtivo(S.getState().events, hojeKey(), agora().getHours())) {
   S.addEvent({ type: 'contract', date: hojeKey(), maxDrinks: 3, horaSaida: '00:30' });

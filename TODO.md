@@ -84,6 +84,12 @@
 - ✅ **Clima das janelas de treino**: `pipeline/clima.py` (open-meteo, sem chave, janelas 6h/19h hoje+amanhã) → `data/clima.json`; linha do treino no Hoje mostra a próxima janela com dica de calor (≥28°C: "FC infla, pace é consequência") e chuva (≥50%).
 - ✅ **Resumo do mês compartilhável** no Relatório (adesão, deslizes vs baseline, treinos, corridas/km do historico, EF, peso, semanas até a prova) — navigator.share com fallback de clipboard.
 
+# Feito na v7.4 (jul/2026) — revisão completa + proteção de dados
+
+- ✅ Wizard de domingo agora tem 6 passos: novo **PASSO 2 · O ATLETA** (corridas feitas×planejadas + km da semana via historico.json, longão com pace/FC, academia X/Y, EF da semana) — o ritual passou a revisar o atleta inteiro. Dev: `?wizard=revisao&passo=N`.
+- ✅ **Lembrete mensal de backup** no fechamento do wizard (>30 dias ou nunca): botão âmbar de export direto; função `exportarBackup()` unificada com Ajustes.
+- ✅ **História dos checkpoints** na Evolução: card alvo × executado (pace/FC real do historico) para 29/07 → 23/09 → prova; só acende quando o primeiro teste rodar. Campo `alvo` em CHECKPOINTS.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

@@ -216,7 +216,7 @@ node --check app.js                  # sanity de sintaxe
 **Parâmetros de dev** (query string): `?hoje=2026-07-07&agora=15:30` (simular data/hora — TODA
 lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto em lógica),
 `?seed=1` (dados demo em store vazio), `?aba=hoje|dieta|treino|evolucao|relatorio|ajustes`,
-`?tema=dark|light`, `?sos=ifood|doce&passo=N`, `?ressaca=1`, `?wizard=revisao`, `?contadores=1`,
+`?tema=dark|light`, `?sos=ifood|doce&passo=N`, `?ressaca=1`, `?wizard=revisao&passo=N`, `?contadores=1`,
 `?contrato=1`, `?detalhe=gym|corrida`, `?dia=YYYY-MM-DD` (dia selecionado na semana do Treino),
 `?posalmoco=1` (registra café/lanche1/almoço agora → escudo pós-almoço no hero; use `hoje` = data
 REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo),
@@ -273,8 +273,10 @@ os dois temas se a mudança mexe em CSS.
   manutenção ~1×/semana não merece slot na zona do polegar; 6 abas não cabem bem em 360px):
   baseline, override do tipo de dia, backup export/import, lembretes opt-in (best-effort, sem
   push server — dependem do app aberto), versão + buscar atualização.
-- **Wizard de revisão** (domingo ≥18h até terça): 5 passos — métricas prontas → gatilhos →
-  1 pergunta → 1 ajuste de AMBIENTE (lista do protocolo) → frase de identidade.
+- **Wizard de revisão** (domingo ≥18h até terça): 6 passos — métricas prontas → O ATLETA
+  (v7.4: corridas×plano + km + longão + EF da semana, via historico.json) → gatilhos →
+  1 pergunta → 1 ajuste de AMBIENTE (lista do protocolo) → frase de identidade + lembrete de
+  backup quando >30 dias (dados vivem só no localStorage — é a proteção real contra perda).
 
 ## Ideias futuras e descartadas
 

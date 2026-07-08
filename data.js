@@ -309,6 +309,7 @@ export const CHECKPOINTS = [
     date: '2026-07-29',
     titulo: 'TESTE 5 km contrarrelógio',
     define: 'os paces de agosto',
+    alvo: '5:45–5:50 /km',
     porque: 'Seu 5 km real está subestimado (o recorde 5:58/km foi submáximo, no meio do volume da meia). O teste é o árbitro final: vindo em 5:30–5:44/km, os tiros descem um degrau inteiro.',
     passos: [
       ['🔥', 'Aquecimento inegociável', '15 min de trote + 4 × 100 m progressivos. Contrarrelógio sem aquecer = km 1 mentiroso.'],
@@ -323,6 +324,7 @@ export const CHECKPOINTS = [
     date: '2026-09-23',
     titulo: 'Tempo Run 6 km — checkpoint do alvo',
     define: 'o alvo da Pampulha',
+    alvo: '6:05–6:20 /km',
     porque: 'É o teste de fogo do ritmo de prova: sustentar 6:10–6:20 confortável aqui trava a Meta A (6:15–6:25) para os 18 km.',
     passos: [
       ['🔥', 'Aquecimento', '10 min de trote leve.'],
