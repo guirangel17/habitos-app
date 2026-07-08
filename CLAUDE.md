@@ -271,8 +271,11 @@ os dois temas se a mudança mexe em CSS.
 - **Relatório**: seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
 - **Ajustes** (acessível pelo ⚙️ no header, NÃO pela nav — decisão de UX da v6: destino de
   manutenção ~1×/semana não merece slot na zona do polegar; 6 abas não cabem bem em 360px):
-  baseline, override do tipo de dia, backup export/import, lembretes opt-in (best-effort, sem
-  push server — dependem do app aberto), versão + buscar atualização.
+  saúde do sistema (v7.5: `checarSaude()` — pipeline/análises/clima/token/backup; pipeline
+  quebrado ou parado >48h acende bolinha âmbar no ⚙️ via `atualizarBadgeSaude()`) + guia de
+  problemas (sheet com runbooks em linguagem de usuário), aparência (tema auto/claro/escuro em
+  `settings.tema`), baseline, override do tipo de dia, backup export/import, lembretes opt-in
+  (best-effort, sem push server — dependem do app aberto), versão + buscar atualização.
 - **Wizard de revisão** (domingo ≥18h até terça): 6 passos — métricas prontas → O ATLETA
   (v7.4: corridas×plano + km + longão + EF da semana, via historico.json) → gatilhos →
   1 pergunta → 1 ajuste de AMBIENTE (lista do protocolo) → frase de identidade + lembrete de

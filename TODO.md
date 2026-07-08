@@ -90,6 +90,12 @@
 - ✅ **Lembrete mensal de backup** no fechamento do wizard (>30 dias ou nunca): botão âmbar de export direto; função `exportarBackup()` unificada com Ajustes.
 - ✅ **História dos checkpoints** na Evolução: card alvo × executado (pace/FC real do historico) para 29/07 → 23/09 → prova; só acende quando o primeiro teste rodar. Campo `alvo` em CHECKPOINTS.
 
+# Feito na v7.5 (jul/2026) — confiabilidade e conforto
+
+- ✅ **Toggle de tema** em Ajustes (Automático/Claro/Escuro): `settings.tema` + `aplicarTema()` (ajusta também os meta theme-color); `?tema=` de dev continua com precedência.
+- ✅ **Saúde do sistema** (primeiro card de Ajustes): pipeline (status + idade da execução, alerta >26h), análises pendentes da semana, clima, token, backup — `checarSaude()`. **Bolinha âmbar no ⚙️** quando o pipeline está quebrado/parado >48h (`atualizarBadgeSaude()` no boot e no foco) — métrica velha nunca mais passa despercebida.
+- ✅ **Guia de problemas** (sheet em Ajustes): o que fazer em cada falha em linguagem de usuário — garmin_auth (chamar o Claude, runbook no repo), quota da IA, análise que não chegou, app preso em versão velha (e o alerta de NUNCA limpar dados do site), métricas desatualizadas, troca de celular.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

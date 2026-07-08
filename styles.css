@@ -113,6 +113,11 @@ header.topo {
   font-size: 1.15rem; border-radius: 12px; border: 1px solid transparent;
 }
 .btn-ajustes.ativa { background: var(--serie-1-wash); border-color: var(--serie-1); }
+.btn-ajustes { position: relative; }
+.btn-ajustes.alerta::after { /* pipeline parado/quebrado — sinal que não exige abrir Ajustes */
+  content: ''; position: absolute; top: 7px; right: 7px; width: 9px; height: 9px;
+  border-radius: 50%; background: var(--warning); border: 2px solid var(--page);
+}
 
 /* ---------- cards ---------- */
 main { padding: 0 14px; display: grid; gap: 12px; }

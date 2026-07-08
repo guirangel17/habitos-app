@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.4'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.5'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -11,7 +11,17 @@ import * as S from './store.js';
 
 // ---------- tempo (com override de dev: ?hoje=YYYY-MM-DD&agora=HH:MM) ----------
 const params = new URLSearchParams(location.search);
-if (params.get('tema')) document.documentElement.dataset.tema = params.get('tema');
+// tema: ?tema= (dev) > escolha salva em Ajustes > automático (media query do sistema)
+function aplicarTema(v) {
+  if (v && v !== 'auto') document.documentElement.dataset.tema = v;
+  else delete document.documentElement.dataset.tema;
+  const cores = { dark: '#0d0d0d', light: '#f9f9f7' };
+  document.querySelectorAll('meta[name="theme-color"]').forEach((mt) => {
+    if (v && v !== 'auto') mt.setAttribute('content', cores[v]);
+    else mt.setAttribute('content', (mt.getAttribute('media') || '').includes('dark') ? cores.dark : cores.light);
+  });
+}
+aplicarTema(params.get('tema') || S.getState().settings.tema || 'auto');
 function agora() {
   const base = params.get('hoje') ? D.parseKey(params.get('hoje')) : new Date();
   if (params.get('agora')) {
@@ -2252,9 +2262,97 @@ function renderRelatorio(root) {
 // ================================================================
 // TELA AJUSTES
 // ================================================================
+// ---------- saúde do sistema: nada para sem o usuário ver ----------
+const ROTULO_PIPE = {
+  garmin_auth: 'conexão com a Garmin expirou — ver guia',
+  gemini_quota: 'IA sem quota — o próximo ciclo tenta sozinho',
+  erro: 'erro na última execução — ver guia',
+};
+
+function checarSaude(st, sp) {
+  const horasDesde = (iso) => (iso ? Math.round((Date.now() - new Date(iso).getTime()) / 36e5) : null);
+  const itens = [];
+  if (!sp?.ultimaExecucao) itens.push({ n: 'warn', txt: 'Pipeline Garmin sem execuções — configurar Secrets no repo' });
+  else {
+    const h = horasDesde(sp.ultimaExecucao);
+    if (sp.status !== 'ok') itens.push({ n: 'warn', txt: `Pipeline: ${ROTULO_PIPE[sp.status] || sp.status}` });
+    else if (h > 26) itens.push({ n: 'warn', txt: `Pipeline não roda há ${Math.round(h / 24)} dia(s) — métricas de corrida podem estar velhas` });
+    else itens.push({ n: 'ok', txt: `Pipeline Garmin · rodou há ${h < 1 ? 'menos de 1h' : `${h}h`}` });
+  }
+  const seteD = D.addDays(hojeKey(), -7);
+  const semAnalise = (dadosHistorico?.corridas || []).filter((c) => c.date >= seteD && c.date <= hojeKey()
+    && (c.distanciaKm || 0) >= 1
+    && !(dadosAnalises?.porData?.[c.date] || []).some((a) => a.activityId === c.activityId));
+  itens.push(semAnalise.length
+    ? { n: 'warn', txt: `${semAnalise.length} corrida(s) da semana sem análise — toque o 🛰️ na aba Treino` }
+    : { n: 'ok', txt: 'Análises de corrida em dia' });
+  const hc = horasDesde(dadosClima?.atualizadoEm);
+  itens.push(hc === null ? { n: 'info', txt: 'Previsão do tempo ainda sem dados' }
+    : hc > 26 ? { n: 'warn', txt: `Previsão do tempo parada há ${Math.round(hc / 24)} dia(s)` }
+      : { n: 'ok', txt: 'Previsão do tempo atualizada' });
+  itens.push(patGarmin()
+    ? { n: 'ok', txt: 'Token do GitHub salvo — disparo rápido ativo' }
+    : { n: 'info', txt: 'Sem token do GitHub — análises só nos horários automáticos' });
+  const diasBk = st.settings.lastBackupTs ? Math.floor((Date.now() - st.settings.lastBackupTs) / 864e5) : null;
+  itens.push(diasBk === null ? { n: 'warn', txt: 'Nenhum backup ainda — os dados vivem só neste aparelho' }
+    : diasBk > 30 ? { n: 'warn', txt: `Último backup há ${diasBk} dias` }
+      : { n: 'ok', txt: `Backup em dia (há ${diasBk === 0 ? 'hoje' : `${diasBk}d`})` });
+  return itens;
+}
+
+// bolinha âmbar no ⚙️ quando o pipeline está parado/quebrado — o aviso que não depende de abrir Ajustes
+async function atualizarBadgeSaude() {
+  const sp = await fetchDados('pipeline-status.json');
+  const h = sp?.ultimaExecucao ? (Date.now() - new Date(sp.ultimaExecucao).getTime()) / 36e5 : Infinity;
+  $('#btn-ajustes')?.classList.toggle('alerta', !sp || sp.status !== 'ok' || h > 48);
+}
+
+function sheetGuiaProblemas() {
+  const item = (ic, t, d) => `<div class="exercicio"><span class="ex-num">${ic}</span><span class="ex-nome">${t}<small>${d}</small></span></div>`;
+  abrirSheet(el(`<div><h3>🛟 Guia de problemas</h3>
+    <p class="detalhe-fase">O card de saúde em Ajustes diz O QUE parou; aqui está o que fazer em cada caso.</p>
+    <div class="exercicios">
+      ${item('🛰️', 'Conexão com a Garmin expirou (garmin_auth)', 'Abra uma sessão do Claude no servidor e peça "renova o token do Garmin" — o passo a passo (túnel + login + Secret) está no CLAUDE.md do repo, leva ~5 min. Nenhuma corrida se perde: tudo fica na Garmin e é analisado quando voltar.')}
+      ${item('⏳', 'IA sem quota (gemini_quota)', 'Resolve sozinho no próximo horário automático. Se passar de 1 dia, conferir a chave GEMINI_API_KEY nos Secrets do repo (GitHub → Settings → Actions).')}
+      ${item('✨', 'Análise não apareceu', 'Com token: 2–4 min depois do 🛰️. Sem token: espera os horários automáticos (manhã, noite e 14h). Corrida com +1 dia sem análise = ver o status na saúde.')}
+      ${item('📵', 'App preso em versão antiga', 'Saia do app e volte (ele checa sozinho ao voltar). Persistiu: Buscar atualização aqui em Ajustes e espere na Hoje. Teimou: guia anônima na URL do app pra ver o que o servidor entrega; último recurso: chrome://serviceworker-internals → Unregister do escopo do app — é seguro, NÃO apaga dados. O que NUNCA fazer: "Limpar dados do site" — isso apaga seus registros.')}
+      ${item('📊', 'Métricas de corrida desatualizadas', 'Quase sempre é o pipeline parado — a saúde diz há quanto tempo e o motivo. O ⚙️ do header ganha uma bolinha âmbar quando isso acontece, pra você não passar semanas sem ver.')}
+      ${item('💾', 'Troquei ou perdi o celular', 'Instale o app de novo pelo Chrome (guirangel17.github.io/habitos-app) e use Ajustes → Importar backup com o último export. É por isso que o lembrete mensal de backup existe.')}
+    </div></div>`));
+}
+
 function renderAjustes(root) {
   const st = S.getState();
   const key = hojeKey();
+
+  // saúde do sistema — primeiro card: é o que responde "tá tudo de pé?"
+  const cardSaude = el(`<div class="card"><h2>Saúde do sistema <small>· pra nada parar sem você ver</small></h2>
+    <div id="saude-itens" style="display:grid;gap:7px;font-size:.8rem;line-height:1.4"><span style="color:var(--muted)">verificando…</span></div>
+    <button class="acao-secundaria" id="guia" style="margin-top:8px">🛟 Guia de problemas ›</button></div>`);
+  cardSaude.querySelector('#guia').onclick = sheetGuiaProblemas;
+  root.append(cardSaude);
+  Promise.all([fetchDados('pipeline-status.json'), carregarAnalises()]).then(([sp]) => {
+    const box = cardSaude.querySelector('#saude-itens');
+    if (!box || !box.isConnected) return;
+    box.innerHTML = checarSaude(S.getState(), sp).map((i) => `<div style="display:flex;gap:8px;align-items:baseline">
+      <span>${i.n === 'ok' ? '✅' : i.n === 'warn' ? '⚠️' : 'ℹ️'}</span>
+      <span style="color:${i.n === 'warn' ? 'var(--ink)' : 'var(--ink-2)'}">${i.txt}</span></div>`).join('');
+    atualizarBadgeSaude();
+  });
+
+  // aparência
+  const temaAtual = st.settings.tema || 'auto';
+  const cardTema = el(`<div class="card"><h2>Aparência</h2><div class="chips" style="margin-top:4px">
+    ${[['auto', 'Automático'], ['light', '☀️ Claro'], ['dark', '🌙 Escuro']].map(([v, l]) => `<button data-v="${v}" class="${temaAtual === v ? 'sel' : ''}">${l}</button>`).join('')}
+  </div></div>`);
+  cardTema.querySelectorAll('button').forEach((b) => {
+    b.onclick = () => {
+      S.setSetting('tema', b.dataset.v);
+      aplicarTema(b.dataset.v);
+      cardTema.querySelectorAll('button').forEach((x) => x.classList.toggle('sel', x === b));
+    };
+  });
+  root.append(cardTema);
 
   // baseline
   const card = el(`<div class="card"><h2>Baseline <small>· estimativa da semana típica ANTES do protocolo — as metas de −50% partem daqui</small></h2><div id="linhas"></div></div>`);
@@ -2485,10 +2583,12 @@ render();
 agendarLembretes();
 carregarAnalises();
 autoDispararAnalise();
+atualizarBadgeSaude();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   carregarAnalises(true);
   autoDispararAnalise();
+  atualizarBadgeSaude();
 });
 // atalho do ícone do PWA (?sos=1) e helpers de dev/verificação
 if (params.get('sos')) {
