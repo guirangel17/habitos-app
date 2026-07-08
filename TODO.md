@@ -47,6 +47,11 @@
 
 - ✅ Countdown "N sem até a Pampulha" removido do header — redundante com a strip da prova no dashboard; o header ficou só chip do dia + ⚙️.
 
+# Feito na v6.3 (jul/2026)
+
+- ✅ Botão voltar do Android: fecha uma camada por vez (sheet/overlay → dia do Treino → aba Hoje → sai) via sentinela no history, em vez de fechar o app direto.
+- ✅ Atualização confiável: `reg.update()` quando o app volta ao foco + `location.reload()` quando o SW novo assume (o snackbar antigo não recarregava o shell — era por isso que a versão "não subia" mesmo fechando e abrindo).
+
 # v7 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

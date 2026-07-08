@@ -1,5 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '6.2'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '6.3'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -98,6 +98,7 @@ function abrirSheet(conteudoEl) {
   fundo.querySelector('.sheet').appendChild(conteudoEl);
   fundo.addEventListener('click', (e) => { if (e.target === fundo) fecharSheet(); });
   document.body.appendChild(fundo);
+  protegerVoltar();
 }
 function fecharSheet() { $('.sheet-fundo')?.remove(); }
 
@@ -704,6 +705,7 @@ function abrirSOS() {
     };
   });
   document.body.appendChild(tela);
+  protegerVoltar();
 }
 function fecharSOS() { clearInterval(sosTimer); $('.sos-tela')?.remove(); }
 
@@ -719,6 +721,7 @@ function sosScript(kind, passoInicial = 0) {
   </div>`);
   tela.querySelector('.fechar').onclick = fecharSOS;
   document.body.appendChild(tela);
+  protegerVoltar();
   const corpo = tela.querySelector('#corpo');
 
   const mostrar = () => {
@@ -1168,6 +1171,7 @@ function contadoresOverlay() {
   tela.querySelector('#jardim-leg').append(legendaJardim(st, key));
   tela.querySelector('.fechar').onclick = () => { clearInterval(contadorTimer); tela.remove(); };
   document.body.appendChild(tela);
+  protegerVoltar();
   const wrap = tela.querySelector('#aneis');
 
   const defs = [
@@ -1247,6 +1251,7 @@ function wizardRevisao(semanaIni) {
   </div>`);
   tela.querySelector('.fechar').onclick = fecharSOS;
   document.body.appendChild(tela);
+  protegerVoltar();
   const corpo = tela.querySelector('#corpo');
 
   const linhaMetrica = (nome, v, vAnt, alvo, okFn) => {
@@ -1913,7 +1918,29 @@ function render() {
 
   document.querySelectorAll('nav.abas button').forEach((b) => b.classList.toggle('ativa', b.dataset.aba === abaAtiva));
   $('#btn-ajustes').classList.toggle('ativa', abaAtiva === 'ajustes');
+  if (temCamadaAberta()) protegerVoltar();
 }
+
+// ---------- botão voltar do Android ----------
+// O voltar fecha UMA camada por vez: sheet/overlay → dia selecionado no Treino → volta pra
+// aba Hoje → (na Hoje, sem nada aberto) sai do app — padrão Material de bottom nav.
+// Mecânica: uma entrada-sentinela no history; o popstate desfaz a camada do topo e re-arma
+// a sentinela enquanto houver camada. Overlays novos DEVEM chamar protegerVoltar() ao abrir.
+let sentinelaVoltar = false;
+function protegerVoltar() {
+  if (!sentinelaVoltar) { sentinelaVoltar = true; history.pushState({ pampulha: 1 }, ''); }
+}
+function temCamadaAberta() {
+  return !!$('.sheet-fundo') || !!$('.sos-tela') || diaTreinoSel !== null || abaAtiva !== 'hoje';
+}
+window.addEventListener('popstate', () => {
+  sentinelaVoltar = false;
+  if ($('.sheet-fundo')) fecharSheet();
+  else if ($('.sos-tela')) { clearInterval(contadorTimer); fecharSOS(); }
+  else if (diaTreinoSel !== null) { diaTreinoSel = null; render(); }
+  else if (abaAtiva !== 'hoje') { abaAtiva = 'hoje'; render(); }
+  if (temCamadaAberta()) protegerVoltar();
+});
 
 document.querySelectorAll('nav.abas button').forEach((b) => {
   b.onclick = () => { if (b.dataset.aba !== 'treino') diaTreinoSel = null; abaAtiva = b.dataset.aba; render(); };
@@ -1944,12 +1971,21 @@ if (params.get('contrato') && !D.contratoAtivo(S.getState().events, hojeKey(), a
   S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'drink' });
 }
 
-// service worker + aviso de atualização
+// service worker + atualização
+// PWA standalone no Android quase nunca morre ao "fechar" — sem navegação nova, o browser não
+// checa o sw.js e o app fica preso na versão velha. Por isso: (1) checar update sempre que o
+// app volta ao foco; (2) quando o SW novo assume, RECARREGAR a página (o shell antigo continua
+// rodando até um reload — só o snackbar não atualizava nada). Dados vivem no localStorage.
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('./sw.js');
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState !== 'visible') return;
+    try { (await navigator.serviceWorker.getRegistration())?.update(); } catch { /* offline */ }
+  });
   let recarregou = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (recarregou) return; recarregou = true;
-    snackbar('App atualizado ✓');
+    if (temCamadaAberta()) snackbar('Atualização pronta — feche e abra para aplicar.');
+    else location.reload();
   });
 }

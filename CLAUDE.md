@@ -114,6 +114,11 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
 9. Estética de referência do usuário: app **SugarCut** (Android) — anéis, gradientes, números
    grandes, dark. Gradiente da marca: `--grad` (azul→aqua). Ele acha telas cheias de card
    confusas — na dúvida, esconda atrás de 1 toque.
+10. **O voltar do Android fecha uma camada por vez** (sheet/overlay → dia selecionado no
+   Treino → aba Hoje → sai do app; padrão Material de bottom nav). Mecânica: entrada-sentinela
+   no history (`protegerVoltar`/`popstate` no app.js). Todo overlay novo que usar
+   `document.body.appendChild` DEVE chamar `protegerVoltar()` ao abrir — senão o voltar fecha
+   o app no meio do fluxo.
 
 ## Deploy e ambiente — PEGADINHAS IMPORTANTES
 
@@ -132,8 +137,12 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
 - **Commits**: `git -c user.name="Guilherme Moura" -c user.email="guirangel17@users.noreply.github.com" commit`.
 - **A CADA DEPLOY que muda arquivos do shell: bumpar `VERSAO` em `sw.js` E `VERSAO_APP` em
   `app.js` (mantêm-se em sincronia).** Sem isso o service worker cache-first nunca entrega a
-  versão nova. O CDN do Pages segura ~10 min; no celular: fechar e abrir o app 2×, ou
-  Ajustes → "Buscar atualização". A versão instalada aparece em Ajustes.
+  versão nova. O CDN do Pages segura ~10 min. Desde a v6.3 o app checa update ao voltar ao
+  foco (`visibilitychange` → `reg.update()`) e **recarrega sozinho** quando o SW novo assume
+  (`controllerchange` → `location.reload()`; com sheet/overlay aberto, avisa por snackbar) —
+  antes disso, "fechar e abrir" NÃO atualizava: PWA standalone no Android não morre ao fechar
+  e a página continuava rodando o shell velho. Fallback manual: Ajustes → Buscar atualização.
+  A versão instalada aparece em Ajustes.
 - Dados do usuário ficam SÓ no aparelho dele (localStorage) — deploy nunca afeta dados. Backup =
   export JSON em Ajustes.
 
