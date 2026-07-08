@@ -1,0 +1,39 @@
+{
+ "schema": 1,
+ "atualizadoEm": "2026-07-08T11:00:09-03:00",
+ "fcMax": 190,
+ "zonas": {
+  "z1": [
+   0,
+   132
+  ],
+  "z2": [
+   133,
+   152
+  ],
+  "z3": [
+   153,
+   165
+  ],
+  "z4": [
+   166,
+   177
+  ],
+  "z5": [
+   178,
+   999
+  ]
+ },
+ "corridas": [],
+ "tendencias": {
+  "paceZ2Serie": [],
+  "paceZ2Atual": null,
+  "paceZ2Ha8Sem": null,
+  "vo2max": {
+   "atual": null,
+   "ha8Sem": null
+  },
+  "cadencia4Sem": null,
+  "kmPorSemana4Sem": 0.0
+ }
+}
