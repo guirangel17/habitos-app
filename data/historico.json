@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-08T11:34:32-03:00",
+ "atualizadoEm": "2026-07-08T12:45:19-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -36,6 +36,7 @@
    "cadencia": 149,
    "vo2max": 43.0,
    "teAerobico": 4.0,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -49,6 +50,7 @@
    "cadencia": 152,
    "vo2max": null,
    "teAerobico": 3.4,
+   "paradoPct": 3,
    "tipoPlano": null
   },
   {
@@ -62,6 +64,7 @@
    "cadencia": 82,
    "vo2max": 45.0,
    "teAerobico": 3.5,
+   "paradoPct": 39,
    "tipoPlano": null
   },
   {
@@ -75,6 +78,7 @@
    "cadencia": 149,
    "vo2max": 46.0,
    "teAerobico": 3.0,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -88,6 +92,7 @@
    "cadencia": 156,
    "vo2max": null,
    "teAerobico": 3.4,
+   "paradoPct": 8,
    "tipoPlano": null
   },
   {
@@ -101,6 +106,7 @@
    "cadencia": 133,
    "vo2max": null,
    "teAerobico": 2.2,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -114,6 +120,7 @@
    "cadencia": 154,
    "vo2max": 46.0,
    "teAerobico": 2.9,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -127,6 +134,7 @@
    "cadencia": 162,
    "vo2max": 46.0,
    "teAerobico": 3.1,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -140,6 +148,7 @@
    "cadencia": 151,
    "vo2max": 46.0,
    "teAerobico": 3.1,
+   "paradoPct": 3,
    "tipoPlano": null
   },
   {
@@ -153,6 +162,7 @@
    "cadencia": 161,
    "vo2max": 46.0,
    "teAerobico": 3.4,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -166,6 +176,7 @@
    "cadencia": 119,
    "vo2max": 46.0,
    "teAerobico": 3.2,
+   "paradoPct": 16,
    "tipoPlano": null
   },
   {
@@ -179,6 +190,7 @@
    "cadencia": 148,
    "vo2max": 47.0,
    "teAerobico": 2.7,
+   "paradoPct": 3,
    "tipoPlano": null
   },
   {
@@ -192,6 +204,7 @@
    "cadencia": 156,
    "vo2max": 47.0,
    "teAerobico": 3.1,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -205,6 +218,7 @@
    "cadencia": 101,
    "vo2max": 47.0,
    "teAerobico": 3.4,
+   "paradoPct": 28,
    "tipoPlano": null
   },
   {
@@ -218,6 +232,7 @@
    "cadencia": 162,
    "vo2max": 45.0,
    "teAerobico": 4.2,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -231,6 +246,7 @@
    "cadencia": 119,
    "vo2max": 47.0,
    "teAerobico": 3.3,
+   "paradoPct": 14,
    "tipoPlano": null
   },
   {
@@ -244,6 +260,7 @@
    "cadencia": 155,
    "vo2max": 48.0,
    "teAerobico": 4.5,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -257,6 +274,7 @@
    "cadencia": 146,
    "vo2max": 47.0,
    "teAerobico": 3.0,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -270,6 +288,7 @@
    "cadencia": 164,
    "vo2max": 46.0,
    "teAerobico": 3.1,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -283,6 +302,7 @@
    "cadencia": 118,
    "vo2max": 47.0,
    "teAerobico": 3.0,
+   "paradoPct": 14,
    "tipoPlano": null
   },
   {
@@ -296,6 +316,7 @@
    "cadencia": 80,
    "vo2max": null,
    "teAerobico": 1.1,
+   "paradoPct": 45,
    "tipoPlano": null
   },
   {
@@ -309,6 +330,7 @@
    "cadencia": 114,
    "vo2max": 48.0,
    "teAerobico": 3.0,
+   "paradoPct": 11,
    "tipoPlano": null
   },
   {
@@ -322,6 +344,7 @@
    "cadencia": 161,
    "vo2max": 47.0,
    "teAerobico": 4.0,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -335,6 +358,7 @@
    "cadencia": 157,
    "vo2max": 48.0,
    "teAerobico": 2.9,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -348,6 +372,7 @@
    "cadencia": 154,
    "vo2max": 47.0,
    "teAerobico": 3.5,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -361,6 +386,7 @@
    "cadencia": 165,
    "vo2max": 48.0,
    "teAerobico": 3.5,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -374,6 +400,7 @@
    "cadencia": 101,
    "vo2max": 48.0,
    "teAerobico": 3.1,
+   "paradoPct": 23,
    "tipoPlano": null
   },
   {
@@ -387,6 +414,7 @@
    "cadencia": 151,
    "vo2max": 47.0,
    "teAerobico": 3.6,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -400,6 +428,7 @@
    "cadencia": 107,
    "vo2max": 48.0,
    "teAerobico": 2.7,
+   "paradoPct": 20,
    "tipoPlano": null
   },
   {
@@ -413,6 +442,7 @@
    "cadencia": 150,
    "vo2max": 48.0,
    "teAerobico": 3.4,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -426,6 +456,7 @@
    "cadencia": 97,
    "vo2max": 48.0,
    "teAerobico": 3.2,
+   "paradoPct": 23,
    "tipoPlano": null
   },
   {
@@ -439,6 +470,7 @@
    "cadencia": 155,
    "vo2max": 48.0,
    "teAerobico": 3.1,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -452,6 +484,7 @@
    "cadencia": 90,
    "vo2max": 48.0,
    "teAerobico": 3.0,
+   "paradoPct": 26,
    "tipoPlano": null
   },
   {
@@ -465,6 +498,7 @@
    "cadencia": 105,
    "vo2max": 49.0,
    "teAerobico": 2.8,
+   "paradoPct": 21,
    "tipoPlano": null
   },
   {
@@ -478,6 +512,7 @@
    "cadencia": 156,
    "vo2max": 48.0,
    "teAerobico": 3.4,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -491,6 +526,7 @@
    "cadencia": 167,
    "vo2max": 47.0,
    "teAerobico": 3.8,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -504,6 +540,7 @@
    "cadencia": 108,
    "vo2max": 48.0,
    "teAerobico": 2.8,
+   "paradoPct": 17,
    "tipoPlano": null
   },
   {
@@ -517,6 +554,7 @@
    "cadencia": 157,
    "vo2max": 48.0,
    "teAerobico": 3.6,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -530,6 +568,7 @@
    "cadencia": 156,
    "vo2max": 47.0,
    "teAerobico": 3.9,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -543,6 +582,7 @@
    "cadencia": 158,
    "vo2max": 48.0,
    "teAerobico": 3.6,
+   "paradoPct": 3,
    "tipoPlano": null
   },
   {
@@ -556,6 +596,7 @@
    "cadencia": 100,
    "vo2max": 48.0,
    "teAerobico": 2.5,
+   "paradoPct": 25,
    "tipoPlano": null
   },
   {
@@ -569,6 +610,7 @@
    "cadencia": 156,
    "vo2max": 48.0,
    "teAerobico": 5.0,
+   "paradoPct": 4,
    "tipoPlano": null
   },
   {
@@ -582,6 +624,7 @@
    "cadencia": 158,
    "vo2max": 48.0,
    "teAerobico": 3.0,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -595,6 +638,7 @@
    "cadencia": 99,
    "vo2max": 48.0,
    "teAerobico": 2.7,
+   "paradoPct": 20,
    "tipoPlano": null
   },
   {
@@ -608,6 +652,7 @@
    "cadencia": 118,
    "vo2max": 48.0,
    "teAerobico": 2.1,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -621,6 +666,7 @@
    "cadencia": 159,
    "vo2max": 47.0,
    "teAerobico": 4.0,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -634,6 +680,7 @@
    "cadencia": 95,
    "vo2max": 47.0,
    "teAerobico": 2.7,
+   "paradoPct": 26,
    "tipoPlano": null
   },
   {
@@ -647,6 +694,7 @@
    "cadencia": 159,
    "vo2max": 46.0,
    "teAerobico": 3.7,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -660,6 +708,7 @@
    "cadencia": 90,
    "vo2max": 46.0,
    "teAerobico": 2.8,
+   "paradoPct": 28,
    "tipoPlano": null
   },
   {
@@ -673,6 +722,7 @@
    "cadencia": 156,
    "vo2max": 46.0,
    "teAerobico": 3.6,
+   "paradoPct": 2,
    "tipoPlano": null
   },
   {
@@ -686,6 +736,7 @@
    "cadencia": 153,
    "vo2max": 46.0,
    "teAerobico": 2.8,
+   "paradoPct": 1,
    "tipoPlano": null
   },
   {
@@ -699,6 +750,7 @@
    "cadencia": 94,
    "vo2max": 47.0,
    "teAerobico": 3.2,
+   "paradoPct": 25,
    "tipoPlano": null
   },
   {
@@ -712,6 +764,7 @@
    "cadencia": 158,
    "vo2max": 46.0,
    "teAerobico": 5.0,
+   "paradoPct": 0,
    "tipoPlano": null
   },
   {
@@ -725,6 +778,7 @@
    "cadencia": 93,
    "vo2max": 48.0,
    "teAerobico": 2.8,
+   "paradoPct": 27,
    "tipoPlano": null
   },
   {
@@ -738,6 +792,7 @@
    "cadencia": 161,
    "vo2max": 48.0,
    "teAerobico": 3.8,
+   "paradoPct": 0,
    "tipoPlano": "prova"
   }
  ],
@@ -746,10 +801,6 @@
    {
     "date": "2026-01-14",
     "seg": 434
-   },
-   {
-    "date": "2026-01-15",
-    "seg": 446
    },
    {
     "date": "2026-01-19",
@@ -764,10 +815,6 @@
     "seg": 443
    },
    {
-    "date": "2026-02-05",
-    "seg": 458
-   },
-   {
     "date": "2026-02-23",
     "seg": 450
    },
@@ -776,24 +823,8 @@
     "seg": 415
    },
    {
-    "date": "2026-02-26",
-    "seg": 421
-   },
-   {
-    "date": "2026-03-05",
-    "seg": 465
-   },
-   {
     "date": "2026-03-16",
     "seg": 457
-   },
-   {
-    "date": "2026-03-19",
-    "seg": 476
-   },
-   {
-    "date": "2026-03-26",
-    "seg": 487
    },
    {
     "date": "2026-04-04",
@@ -804,76 +835,36 @@
     "seg": 437
    },
    {
-    "date": "2026-04-09",
-    "seg": 501
-   },
-   {
     "date": "2026-04-15",
     "seg": 435
-   },
-   {
-    "date": "2026-04-16",
-    "seg": 491
    },
    {
     "date": "2026-04-21",
     "seg": 448
    },
    {
-    "date": "2026-04-23",
-    "seg": 484
-   },
-   {
     "date": "2026-05-04",
     "seg": 435
-   },
-   {
-    "date": "2026-05-05",
-    "seg": 514
-   },
-   {
-    "date": "2026-05-07",
-    "seg": 481
    },
    {
     "date": "2026-05-11",
     "seg": 449
    },
    {
-    "date": "2026-05-14",
-    "seg": 480
-   },
-   {
     "date": "2026-05-20",
     "seg": 365
-   },
-   {
-    "date": "2026-05-21",
-    "seg": 467
    },
    {
     "date": "2026-05-26",
     "seg": 416
    },
    {
-    "date": "2026-05-28",
-    "seg": 531
-   },
-   {
     "date": "2026-05-31",
     "seg": 573
    },
    {
-    "date": "2026-06-02",
-    "seg": 485
-   },
-   {
     "date": "2026-06-08",
     "seg": 411
-   },
-   {
-    "date": "2026-06-11",
-    "seg": 482
    },
    {
     "date": "2026-06-15",
@@ -882,23 +873,15 @@
    {
     "date": "2026-06-22",
     "seg": 431
-   },
-   {
-    "date": "2026-06-25",
-    "seg": 504
-   },
-   {
-    "date": "2026-07-02",
-    "seg": 482
    }
   ],
-  "paceZ2Atual": "7:52",
-  "paceZ2Ha8Sem": "8:01",
+  "paceZ2Atual": "6:57",
+  "paceZ2Ha8Sem": "7:24",
   "vo2max": {
    "atual": 48.0,
    "ha8Sem": 47.0
   },
-  "cadencia4Sem": 129,
+  "cadencia4Sem": 157,
   "kmPorSemana4Sem": 14.6
  }
 }
