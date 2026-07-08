@@ -239,9 +239,14 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .cronograma { max-height: 55dvh; overflow-y: auto; display: grid; gap: 6px; padding-right: 2px; }
 .cron-mes { font-size: 0.7rem; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 0 2px; }
 .cron-item {
-  display: grid; grid-template-columns: 26px 44px 1fr; gap: 8px; align-items: center;
-  border: 1px solid var(--border); border-radius: 10px; padding: 9px 10px; text-align: left;
+  display: grid; grid-template-columns: 1fr 34px; align-items: stretch;
+  border: 1px solid var(--border); border-radius: 10px; text-align: left;
 }
+.cron-toggle {
+  display: grid; grid-template-columns: 26px 44px 1fr; gap: 8px; align-items: center;
+  padding: 9px 4px 9px 10px; text-align: left;
+}
+.cron-ver { border: none; border-left: 1px solid var(--grid); border-radius: 0 10px 10px 0; font-size: 1.1rem; }
 .cron-item .caixa {
   width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--baseline);
   display: grid; place-items: center; font-size: 0.75rem; color: var(--surface);

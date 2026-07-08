@@ -768,12 +768,16 @@ function renderTreino(root) {
     const ok = !!feitasCorrida.get(data);
     const passada = data < key;
     const hoje = data === key;
-    const item = el(`<button class="cron-item ${ok ? 'feita' : ''} ${passada && !ok ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
-      <span class="caixa">${ok ? '✓' : ''}</span>
-      <span class="cron-data num">${fmtData(data)}</span>
-      <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}</span>
-    </button>`);
-    item.onclick = () => S.addEvent({ type: 'workout', date: data, kind: 'corrida', done: !ok });
+    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
+      <button class="cron-toggle">
+        <span class="caixa">${ok ? '✓' : ''}</span>
+        <span class="cron-data num">${fmtData(data)}</span>
+        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}</span>
+      </button>
+      <button class="tr-ver cron-ver" aria-label="ver guia da corrida">›</button>
+    </div>`);
+    item.querySelector('.cron-toggle').onclick = () => S.addEvent({ type: 'workout', date: data, kind: 'corrida', done: !ok });
+    item.querySelector('.cron-ver').onclick = () => sheetTreinoDetalhe('corrida', { corrida: { tipo, nome } }, data);
     if (!alvoScroll && data >= key) alvoScroll = item;
     cron.append(item);
   }
