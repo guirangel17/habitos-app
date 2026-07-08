@@ -1,5 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '6.3'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.0'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -388,6 +388,24 @@ function slotContextual(st, key) {
       <span class="seta">→</span>
     </button>`);
     c.onclick = () => wizardRevisao(semanaRev);
+    return [c];
+  }
+
+  // 4. corrida confirmada pelo Garmin sem check no app → 1 toque (nunca automático)
+  const pend = analisePendenteConfirmacao(st, key);
+  if (pend) {
+    const g = pend.analise.garmin;
+    const c = el(`<div class="card ressaca-banner"><b>🛰️ O Garmin registrou sua corrida de ${fmtData(pend.date)}</b>
+      ${String(g.distanciaKm).replace('.', ',')} km em pace ${g.paceMedio || '–'}/km — a análise está na aba Treino. Marcar o treino como feito?
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="acao-primaria" style="margin:0;padding:11px" id="sim">✓ Marcar feito</button>
+        <button class="acao-secundaria" style="margin:0;width:auto" id="nao">agora não</button>
+      </div></div>`);
+    c.querySelector('#sim').onclick = () => {
+      S.addEvent({ type: 'workout', date: pend.date, kind: 'corrida', done: true });
+      snackbar('Treino no papel. 👊');
+    };
+    c.querySelector('#nao').onclick = () => S.setSetting(`garminDispensado_${pend.date}`, true);
     return [c];
   }
 
@@ -803,6 +821,154 @@ function iniciarOnda(corpo) {
 }
 
 // ================================================================
+// ANÁLISES GARMIN — consome data/*.json gerados pelo pipeline (GitHub Actions)
+// Com PAT em Ajustes: lê pela API do GitHub (sem cache) e dispara o workflow.
+// Sem PAT: fetch relativo via Pages (SW faz network-first em /data/).
+// ================================================================
+const REPO_API = 'https://api.github.com/repos/guirangel17/habitos-app';
+let dadosAnalises = null;   // { doc, porData: {date: [entradas]} }
+let dadosHistorico = null;
+let analisesCarregando = null; // promise em voo do fetch, ou null
+let analisesTentou = false;
+let analiseAguardando = false; // polling pós-disparo em andamento
+let pollAnalise = null;
+
+const patGarmin = () => S.getState().settings.garminPat || null;
+
+async function fetchDados(nome) {
+  const pat = patGarmin();
+  if (pat) {
+    try {
+      const r = await fetch(`${REPO_API}/contents/data/${nome}?ref=main`, {
+        headers: { Accept: 'application/vnd.github.raw+json', Authorization: `Bearer ${pat}` },
+        cache: 'no-store',
+      });
+      if (r.ok) return await r.json();
+    } catch { /* cai no fallback do Pages */ }
+  }
+  try {
+    const r = await fetch(`./data/${nome}`, { cache: 'no-cache' });
+    if (r.ok) return await r.json();
+  } catch { /* offline sem cache */ }
+  return null;
+}
+
+function carregarAnalises(force = false) {
+  if (analisesCarregando) return analisesCarregando; // promise em voo
+  if ((dadosAnalises || analisesTentou) && !force) return Promise.resolve();
+  analisesCarregando = (async () => {
+    const antes = dadosAnalises?.doc?.atualizadoEm ?? null;
+    const [an, hist] = await Promise.all([fetchDados('analises.json'), fetchDados('historico.json')]);
+    analisesTentou = true;
+    if (hist) dadosHistorico = hist;
+    if (an) {
+      const porData = {};
+      for (const x of an.analises || []) (porData[x.date] = porData[x.date] || []).push(x);
+      dadosAnalises = { doc: an, porData };
+      if (an.atualizadoEm !== antes) render();
+    }
+  })().finally(() => { analisesCarregando = null; });
+  return analisesCarregando;
+}
+
+const analisesDoDia = (key) => dadosAnalises?.porData?.[key] || [];
+
+// dispara o workflow do Actions (caminho rápido ~2-4 min) — exige PAT
+async function dispararAnalise(origem) {
+  const pat = patGarmin();
+  if (!pat) return false;
+  const ultimo = Number(S.getState().settings.garminUltimoDisparo || 0);
+  if (origem === 'auto' && Date.now() - ultimo < 20 * 60e3) return false;
+  try {
+    const r = await fetch(`${REPO_API}/actions/workflows/analisar-corridas.yml/dispatches`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${pat}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: 'main' }),
+    });
+    if (r.status !== 204) throw new Error(`HTTP ${r.status}`);
+    S.setSetting('garminUltimoDisparo', Date.now());
+    iniciarPollingAnalise();
+    if (origem !== 'auto') snackbar('Análise disparada — chega em ~2-4 min 🛰️');
+    return true;
+  } catch {
+    if (origem !== 'auto') snackbar('Não consegui disparar — confira o token em Ajustes e a rede.');
+    return false;
+  }
+}
+
+function iniciarPollingAnalise() {
+  clearInterval(pollAnalise);
+  const fim = Date.now() + 8 * 60e3;
+  analiseAguardando = true;
+  pollAnalise = setInterval(async () => {
+    if (Date.now() > fim) { clearInterval(pollAnalise); analiseAguardando = false; render(); return; }
+    const antes = dadosAnalises?.doc?.atualizadoEm ?? null;
+    await carregarAnalises(true);
+    if ((dadosAnalises?.doc?.atualizadoEm ?? null) !== antes) {
+      clearInterval(pollAnalise);
+      analiseAguardando = false;
+      snackbar('Análise da corrida pronta ✨');
+      render();
+    }
+  }, 30e3);
+}
+
+// auto-disparo ao abrir/focar: dia com corrida planejada e ainda sem análise
+function autoDispararAnalise() {
+  const key = hojeKey();
+  if (!patGarmin() || agora().getHours() < 7) return;
+  if (!D.treinoDoDia(key).corrida || analisesDoDia(key).length) return;
+  dispararAnalise('auto');
+}
+
+// confirmação de 1 toque: Garmin registrou corrida planejada sem check no app (últimos 3 dias)
+function analisePendenteConfirmacao(st, key) {
+  if (!dadosAnalises) return null;
+  for (const [date, lista] of Object.entries(dadosAnalises.porData)) {
+    if (date > key || date < D.addDays(key, -3)) continue;
+    if (!D.treinoDoDia(date).corrida) continue;
+    if (D.workoutsDoDia(st.events, date).corrida !== undefined) continue;
+    if (st.settings[`garminDispensado_${date}`]) continue;
+    return { date, analise: lista[0] };
+  }
+  return null;
+}
+
+const ROTULO_TE = {
+  RECOVERY: 'Recuperação', AEROBIC_BASE: 'Base aeróbica', TEMPO: 'Tempo', LACTATE_THRESHOLD: 'Limiar',
+  VO2MAX: 'VO2max', ANAEROBIC_CAPACITY: 'Anaeróbico', SPRINT: 'Sprint',
+};
+
+function blocoAnalise(a) {
+  const g = a.garmin, ia = a.ia;
+  const stat = (l, v) => `<div class="ana-stat"><span class="l">${l}</span><b class="num">${v ?? '–'}</b></div>`;
+  const zonas = g.zonasFc ? `<div class="ana-zonas">
+      <div class="ana-zbar">${['z1', 'z2', 'z3', 'z4', 'z5'].map((z, i) => (g.zonasFc[z] ? `<span style="width:${g.zonasFc[z]}%;background:var(--seq-${i + 1})"></span>` : '')).join('')}</div>
+      <div class="ana-zleg">${['z1', 'z2', 'z3', 'z4', 'z5'].filter((z) => g.zonasFc[z]).map((z, i) => `${z.toUpperCase()} ${g.zonasFc[z]}%`).join(' · ')}</div>
+    </div>` : '';
+  const splits = g.splits?.length ? `<div class="ana-splits">${g.splits.map((s) => `<span class="num">${s.km}k ${s.pace}${s.fc ? ` · ${s.fc}` : ''}</span>`).join('')}</div>` : '';
+  return el(`<div class="analise">
+    <div class="ana-cab">SUA CORRIDA · GARMIN${ia.nota_execucao ? `<span class="ana-nota num">execução ${ia.nota_execucao}/10</span>` : ''}</div>
+    <div class="ana-stats">
+      ${stat('pace', g.paceMedio ? `${g.paceMedio}/km` : null)}
+      ${stat('distância', `${String(g.distanciaKm).replace('.', ',')} km`)}
+      ${stat('tempo', `${g.duracaoMin} min`)}
+      ${stat('FC méd/máx', g.fcMedia ? `${g.fcMedia}/${g.fcMax}` : null)}
+      ${stat('cadência', g.cadencia ? `${g.cadencia} spm` : null)}
+      ${stat('Garmin diz', ROTULO_TE[g.trainingEffect?.label] || '–')}
+    </div>
+    ${zonas}${splits}
+    <div class="ana-ia">
+      <p>${esc(ia.resumo)}</p>
+      <p class="ana-comp">${esc(ia.comparacao_plano)}</p>
+      ${(ia.pontos_fortes || []).map((p) => `<p class="ana-item">💪 ${esc(p)}</p>`).join('')}
+      ${(ia.pontos_atencao || []).map((p) => `<p class="ana-item atencao">👀 ${esc(p)}</p>`).join('')}
+      <p class="ana-dica">→ ${esc(ia.proxima_dica)}</p>
+    </div>
+  </div>`);
+}
+
+// ================================================================
 // TELA DIETA — consulta e registro do plano alimentar (100% read-only sobre data.js)
 // ================================================================
 function renderDieta(root) {
@@ -881,6 +1047,7 @@ function renderDieta(root) {
 function renderTreino(root) {
   const st = S.getState();
   const key = hojeKey();
+  carregarAnalises(); // re-renderiza sozinho quando o JSON chegar
   if (diaTreinoSel === key) diaTreinoSel = null; // tocar no dia de hoje = voltar ao padrão
   const alvo = diaTreinoSel || key; // dia exibido no card de treino
   const plano = D.treinoDoDia(alvo);
@@ -943,6 +1110,13 @@ function renderTreino(root) {
   if (!plano.corrida && !plano.gym) tr.append(el(`<p style="font-size:.85rem;color:var(--muted)">Descanso — ${futuro ? 'o treino é' : 'hoje o treino é'} dormir 7–8h. Metade da recuperação acontece dormindo.</p>`));
   root.append(cardHoje);
 
+  // disparo rápido da análise (só com PAT configurado em Ajustes)
+  if (patGarmin()) {
+    const l = el(`<button class="linha-streaks">🛰️ <span>${analiseAguardando ? 'analisando a corrida… (~2-4 min)' : 'Buscar análise da última corrida'}</span><span class="seta">${analiseAguardando ? '⏳' : '→'}</span></button>`);
+    if (!analiseAguardando) l.onclick = () => dispararAnalise('manual');
+    root.append(l);
+  }
+
   // cronograma completo de corridas
   const stats = D.corridasStats(st.events, key);
   const cardCron = el(`<div class="card"><h2>Cronograma de corridas <small>· ${stats.feitas}/${stats.passadas} feitas até hoje · ${stats.total} até a prova</small></h2>
@@ -962,11 +1136,12 @@ function renderTreino(root) {
     const ok = !!feitasCorrida.get(data);
     const passada = data < key;
     const hoje = data === key;
-    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
+    const temAnalise = analisesDoDia(data).length > 0;
+    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
       <button class="cron-toggle">
         <span class="caixa">${ok ? '✓' : ''}</span>
         <span class="cron-data num">${fmtData(data)}</span>
-        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}</span>
+        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}</span>
       </button>
       <button class="tr-ver cron-ver" aria-label="ver guia da corrida">›</button>
     </div>`);
@@ -1003,6 +1178,8 @@ function sheetTreinoDetalhe(kind, plano, key) {
         <div class="exercicio"><span class="ex-num">🗣</span><span class="ex-nome">Sensação<small>${esc(g.sensacao || '—')}</small></span></div>
         ${g.extra ? `<div class="exercicio"><span class="ex-num">☝️</span><span class="ex-nome">Execução<small>${esc(g.extra)}</small></span></div>` : ''}
       </div></div>`);
+    // análise da corrida executada (pipeline Garmin → IA), quando existir para o dia
+    for (const a of analisesDoDia(key)) box.append(blocoAnalise(a));
   }
   abrirSheet(box);
 }
@@ -1424,6 +1601,25 @@ function renderEvolucao(root) {
     root.append(card);
   }
 
+  // corrida: tendências do histórico do Garmin (pipeline v7) — só com dados disponíveis
+  carregarAnalises();
+  const tend = dadosHistorico?.tendencias;
+  if (tend?.paceZ2Serie?.length >= 3) {
+    root.append(el('<div class="secao">CORRIDA</div>'));
+    const v = tend.vo2max || {};
+    const dVo2 = v.atual != null && v.ha8Sem != null ? Math.round((v.atual - v.ha8Sem) * 10) / 10 : null;
+    const card = el(`<div class="card"><h2>Pace em Z2 — o motor aeróbico <small>· corridas com FC ≤152 · ↓ = mais rápido</small></h2>
+      <div class="tiles" style="margin-bottom:12px">
+        <div class="tile"><div class="l">Pace Z2 agora</div><div class="v num">${tend.paceZ2Atual || '–'}<small> /km</small></div></div>
+        <div class="tile"><div class="l">Há 8 semanas</div><div class="v num">${tend.paceZ2Ha8Sem || '–'}<small> /km</small></div></div>
+        <div class="tile"><div class="l">VO2max</div><div class="v num">${v.atual ?? '–'}${dVo2 ? `<small> ${dVo2 > 0 ? '+' : ''}${String(dVo2).replace('.', ',')}</small>` : ''}</div></div>
+      </div>
+      <div class="grafico-wrap">${graficoPaceZ2(tend.paceZ2Serie, key)}</div>
+      <p style="font-size:.75rem;color:var(--muted);margin-top:8px">Cadência (4 sem): <b class="num" style="color:var(--ink)">${tend.cadencia4Sem || '–'} spm</b> · volume: <b class="num" style="color:var(--ink)">${String(tend.kmPorSemana4Sem ?? '–').replace('.', ',')} km/sem</b></p>
+    </div>`);
+    root.append(card);
+  }
+
   // métricas semanais do §4 moraram aqui até a v5 — hoje vivem na aba Dieta ("Semana")
 
   // constância: uma linha legível por semana, meta = 80% (28/35), não perfeição
@@ -1604,6 +1800,41 @@ function graficoLinha(pontos, mm, hojeKey, comCorredor) {
 function fmtData(key) {
   const d = D.parseKey(key);
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+// gráfico do pace em Z2 (serie = [{date, seg}]): pontos crus esmaecidos + média móvel 7d;
+// eixo Y em m:ss/km (menor = mais rápido — linha descendo é evolução)
+function graficoPaceZ2(serie, hojeKey) {
+  const pontos = serie.map((p) => ({ date: p.date, valor: p.seg }));
+  const mm = D.mediaMovel7(pontos);
+  const w = 420, h = 170, padL = 40, padR = 12, padT = 12, padB = 22;
+  const d0 = pontos[0].date, d1 = hojeKey > pontos[pontos.length - 1].date ? hojeKey : pontos[pontos.length - 1].date;
+  const spanDias = Math.max(1, D.diffDays(d0, d1));
+  const vs = pontos.map((p) => p.valor);
+  let min = Math.min(...vs), max = Math.max(...vs);
+  const folga = Math.max(8, (max - min) * 0.12);
+  min -= folga; max += folga;
+  const x = (dk) => padL + (D.diffDays(d0, dk) / spanDias) * (w - padL - padR);
+  const y = (v) => padT + (1 - (v - min) / (max - min)) * (h - padT - padB);
+  const fmtSeg = (s) => `${Math.floor(s / 60)}:${String(Math.round(s) % 60).padStart(2, '0')}`;
+  const passo = (max - min) > 90 ? 30 : 15; // gridlines a cada 15/30s de pace
+  let grid = '';
+  for (let v = Math.ceil(min / passo) * passo; v <= max; v += passo) {
+    grid += `<line x1="${padL}" x2="${w - padR}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>
+      <text x="${padL - 5}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="var(--muted)" class="num">${fmtSeg(v)}</text>`;
+  }
+  const dots = pontos.map((p) => `<circle cx="${x(p.date).toFixed(1)}" cy="${y(p.valor).toFixed(1)}" r="2.5" fill="var(--muted)" opacity="0.45"/>`).join('');
+  const path = mm.map((p, i) => `${i ? 'L' : 'M'}${x(p.date).toFixed(1)},${y(p.valor).toFixed(1)}`).join(' ');
+  const fim = mm[mm.length - 1];
+  const rotuloFim = `<circle cx="${x(fim.date)}" cy="${y(fim.valor)}" r="4.5" fill="var(--serie-2)" stroke="var(--surface)" stroke-width="2"/>
+    <text x="${Math.min(x(fim.date) + 7, w - padR - 2)}" y="${y(fim.valor) - 7}" font-size="10.5" font-weight="650" fill="var(--ink)" text-anchor="${x(fim.date) > w - 60 ? 'end' : 'start'}" class="num">${fmtSeg(fim.valor)}</text>`;
+  const eixoX = `<text x="${padL}" y="${h - 6}" font-size="9" fill="var(--muted)">${fmtData(d0)}</text>
+    <text x="${w - padR}" y="${h - 6}" font-size="9" fill="var(--muted)" text-anchor="end">${fmtData(d1)}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:300px">
+    ${grid}${dots}
+    <path d="${path}" fill="none" stroke="var(--serie-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${rotuloFim}${eixoX}
+  </svg>`;
 }
 
 // ================================================================
@@ -1840,6 +2071,39 @@ function renderAjustes(root) {
   cardLem.querySelector('#t-revisao').onclick = (e) => liga('revisao', e.currentTarget);
   root.append(cardLem);
 
+  // integração Garmin — análises automáticas de corrida (pipeline v7)
+  const temPat = !!st.settings.garminPat;
+  const cardGar = el(`<div class="card"><h2>Análises Garmin <small>· pipeline no GitHub Actions</small></h2>
+    <p id="gar-status" style="font-size:.78rem;color:var(--muted);margin-bottom:10px">carregando status…</p>
+    <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px">Token do GitHub (fine-grained, só o repo habitos-app: Actions RW + Contents R) ativa o disparo rápido pós-corrida e a leitura sem cache. Fica salvo SÓ neste aparelho.</p>
+    <div style="display:flex;gap:8px">
+      <input class="rev-input" style="margin:0;flex:1" type="password" id="gar-pat" placeholder="${temPat ? '•••••••• (token salvo)' : 'github_pat_…'}">
+      <button class="acao-primaria" style="margin:0;width:auto;padding:11px 14px" id="gar-salvar">Salvar</button>
+    </div>
+    ${temPat ? '<button class="acao-secundaria" id="gar-remover" style="margin-top:6px">remover token deste aparelho</button>' : ''}
+  </div>`);
+  cardGar.querySelector('#gar-salvar').onclick = () => {
+    const v = cardGar.querySelector('#gar-pat').value.trim();
+    if (!v) return snackbar('Cole o token no campo antes de salvar.');
+    S.setSetting('garminPat', v);
+    snackbar('Token salvo neste aparelho ✓');
+  };
+  cardGar.querySelector('#gar-remover')?.addEventListener('click', () => {
+    S.setSetting('garminPat', null);
+    snackbar('Token removido.');
+  });
+  fetchDados('pipeline-status.json').then((s) => {
+    const alvo = cardGar.querySelector('#gar-status');
+    if (!alvo || !alvo.isConnected) return;
+    if (!s || !s.ultimaExecucao) { alvo.textContent = 'Pipeline ainda sem execuções — configure os Secrets no repo e rode o workflow.'; return; }
+    const rot = {
+      ok: '✓ ok', garmin_auth: '⚠ conexão com a Garmin expirou — renovar o token (runbook no CLAUDE.md)',
+      gemini_quota: '⏳ quota da IA — o próximo ciclo tenta de novo', erro: '⚠ erro na última execução',
+    }[s.status] || s.status;
+    alvo.textContent = `${rot} · executou ${s.ultimaExecucao.slice(0, 16).replace('T', ' ')}${s.ultimaAnalise ? ` · última análise ${fmtData(s.ultimaAnalise)}` : ''}`;
+  });
+  root.append(cardGar);
+
   // versão + atualização manual (o CDN do Pages pode atrasar ~10 min)
   const cardUpd = el(`<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
     <div><h2 style="margin-bottom:2px">Versão do app</h2>
@@ -1951,6 +2215,13 @@ $('#sos-fab').onclick = abrirSOS;
 S.onChange(render);
 render();
 agendarLembretes();
+carregarAnalises();
+autoDispararAnalise();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  carregarAnalises(true);
+  autoDispararAnalise();
+});
 // atalho do ícone do PWA (?sos=1) e helpers de dev/verificação
 if (params.get('sos')) {
   if (SOS_SCRIPTS[params.get('sos')]) sosScript(params.get('sos'), Number(params.get('passo') || 0));
@@ -1960,7 +2231,10 @@ if (params.get('ressaca') && !D.ressacaDoDia(S.getState().events, hojeKey()).on)
   S.addEvent({ type: 'hangover_on', date: hojeKey() });
 }
 if (params.get('contadores')) contadoresOverlay();
-if (params.get('detalhe')) sheetTreinoDetalhe(params.get('detalhe'), D.treinoDoDia(hojeKey()), hojeKey());
+if (params.get('detalhe')) {
+  // espera as análises pra o sheet já nascer com a seção SUA CORRIDA (dev/screenshots)
+  carregarAnalises().then(() => sheetTreinoDetalhe(params.get('detalhe'), D.treinoDoDia(hojeKey()), hojeKey()));
+}
 if (params.get('wizard') === 'revisao') {
   wizardRevisao(D.revisaoPendente(S.getState().events, hojeKey(), 20) || D.addDays(D.inicioSemana(hojeKey()), -7));
 }

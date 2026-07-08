@@ -1,0 +1,54 @@
+# Analisa corridas novas do Garmin com IA e publica em data/ (servido pelo Pages ao PWA).
+#
+# Gatilhos: workflow_dispatch (disparado pelo app via PAT — caminho rápido, ~2-4 min)
+# e crons de segurança nas janelas de treino BRT (UTC-3).
+#
+# Secrets necessários (Settings → Secrets and variables → Actions):
+#   GARMIN_TOKEN    saída de: python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"
+#   GEMINI_API_KEY  chave do Google AI Studio (aistudio.google.com/apikey)
+#
+# RUNBOOK — workflow vermelho com status "garmin_auth" (~1x/ano, token OAuth1 expirou):
+#   1. na máquina local: cd ~/treino-pampulha/garmin && python3 login-garmin.py
+#   2. python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"
+#   3. colar a saída no Secret GARMIN_TOKEN e rodar este workflow manualmente.
+name: Analisar corridas
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15,45 10-12 * * *'   # 07:15–09:45 BRT — pós-treino da manhã
+    - cron: '15,45 22,23 * * *'   # 19:15–20:45 BRT — pós-treino da noite
+    - cron: '15,45 0,1 * * *'     # 21:15–22:45 BRT — fim da janela noturna
+    - cron: '0 17 * * *'          # 14:00 BRT — varredura diária (horários atípicos)
+concurrency:
+  group: analisar-corridas
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  analisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install garth==0.8.0
+      - name: Dump do plano (data.js → JSON)
+        run: node pipeline/dump-plano.mjs > pipeline/plano.json
+      - name: Analisar corridas novas
+        run: python pipeline/analisar.py
+        env:
+          GARTH_TOKEN: ${{ secrets.GARMIN_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      - name: Commit se houver mudança
+        if: always()
+        run: |
+          if ! git diff --quiet -- data/; then
+            git config user.name "pipeline-corridas[bot]"
+            git config user.email "guirangel17@users.noreply.github.com"
+            git add data/analises.json data/historico.json data/pipeline-status.json
+            git commit -m "análise automática de corrida [skip ci]"
+            git pull --rebase origin main
+            git push
+          fi

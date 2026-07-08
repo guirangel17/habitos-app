@@ -347,6 +347,29 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .cron-data { font-size: 0.72rem; color: var(--muted); }
 .cron-nome { font-size: 0.78rem; color: var(--ink-2); line-height: 1.3; }
 
+/* ---------- análise Garmin (pipeline v7) ---------- */
+.cron-badge { font-size: 0.72rem; }
+.analise { margin-top: 14px; border-top: 1px solid var(--grid); padding-top: 12px; }
+.ana-cab {
+  font-size: 0.64rem; font-weight: 700; letter-spacing: 0.1em; color: var(--serie-2);
+  display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;
+}
+.ana-nota { color: var(--ink); font-size: 0.72rem; letter-spacing: 0; }
+.ana-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ana-stat { border: 1px solid var(--grid); border-radius: 10px; padding: 7px 9px; display: grid; gap: 1px; }
+.ana-stat .l { font-size: 0.62rem; color: var(--muted); }
+.ana-stat b { font-size: 0.85rem; }
+.ana-zonas { margin-top: 8px; }
+.ana-zbar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--grid); }
+.ana-zbar span { display: block; height: 100%; }
+.ana-zleg { font-size: 0.66rem; color: var(--muted); margin-top: 4px; }
+.ana-splits { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 8px; font-size: 0.68rem; color: var(--muted); }
+.ana-ia { margin-top: 10px; font-size: 0.82rem; color: var(--ink-2); line-height: 1.5; display: grid; gap: 7px; }
+.ana-ia .ana-comp { color: var(--ink); }
+.ana-item { padding-left: 2px; }
+.ana-item.atencao { color: var(--warning); }
+.ana-dica { border-left: 3px solid var(--serie-2); padding-left: 9px; color: var(--ink); font-weight: 550; }
+
 /* ---------- contadores estilo SugarCut ---------- */
 .aneis { display: grid; gap: 22px; padding: 12px 0; }
 .anel-card { position: relative; display: grid; justify-items: center; }

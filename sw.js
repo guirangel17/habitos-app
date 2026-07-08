@@ -1,5 +1,5 @@
 // Service worker — cache-first do app shell, com versionamento para updates.
-const VERSAO = 'pampulha-v6.3';
+const VERSAO = 'pampulha-v7.0';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './data.js', './derive.js',
   './store.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
@@ -19,6 +19,18 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+  // data/*.json muda a cada análise do pipeline — rede primeiro, cache só como fallback offline
+  if (url.pathname.includes('/data/')) {
+    e.respondWith(
+      fetch(e.request).then((resp) => {
+        const copia = resp.clone();
+        caches.open(VERSAO).then((c) => c.put(e.request, copia));
+        return resp;
+      }).catch(() => caches.match(e.request, { ignoreSearch: true }))
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then((hit) => hit
       || fetch(e.request).then((resp) => {

@@ -52,7 +52,17 @@
 - ✅ Botão voltar do Android: fecha uma camada por vez (sheet/overlay → dia do Treino → aba Hoje → sai) via sentinela no history, em vez de fechar o app direto.
 - ✅ Atualização confiável: `reg.update()` quando o app volta ao foco + `location.reload()` quando o SW novo assume (o snackbar antigo não recarregava o shell — era por isso que a versão "não subia" mesmo fechando e abrindo).
 
-# v7 — ideias futuras
+# Feito na v7 (jul/2026) — análise automática de corridas
+
+- ✅ Pipeline Garmin → Gemini no GitHub Actions: corrida termina → stats (pace, FC, cadência, splits, training effect) + zonas de FC CANÔNICAS (FCmax 190, calculadas da série — nunca as do Connect) → análise da IA no tom do protocolo (zero punição) → data/analises.json publicado no Pages.
+- ✅ Disparo quase-imediato (~2-4 min): o app dispara o workflow e lê os JSONs pela API do GitHub com PAT fine-grained salvo só no aparelho (Ajustes); crons como rede de segurança; polling com snackbar "análise pronta ✨".
+- ✅ Aba Treino: ✨ no cronograma, seção SUA CORRIDA no sheet (stats + zonas + splits + parecer), botão "Buscar análise".
+- ✅ Slot contextual: confirmação de 1 toque "O Garmin registrou sua corrida — marcar feito?" (nunca automático).
+- ✅ Evolução: seção CORRIDA com pace-em-Z2 ao longo do tempo (historico.json + tendências determinísticas), VO2max, cadência e volume.
+- ✅ Ajustes: campo do PAT + status do pipeline; sw.js network-first para /data/.
+- Riscos documentados no CLAUDE.md (garth deprecado, token ~1 ano com runbook, quota Gemini).
+
+# v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
 - Gráfico de aderência semanal × ritmo de perda (correlação visível).

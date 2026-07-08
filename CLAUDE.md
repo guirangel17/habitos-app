@@ -91,8 +91,9 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
    linhas de altura única (fresh start de segunda, treino de hoje, anel do marco, peso matinal)
    + slot contextual. **Esse layout é o teto — nenhuma funcionalidade nova ganha card ou linha
    permanente na Hoje**; tudo condicional disputa o *slot contextual único* (prioridade:
-   ressaca > contrato > fechar contrato de ontem > revisão pendente), no máximo 1 visível por
-   vez. A trilha das 5 refeições e o cardápio moram na aba Dieta.
+   ressaca > contrato > fechar contrato de ontem > revisão pendente > corrida do Garmin a
+   confirmar), no máximo 1 visível por vez. A trilha das 5 refeições e o cardápio moram na aba
+   Dieta.
 3. **Sem gestos escondidos.** O usuário reclamou de toque longo — toda ação secundária tem
    affordance visível (botão `›`, sheet). Toque simples = ação primária óbvia.
 4. **Recompensa = evidência de dados, não decoração.** Sem XP, níveis, badges, mascotes
@@ -146,6 +147,33 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
 - Dados do usuário ficam SÓ no aparelho dele (localStorage) — deploy nunca afeta dados. Backup =
   export JSON em Ajustes.
 
+## Pipeline de análise de corridas (v7) — Garmin → Gemini → data/*.json
+
+Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app exibe.
+
+- **Arquivos**: `pipeline/analisar.py` (o pipeline; funções puras testadas em
+  `pipeline/test_analisar.py` — `python3 pipeline/test_analisar.py`), `pipeline/dump-plano.mjs`
+  (data.js → plano.json, fonte única do calendário), `.github/workflows/analisar-corridas.yml`
+  (dispatch + crons nas janelas de treino BRT). Saídas commitadas: `data/analises.json`,
+  `data/historico.json` (+ tendências), `data/pipeline-status.json` (Ajustes lê).
+- **Auth Garmin**: garth 0.8.0 (pinado; deprecado mas funcional) via Secret `GARMIN_TOKEN` —
+  o garth auto-autentica pela env `GARTH_TOKEN`. Token OAuth1 vive ~1 ano. **Runbook quando
+  status=garmin_auth**: local `cd ~/treino-pampulha/garmin && python3 login-garmin.py`, depois
+  `python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"` e colar no
+  Secret. Secret `GEMINI_API_KEY` = chave do AI Studio.
+- **Zonas de FC CANÔNICAS** (nunca usar as do Garmin/Connect — variam com a config do relógio):
+  FCmax 190 → Z1 <133 · Z2 133–152 · Z3 153–165 · Z4 166–177 · Z5 178+ (const `ZONAS_FC` no
+  analisar.py, espelha plano-hibrido-pampulha.md). Calculadas da série temporal de FC
+  (endpoint `details`); **lat/lon são descartados na leitura e NUNCA entram nos JSONs**.
+- **Tom da IA**: system prompt com as regras do plano (Z2 por FC manda nos fáceis; tiros por
+  splits, nunca pace médio) e zero linguagem punitiva — mesma regra do app (princípio 1).
+- **Disparo rápido**: o app dispara `workflow_dispatch` e lê os JSONs pela API do GitHub usando
+  um PAT fine-grained (repo habitos-app, Actions RW + Contents R) salvo em `settings.garminPat`
+  (SÓ no aparelho, nunca commitado). Sem PAT, tudo degrada pros crons + fetch via Pages.
+- **Pegadinha**: `sw.js` faz network-first para `/data/` (cache-first congelaria as análises).
+- Confirmação de treino feito é SEMPRE 1 toque (slot contextual, prioridade mais baixa) — nunca
+  automática. Dispensa fica em `settings.garminDispensado_{date}`.
+
 ## Fluxo de desenvolvimento e verificação
 
 ```bash
@@ -195,13 +223,16 @@ os dois temas se a mudança mexe em CSS.
 - **Treino**: Semana (7 dias como BOTÕES — tocar troca o card de baixo para "Treino de terça ·
   15/07" com chip "‹ voltar para hoje"; dia passado = check retroativo, dia futuro = read-only
   com `›`; estado `diaTreinoSel`, resetado ao trocar de aba) → Treino do dia (checks + `›` com
-  exercícios/série×reps + fase de periodização do mês, ou guia de pace da corrida) → Cronograma
-  das 67 corridas (tick + `›` por linha, auto-scroll para a próxima).
+  exercícios/série×reps + fase de periodização do mês, ou guia de pace da corrida) → linha
+  "🛰️ Buscar análise da última corrida" (só com PAT; vira "analisando…" durante o polling) →
+  Cronograma das 67 corridas (tick + `›` por linha, ✨ quando há análise do Garmin — o sheet
+  da corrida ganha a seção SUA CORRIDA: stats, zonas canônicas, splits e parecer da IA).
 - **Evolução**: hero gradiente com rota até a prova (semanas pintadas) → jardim (toque → overlay
   de anéis ao vivo) → IDENTIDADE (frase + 4 evidências) → CORPO (tiles + gráficos peso/cintura)
-  → CONSTÂNCIA (linhas semanais, ✓ verde a 28/35) → PADRÕES (ajuste da última revisão +
-  gatilho×período quando ≥2 sem de dados, senão barras). As métricas da semana atual moraram
-  aqui até a v5 — hoje vivem na aba Dieta.
+  → CORRIDA (v7: pace em Z2 ao longo do tempo + VO2max + cadência/volume, lendo
+  historico.json — só aparece com dados do pipeline) → CONSTÂNCIA (linhas semanais, ✓ verde a
+  28/35) → PADRÕES (ajuste da última revisão + gatilho×período quando ≥2 sem de dados, senão
+  barras). As métricas da semana atual moraram aqui até a v5 — hoje vivem na aba Dieta.
 - **Relatório**: seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
 - **Ajustes** (acessível pelo ⚙️ no header, NÃO pela nav — decisão de UX da v6: destino de
   manutenção ~1×/semana não merece slot na zona do polegar; 6 abas não cabem bem em 360px):
