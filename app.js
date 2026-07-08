@@ -1,5 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '6.0'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '6.1'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -128,6 +128,42 @@ function refeicaoDaVez(meals) {
   return pendentes[pendentes.length - 1];
 }
 
+// ticker de 1s dos anéis do dashboard — limpo no render() e quando o card sai da tela
+let hojeTimer = null;
+function iniciarTickHoje() {
+  clearInterval(hojeTimer);
+  const CIRC = 2 * Math.PI * 52;
+  const tick = () => {
+    const card = $('.card-tempo');
+    if (!card || !card.isConnected) { clearInterval(hojeTimer); return; }
+    const st = S.getState();
+    const inicioTs = D.parseKey(st.settings.startKey || hojeKey()).getTime();
+    const agoraTs = Date.now();
+    let proxFlor = null;
+    card.querySelectorAll('.tempo-anel').forEach((a) => {
+      const type = a.dataset.tipo;
+      const t = D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), agoraTs);
+      const m = D.proximoMarco(t.totalDias);
+      a.querySelector('.ta-dias').textContent = t.dias;
+      a.querySelector('.ta-hms').textContent =
+        `${String(t.horas).padStart(2, '0')}:${String(t.min).padStart(2, '0')}:${String(t.seg).padStart(2, '0')}`;
+      a.querySelector('.ta-prog').style.strokeDasharray = `${CIRC * m.frac} ${CIRC}`;
+      a.querySelector('.ta-marco').textContent = `marco de ${m.alvo}d em ${Math.max(1, Math.ceil(m.alvo - t.totalDias))}d`;
+      const flor = MARCOS_FLOR.find((f) => f > t.totalDias);
+      if (flor) {
+        const dias = Math.max(1, Math.ceil(flor - t.totalDias));
+        if (!proxFlor || dias < proxFlor.dias) proxFlor = { dias, flor, icone: type === 'delivery' ? '🛵' : '🍫' };
+      }
+    });
+    const prox = card.querySelector('.tempo-prox');
+    prox.innerHTML = proxFlor
+      ? `próxima conquista: ${miniFlorSVG()} <b>flor nova no jardim</b> — em ${proxFlor.dias}d, no marco de ${proxFlor.flor} do ${proxFlor.icone}`
+      : `próxima conquista: ${miniEstrelaSVG()} cada onda surfada no SOS vira estrela no céu do jardim`;
+  };
+  tick();
+  hojeTimer = setInterval(tick, 1000);
+}
+
 function renderHoje(root) {
   const st = S.getState();
   const key = hojeKey();
@@ -166,7 +202,7 @@ function renderHoje(root) {
       ${ajuste && !ouroDomingo ? `<p class="ajuste-dia">Hoje (${tipo}): ${esc(ajuste)}</p>` : ''}
       <div class="hero-acoes">
         <button class="acao-primaria" id="hero-feita">✓ Feita</button>
-        <button class="acao-secundaria" id="hero-opcoes">substituições / pulei / fora do plano</button>
+        <button class="acao-secundaria" id="hero-opcoes">substituições / pulei ›</button>
       </div>
     </div>`);
     hero.querySelector('#hero-feita').onclick = () => {
@@ -183,9 +219,10 @@ function renderHoje(root) {
     const partes = [];
     if (planoT.corrida) partes.push(`${TIPO_CORRIDA_ICONE[planoT.corrida.tipo]} ${planoT.corrida.nome}${feitoT.corrida ? ' ✓' : ''}`);
     if (planoT.gym) partes.push(`🏋️ ${planoT.gym.split(' — ')[0]}${feitoT.gym ? ' ✓' : ''}`);
+    const florMarco = MARCOS_FLOR.includes(eh.marco) ? ' → flor nova no jardim' : '';
     const marcoTxt = eh.batidoHa24h
       ? `${icTipo[eh.tipo]} marco de ${eh.marcoAnterior} dias é seu ✓ · próximo: ${eh.marco}`
-      : `${icTipo[eh.tipo]} faltam ${Math.max(1, Math.ceil(eh.marco - eh.totalDias))} dias para o marco de ${eh.marco}`;
+      : `${icTipo[eh.tipo]} faltam ${Math.max(1, Math.ceil(eh.marco - eh.totalDias))} dias para o marco de ${eh.marco}${florMarco}`;
     root.append(el(`<div class="card hero-refeicao completo">
       <div class="hero-rotulo">COLHEITA DO DIA</div>
       <h1>${feitas}/5 no plano ✓</h1>
@@ -246,28 +283,45 @@ function renderHoje(root) {
     }
   }
 
-  // ---- marco mais próximo (goal gradient) — absorve a antiga linha de tempo limpo ----
-  const em = md.escolhido;
-  const outro = md.ambos.find((x) => x.tipo !== em.tipo);
-  const CIRC_MINI = 2 * Math.PI * 15;
-  const marcoRotulo = em.batidoHa24h
-    ? `marco de ${em.marcoAnterior}d é seu ✓ · próximo: ${em.marco}d`
-    : `faltam ${Math.max(1, Math.ceil(em.marco - em.totalDias))}d p/ o marco de ${em.marco}`;
-  const linha = el(`<button class="linha-streaks linha-marco">
-    <svg viewBox="0 0 40 40" class="anel-mini" aria-hidden="true">
-      <defs><linearGradient id="gradMini" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#3987e5"/><stop offset="100%" stop-color="#1baf7a"/>
-      </linearGradient></defs>
-      <circle cx="20" cy="20" r="15" fill="none" stroke="var(--grid)" stroke-width="5"/>
-      <circle cx="20" cy="20" r="15" fill="none" stroke="url(#gradMini)" stroke-width="5" stroke-linecap="round"
-        transform="rotate(-90 20 20)" stroke-dasharray="${CIRC_MINI * (em.batidoHa24h ? 1 : em.frac)} ${CIRC_MINI}"/>
-    </svg>
-    <span>${icTipo[em.tipo]} <b class="num">${em.dias}d</b> <small class="marco-sub">${esc(marcoRotulo)}</small></span>
-    <span class="marco-outro">${icTipo[outro.tipo]} <b class="num">${outro.dias}d</b></span>
-    <span class="seta">→</span>
+  // ---- TEMPO LIMPO ao vivo: os dois anéis no dashboard (toque → jardim + detalhes) ----
+  const cardTempo = el(`<button class="card card-tempo">
+    <h2>Tempo limpo <small>· toque para abrir o jardim →</small></h2>
+    <div class="tempo-aneis"></div>
+    <p class="tempo-prox"></p>
   </button>`);
-  linha.onclick = contadoresOverlay;
-  root.append(linha);
+  const taWrap = cardTempo.querySelector('.tempo-aneis');
+  [['delivery', '🛵'], ['sweet', '🍫']].forEach(([type, icone], i) => {
+    taWrap.append(el(`<div class="tempo-anel" data-tipo="${type}">
+      <svg viewBox="0 0 120 120" class="ta-svg" aria-hidden="true">
+        <defs><linearGradient id="gradHoje${i}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3987e5"/><stop offset="100%" stop-color="#1baf7a"/>
+        </linearGradient></defs>
+        <circle cx="60" cy="60" r="52" fill="none" stroke="var(--grid)" stroke-width="7"/>
+        <circle class="ta-prog" cx="60" cy="60" r="52" fill="none" stroke="url(#gradHoje${i})" stroke-width="7"
+          stroke-linecap="round" transform="rotate(-90 60 60)"/>
+      </svg>
+      <div class="ta-centro">
+        <span class="ta-icone">${icone}</span>
+        <span class="ta-dias num">–</span>
+        <span class="ta-hms num">--:--:--</span>
+      </div>
+      <span class="ta-marco"></span>
+    </div>`));
+  });
+  cardTempo.onclick = contadoresOverlay;
+  root.append(cardTempo);
+  iniciarTickHoje();
+
+  // ---- o objetivo sempre à vista: strip da prova ----
+  const iniPlano = st.settings.startKey || key;
+  const pct = Math.min(100, Math.max(0, Math.round((D.diffDays(iniPlano, key) / Math.max(1, D.diffDays(iniPlano, PROVA))) * 100)));
+  const strip = el(`<button class="card card-pampulha">
+    <div class="cp-topo"><span>🏁 Volta da Pampulha 18k</span><b class="num">${D.semanasAteProva(key)} semanas</b></div>
+    <div class="cp-barra"><span style="width:${pct}%"></span></div>
+    <div class="cp-sub"><span>${pct}% do caminho percorrido</span><span>06/12/2026</span></div>
+  </button>`);
+  strip.onclick = () => { diaTreinoSel = null; abaAtiva = 'evolucao'; render(); };
+  root.append(strip);
 
   // ---- peso contextual: só de manhã, sem registro hoje ----
   const pesos = D.serie(st.events, 'weight');
@@ -954,9 +1008,11 @@ function sheetTreinoDetalhe(kind, plano, key) {
 // JARDIM DO TEMPO LIMPO — recompensa viva e determinística
 // cada dia limpo cresce a planta · cada marco vira flor · cada onda surfada vira estrela
 // ================================================================
+const MARCOS_FLOR = [3, 7, 14, 21, 30, 45, 60, 90, 120]; // marcos que viram flor no jardim
+
 function jardimSVG(plantas, estrelas) {
   const W = 420, H = 200, CHAO = 168;
-  const marcosFlor = [3, 7, 14, 21, 30, 45, 60, 90, 120];
+  const marcosFlor = MARCOS_FLOR;
   let out = '';
 
   // céu: estrelas (ondas surfadas), posições determinísticas
@@ -1035,6 +1091,48 @@ function jardimSVG(plantas, estrelas) {
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="jardim">${out}</svg>`;
 }
 
+// miniaturas das recompensas do jardim — a referência visual do que se ganha
+function miniFolhaSVG(t = 14) {
+  return `<svg viewBox="0 0 24 24" width="${t}" height="${t}" style="display:inline-block;vertical-align:-3px">
+    <ellipse cx="9" cy="14" rx="8" ry="3.4" transform="rotate(-28 9 14)" fill="var(--jardim-folha)"/>
+    <ellipse cx="16" cy="10" rx="7" ry="3" transform="rotate(24 16 10)" fill="var(--jardim-folha)" opacity="0.8"/>
+  </svg>`;
+}
+function miniFlorSVG(t = 14) {
+  let petalas = '';
+  for (let pt = 0; pt < 6; pt++) {
+    const a = (Math.PI / 3) * pt;
+    petalas += `<circle cx="${12 + Math.cos(a) * 5.6}" cy="${12 + Math.sin(a) * 5.6}" r="3.7" fill="var(--jardim-petala-1)"/>`;
+  }
+  return `<svg viewBox="0 0 24 24" width="${t}" height="${t}" style="display:inline-block;vertical-align:-3px">${petalas}<circle cx="12" cy="12" r="3" fill="var(--jardim-miolo)"/></svg>`;
+}
+function miniEstrelaSVG(t = 14) {
+  return `<svg viewBox="0 0 24 24" width="${t}" height="${t}" style="display:inline-block;vertical-align:-3px">
+    <circle cx="12" cy="12" r="3.2" fill="var(--jardim-estrela)"/>
+    <path d="M12 3.5v4.5M12 16v4.5M3.5 12H8M16 12h4.5" stroke="var(--jardim-estrela)" stroke-width="1.7" stroke-linecap="round"/>
+  </svg>`;
+}
+
+// legenda do jardim: o que cada elemento significa + a próxima flor de cada planta
+function legendaJardim(st, key) {
+  const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
+  const prox = ['delivery', 'sweet'].map((type) => {
+    const icone = type === 'delivery' ? '🛵' : '🍫';
+    const t = D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), Date.now());
+    const flor = MARCOS_FLOR.find((f) => f > t.totalDias);
+    if (!flor) return `${icone} todas as flores de marco até 120d já são suas`;
+    return `${icone} próxima flor: marco de ${flor} dias — faltam ${Math.max(1, Math.ceil(flor - t.totalDias))}d`;
+  });
+  return el(`<div class="jardim-legenda">
+    <div class="jl-itens">
+      <span>${miniFolhaSVG()} folha nova a cada 2 dias limpos</span>
+      <span>${miniFlorSVG()} flor a cada marco (3·7·14·21·30…)</span>
+      <span>${miniEstrelaSVG()} estrela por onda surfada no SOS</span>
+    </div>
+    <div class="jl-prox">${prox.map((l) => `<span>${l}</span>`).join('')}</div>
+  </div>`);
+}
+
 function dadosJardim(st, key) {
   const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
   const dias = (type) => Math.floor(D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), Date.now()).totalDias);
@@ -1064,8 +1162,10 @@ function contadoresOverlay() {
     <h2>Tempo limpo</h2>
     <p class="nomeacao">Cada dia limpo cresce o jardim · cada marco vira flor · cada onda surfada vira estrela.</p>
     ${jardimSVG(jardim.plantas, jardim.estrelas)}
+    <div id="jardim-leg"></div>
     <div class="aneis" id="aneis"></div>
   </div>`);
+  tela.querySelector('#jardim-leg').append(legendaJardim(st, key));
   tela.querySelector('.fechar').onclick = () => { clearInterval(contadorTimer); tela.remove(); };
   document.body.appendChild(tela);
   const wrap = tela.querySelector('#aneis');
@@ -1257,6 +1357,7 @@ function renderEvolucao(root) {
     <h2>Jardim do tempo limpo <small>· toque para ver ao vivo →</small></h2>
     ${jardimSVG(jardim.plantas, jardim.estrelas)}
   </button>`);
+  cardJardim.append(legendaJardim(st, key));
   cardJardim.onclick = contadoresOverlay;
   root.append(cardJardim);
 
@@ -1791,6 +1892,7 @@ function agendarLembretes() {
 // render principal + navegação
 // ================================================================
 function render() {
+  clearInterval(hojeTimer);
   const st = S.getState();
   if (!st.settings.startKey) S.setSetting('startKey', hojeKey());
 

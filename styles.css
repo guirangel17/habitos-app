@@ -135,9 +135,12 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 
 /* ---------- hero da refeição da vez ---------- */
 .hero-refeicao {
-  padding: 18px 16px;
+  padding: 14px 16px 12px;
   background: linear-gradient(180deg, var(--serie-1-wash) 0%, transparent 60%) , var(--surface);
 }
+.hero-refeicao .hero-acoes { display: flex; gap: 8px; align-items: stretch; }
+.hero-refeicao .hero-acoes .acao-primaria { flex: 1.5; margin-top: 10px; padding: 12px; }
+.hero-refeicao .hero-acoes .acao-secundaria { flex: 1; margin-top: 10px; width: auto; padding: 8px 4px; font-size: 0.74rem; }
 .hero-refeicao .hero-rotulo {
   font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--serie-1); margin-bottom: 6px;
   display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
@@ -146,7 +149,7 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .hero-refeicao .colheita { display: grid; gap: 5px; margin-top: 10px; font-size: 0.85rem; color: var(--ink-2); line-height: 1.45; }
 .hero-refeicao.destaque-16h { border-color: var(--warning); }
 .hero-refeicao.destaque-16h .hero-rotulo { color: var(--warning); }
-.hero-refeicao h1 { font-size: 1.5rem; line-height: 1.2; }
+.hero-refeicao h1 { font-size: 1.3rem; line-height: 1.2; }
 .hero-refeicao h1 .hora { font-size: 0.95rem; color: var(--muted); font-weight: 400; }
 .hero-refeicao .cardapio { font-size: 0.95rem; color: var(--ink-2); line-height: 1.5; margin-top: 8px; }
 .hero-refeicao .ajuste-dia { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
@@ -191,12 +194,36 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .lt-check.feito { color: var(--muted); }
 .linha-treino .tr-ver { border: none; font-size: 1.15rem; color: var(--muted); padding: 0 2px; }
 
-/* linha do marco mais próximo (goal gradient, dashboard v6) */
-.anel-mini { width: 34px; height: 34px; flex-shrink: 0; }
-.linha-marco .marco-sub { color: var(--muted); font-size: 0.72rem; }
-.linha-marco .marco-outro { margin-left: auto; color: var(--muted); font-size: 0.78rem; }
-.linha-marco .marco-outro b { color: var(--ink-2); font-size: 0.82rem; }
-.linha-marco .seta { margin-left: 0; }
+/* tempo limpo ao vivo no dashboard (v6.1) */
+.card-tempo { text-align: left; width: 100%; }
+.tempo-aneis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; justify-items: center; }
+.tempo-anel { position: relative; display: grid; justify-items: center; gap: 4px; width: 100%; max-width: 150px; }
+.ta-svg { width: 100%; height: auto; }
+.ta-prog { transition: stroke-dasharray 0.9s ease; filter: drop-shadow(0 0 5px rgba(42, 120, 214, 0.4)); }
+.ta-centro {
+  position: absolute; top: 0; width: 100%; aspect-ratio: 1;
+  display: grid; place-content: center; justify-items: center; gap: 1px; text-align: center;
+}
+.ta-icone { font-size: 1rem; }
+.ta-dias { font-size: 1.7rem; font-weight: 700; line-height: 1.05; }
+.ta-dias::after { content: " d"; font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+.ta-hms { font-size: 0.7rem; color: var(--ink-2); letter-spacing: 0.04em; }
+.ta-marco { font-size: 0.68rem; color: var(--muted); }
+.tempo-prox { margin-top: 10px; font-size: 0.78rem; color: var(--ink-2); line-height: 1.5; }
+.tempo-prox b { color: var(--ink); }
+
+/* strip da prova (v6.1) */
+.card-pampulha { width: 100%; text-align: left; background: var(--grad); border: none; color: #fff; padding: 13px 14px 11px; }
+.cp-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; font-weight: 700; }
+.cp-topo b { font-size: 1.05rem; }
+.cp-barra { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.28); margin: 9px 0 6px; overflow: hidden; }
+.cp-barra span { display: block; height: 100%; border-radius: 999px; background: #fff; }
+.cp-sub { display: flex; justify-content: space-between; font-size: 0.68rem; color: rgba(255, 255, 255, 0.85); }
+
+/* legenda do jardim (v6.1) */
+.jardim-legenda { display: grid; gap: 8px; margin-top: 8px; text-align: left; }
+.jl-itens { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.7rem; color: var(--muted); }
+.jl-prox { display: grid; gap: 3px; font-size: 0.76rem; color: var(--ink-2); font-weight: 600; }
 
 /* abertura de semana (fresh start de segunda) */
 .linha-fresh { border-color: var(--serie-1); gap: 10px; line-height: 1.4; }

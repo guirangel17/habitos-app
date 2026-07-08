@@ -97,7 +97,11 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
    affordance visível (botão `›`, sheet). Toque simples = ação primária óbvia.
 4. **Recompensa = evidência de dados, não decoração.** Sem XP, níveis, badges, mascotes
    (decisão explícita, ver TODO.md). As recompensas são: jardim generativo, anéis com tempo vivo,
-   recordes, heatmaps, frase de identidade que "assina" com 4 domingos de revisão.
+   recordes, heatmaps, frase de identidade que "assina" com 4 domingos de revisão. Desde a v6.1
+   a recompensa é sempre NOMEADA E VISÍVEL antes de ser ganha: `legendaJardim` (miniaturas SVG
+   de folha/flor/estrela + "próxima flor em Xd") vive no overlay e no card do jardim, e o
+   dashboard diz o que o próximo marco entrega — feedback do usuário: saber O QUE ganha é o
+   que gera desejo.
 5. **O jardim é determinístico** — função pura dos dados (dia limpo = folha, marco = flor, onda
    surfada = estrela). `Math.random()` em render é proibido (o jardim mudaria a cada abertura).
 6. **Custo de registro mínimo**: caminho feliz do dia = ~6 toques, zero digitação. Qualquer
@@ -165,9 +169,12 @@ os dois temas se a mudança mexe em CSS.
   vira **colheita do dia** — peak-end: refeições, treino, dia limpo→jardim, marco) → linha de
   **abertura de semana** (só segunda <12h — fresh start: recomeço ou momentum de semanas verdes)
   → linha **treino de hoje** (check por modalidade + › para a aba Treino) → aviso
-  never-miss-twice (só quando acionável) → linha do **anel do marco mais próximo** (goal
-  gradient: maior frac entre 🛵/🍫, celebra marco batido <24h; toque → overlay de contadores) →
-  peso contextual (manhã) → "+ Registrar" (sheet: peso/delivery/doce/noite fora + link SOS).
+  never-miss-twice (só quando acionável) → card **TEMPO LIMPO** com os 2 anéis AO VIVO
+  (dias + hh:mm:ss, ticker de 1s em `hojeTimer` — sempre `clearInterval` no `render()`; arco =
+  frac do próximo marco; rodapé "próxima conquista: flor em Xd"; toque → overlay) → **strip da
+  Pampulha** (gradiente `--grad`, semanas restantes + barra de % do caminho; toque → Evolução)
+  → peso contextual (manhã) → "+ Registrar" (sheet: peso/delivery/doce/noite fora + link SOS).
+  O hero da refeição é COMPACTO de propósito (v6.1: a dieta não pode dominar o dashboard).
 - **Dieta**: contexto do dia (tipo + kcal/macros da fase + porquê) → trilha de 5 marcadores
   (migrada da Hoje; toque → sheet da refeição) → cardápio de hoje inteiro (principal + ajuste
   do tipo + badge ouro domingo) → semana em números (3 métricas §4, movidas da Evolução +

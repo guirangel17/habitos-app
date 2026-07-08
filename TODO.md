@@ -36,6 +36,13 @@
 - ✅ Semana da aba Treino clicável: cada dia é botão; card vira "Treino de {dia}" com chip "‹ voltar para hoje"; passado = check retroativo, futuro = read-only.
 - ✅ derive.js: `marcoDashboard` e `aberturaSemana` (+12 asserts novos); `proximoMarco` expõe o marco anterior. Dev param novo: `?dia=YYYY-MM-DD`.
 
+# Feito na v6.1 (jul/2026) — feedback: "a Hoje ainda não parece um dashboard"
+
+- ✅ Anéis de tempo limpo AO VIVO no dashboard (dias + hh:mm:ss + arco do marco, ticker 1s) no lugar da linha pequena de marco; toque abre o overlay.
+- ✅ Strip da Pampulha em gradiente no dashboard (semanas restantes + % do caminho) — o countdown não fica mais só no header.
+- ✅ Hero da refeição compactado (h1 menor, botões lado a lado) — dieta vira um bloco entre iguais.
+- ✅ Legenda do jardim com miniaturas SVG (folha/flor/estrela) + "próxima flor: marco de N — faltam Xd" por planta, no overlay e no card da Evolução; o marco agora DIZ o que entrega ("→ flor nova no jardim").
+
 # v7 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
