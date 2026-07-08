@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-08T13:10:56-03:00",
+ "atualizadoEm": "2026-07-08T13:21:54-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -37,6 +37,7 @@
    "vo2max": 43.0,
    "teAerobico": 4.0,
    "paradoPct": 1,
+   "ef": 0.92,
    "tipoPlano": null
   },
   {
@@ -51,6 +52,7 @@
    "vo2max": null,
    "teAerobico": 3.4,
    "paradoPct": 3,
+   "ef": 0.909,
    "tipoPlano": null
   },
   {
@@ -65,6 +67,7 @@
    "vo2max": 45.0,
    "teAerobico": 3.5,
    "paradoPct": 39,
+   "ef": 0.969,
    "tipoPlano": null
   },
   {
@@ -79,6 +82,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.0,
    "paradoPct": 0,
+   "ef": 0.931,
    "tipoPlano": null
   },
   {
@@ -93,6 +97,7 @@
    "vo2max": null,
    "teAerobico": 3.4,
    "paradoPct": 8,
+   "ef": 0.876,
    "tipoPlano": null
   },
   {
@@ -107,6 +112,7 @@
    "vo2max": null,
    "teAerobico": 2.2,
    "paradoPct": 2,
+   "ef": 0.847,
    "tipoPlano": null
   },
   {
@@ -121,6 +127,7 @@
    "vo2max": 46.0,
    "teAerobico": 2.9,
    "paradoPct": 1,
+   "ef": 0.898,
    "tipoPlano": null
   },
   {
@@ -135,6 +142,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.1,
    "paradoPct": 0,
+   "ef": 0.979,
    "tipoPlano": null
   },
   {
@@ -149,6 +157,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.1,
    "paradoPct": 3,
+   "ef": 0.897,
    "tipoPlano": null
   },
   {
@@ -163,6 +172,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.4,
    "paradoPct": 1,
+   "ef": 0.917,
    "tipoPlano": null
   },
   {
@@ -177,6 +187,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.2,
    "paradoPct": 16,
+   "ef": 0.897,
    "tipoPlano": null
   },
   {
@@ -191,6 +202,7 @@
    "vo2max": 47.0,
    "teAerobico": 2.7,
    "paradoPct": 3,
+   "ef": 0.919,
    "tipoPlano": null
   },
   {
@@ -205,6 +217,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.1,
    "paradoPct": 0,
+   "ef": 0.957,
    "tipoPlano": null
   },
   {
@@ -219,6 +232,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.4,
    "paradoPct": 28,
+   "ef": 0.975,
    "tipoPlano": null
   },
   {
@@ -233,6 +247,7 @@
    "vo2max": 45.0,
    "teAerobico": 4.2,
    "paradoPct": 0,
+   "ef": 0.927,
    "tipoPlano": null
   },
   {
@@ -247,6 +262,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.3,
    "paradoPct": 14,
+   "ef": 0.909,
    "tipoPlano": null
   },
   {
@@ -261,6 +277,7 @@
    "vo2max": 48.0,
    "teAerobico": 4.5,
    "paradoPct": 0,
+   "ef": 0.858,
    "tipoPlano": null
   },
   {
@@ -275,6 +292,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.0,
    "paradoPct": 2,
+   "ef": 0.893,
    "tipoPlano": null
   },
   {
@@ -289,6 +307,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.1,
    "paradoPct": 1,
+   "ef": 0.966,
    "tipoPlano": null
   },
   {
@@ -303,6 +322,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.0,
    "paradoPct": 14,
+   "ef": 0.92,
    "tipoPlano": null
   },
   {
@@ -317,6 +337,7 @@
    "vo2max": null,
    "teAerobico": 1.1,
    "paradoPct": 45,
+   "ef": null,
    "tipoPlano": null
   },
   {
@@ -331,6 +352,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.0,
    "paradoPct": 11,
+   "ef": 0.873,
    "tipoPlano": null
   },
   {
@@ -345,6 +367,7 @@
    "vo2max": 47.0,
    "teAerobico": 4.0,
    "paradoPct": 1,
+   "ef": 0.861,
    "tipoPlano": null
   },
   {
@@ -359,6 +382,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.9,
    "paradoPct": 1,
+   "ef": 0.928,
    "tipoPlano": null
   },
   {
@@ -373,6 +397,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.5,
    "paradoPct": 2,
+   "ef": 0.91,
    "tipoPlano": null
   },
   {
@@ -387,6 +412,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.5,
    "paradoPct": 0,
+   "ef": 1.04,
    "tipoPlano": null
   },
   {
@@ -401,6 +427,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.1,
    "paradoPct": 23,
+   "ef": 0.85,
    "tipoPlano": null
   },
   {
@@ -415,6 +442,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.6,
    "paradoPct": 2,
+   "ef": 0.92,
    "tipoPlano": null
   },
   {
@@ -429,6 +457,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.7,
    "paradoPct": 20,
+   "ef": 0.905,
    "tipoPlano": null
   },
   {
@@ -443,6 +472,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.4,
    "paradoPct": 2,
+   "ef": 0.881,
    "tipoPlano": null
   },
   {
@@ -457,6 +487,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.2,
    "paradoPct": 23,
+   "ef": 0.872,
    "tipoPlano": null
   },
   {
@@ -471,6 +502,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.1,
    "paradoPct": 2,
+   "ef": 0.939,
    "tipoPlano": null
   },
   {
@@ -485,6 +517,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.0,
    "paradoPct": 26,
+   "ef": 0.905,
    "tipoPlano": null
   },
   {
@@ -499,6 +532,7 @@
    "vo2max": 49.0,
    "teAerobico": 2.8,
    "paradoPct": 21,
+   "ef": 0.96,
    "tipoPlano": null
   },
   {
@@ -513,6 +547,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.4,
    "paradoPct": 1,
+   "ef": 0.891,
    "tipoPlano": null
   },
   {
@@ -527,6 +562,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.8,
    "paradoPct": 0,
+   "ef": 1.018,
    "tipoPlano": null
   },
   {
@@ -541,6 +577,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.8,
    "paradoPct": 17,
+   "ef": 0.94,
    "tipoPlano": null
   },
   {
@@ -555,6 +592,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.6,
    "paradoPct": 0,
+   "ef": 0.945,
    "tipoPlano": null
   },
   {
@@ -569,6 +607,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.9,
    "paradoPct": 0,
+   "ef": 0.906,
    "tipoPlano": null
   },
   {
@@ -583,6 +622,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.6,
    "paradoPct": 3,
+   "ef": 1.103,
    "tipoPlano": null
   },
   {
@@ -597,6 +637,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.5,
    "paradoPct": 25,
+   "ef": 1.003,
    "tipoPlano": null
   },
   {
@@ -611,6 +652,7 @@
    "vo2max": 48.0,
    "teAerobico": 5.0,
    "paradoPct": 4,
+   "ef": 0.982,
    "tipoPlano": null
   },
   {
@@ -625,6 +667,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.0,
    "paradoPct": 0,
+   "ef": 1.016,
    "tipoPlano": null
   },
   {
@@ -639,6 +682,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.7,
    "paradoPct": 20,
+   "ef": 0.831,
    "tipoPlano": null
   },
   {
@@ -653,6 +697,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.1,
    "paradoPct": 1,
+   "ef": 0.781,
    "tipoPlano": null
   },
   {
@@ -667,6 +712,7 @@
    "vo2max": 47.0,
    "teAerobico": 4.0,
    "paradoPct": 0,
+   "ef": 0.922,
    "tipoPlano": null
   },
   {
@@ -681,6 +727,7 @@
    "vo2max": 47.0,
    "teAerobico": 2.7,
    "paradoPct": 26,
+   "ef": 0.891,
    "tipoPlano": null
   },
   {
@@ -695,6 +742,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.7,
    "paradoPct": 0,
+   "ef": 1.006,
    "tipoPlano": null
   },
   {
@@ -709,6 +757,7 @@
    "vo2max": 46.0,
    "teAerobico": 2.8,
    "paradoPct": 28,
+   "ef": 0.928,
    "tipoPlano": null
   },
   {
@@ -723,6 +772,7 @@
    "vo2max": 46.0,
    "teAerobico": 3.6,
    "paradoPct": 2,
+   "ef": 0.989,
    "tipoPlano": null
   },
   {
@@ -737,6 +787,7 @@
    "vo2max": 46.0,
    "teAerobico": 2.8,
    "paradoPct": 1,
+   "ef": 0.981,
    "tipoPlano": null
   },
   {
@@ -751,6 +802,7 @@
    "vo2max": 47.0,
    "teAerobico": 3.2,
    "paradoPct": 25,
+   "ef": 0.851,
    "tipoPlano": null
   },
   {
@@ -765,6 +817,7 @@
    "vo2max": 46.0,
    "teAerobico": 5.0,
    "paradoPct": 0,
+   "ef": 0.848,
    "tipoPlano": null
   },
   {
@@ -779,6 +832,7 @@
    "vo2max": 48.0,
    "teAerobico": 2.8,
    "paradoPct": 27,
+   "ef": 0.981,
    "tipoPlano": null
   },
   {
@@ -793,6 +847,7 @@
    "vo2max": 48.0,
    "teAerobico": 3.8,
    "paradoPct": 0,
+   "ef": 0.971,
    "tipoPlano": "prova"
   }
  ],
@@ -882,6 +937,221 @@
    "ha8Sem": 47.0
   },
   "cadencia4Sem": 157,
-  "kmPorSemana4Sem": 14.6
+  "kmPorSemana4Sem": 14.6,
+  "efSerie": [
+   {
+    "date": "2026-01-12",
+    "ef": 0.92
+   },
+   {
+    "date": "2026-01-14",
+    "ef": 0.909
+   },
+   {
+    "date": "2026-01-19",
+    "ef": 0.931
+   },
+   {
+    "date": "2026-01-26",
+    "ef": 0.898
+   },
+   {
+    "date": "2026-01-28",
+    "ef": 0.979
+   },
+   {
+    "date": "2026-02-02",
+    "ef": 0.897
+   },
+   {
+    "date": "2026-02-23",
+    "ef": 0.919
+   },
+   {
+    "date": "2026-02-25",
+    "ef": 0.957
+   },
+   {
+    "date": "2026-03-01",
+    "ef": 0.927
+   },
+   {
+    "date": "2026-03-16",
+    "ef": 0.893
+   },
+   {
+    "date": "2026-03-18",
+    "ef": 0.966
+   },
+   {
+    "date": "2026-03-29",
+    "ef": 0.861
+   },
+   {
+    "date": "2026-04-04",
+    "ef": 0.928
+   },
+   {
+    "date": "2026-04-06",
+    "ef": 0.91
+   },
+   {
+    "date": "2026-04-08",
+    "ef": 1.04
+   },
+   {
+    "date": "2026-04-15",
+    "ef": 0.92
+   },
+   {
+    "date": "2026-04-21",
+    "ef": 0.881
+   },
+   {
+    "date": "2026-05-04",
+    "ef": 0.939
+   },
+   {
+    "date": "2026-05-11",
+    "ef": 0.891
+   },
+   {
+    "date": "2026-05-13",
+    "ef": 1.018
+   },
+   {
+    "date": "2026-05-15",
+    "ef": 0.945
+   },
+   {
+    "date": "2026-05-18",
+    "ef": 0.906
+   },
+   {
+    "date": "2026-05-20",
+    "ef": 1.103
+   },
+   {
+    "date": "2026-05-24",
+    "ef": 0.982
+   },
+   {
+    "date": "2026-05-26",
+    "ef": 1.016
+   },
+   {
+    "date": "2026-05-31",
+    "ef": 0.781
+   },
+   {
+    "date": "2026-06-01",
+    "ef": 0.922
+   },
+   {
+    "date": "2026-06-08",
+    "ef": 1.006
+   },
+   {
+    "date": "2026-06-15",
+    "ef": 0.989
+   },
+   {
+    "date": "2026-06-22",
+    "ef": 0.981
+   },
+   {
+    "date": "2026-07-05",
+    "ef": 0.971
+   }
+  ],
+  "efAtual": 0.98,
+  "efHa8Sem": 0.949,
+  "kmSemanas": [
+   {
+    "semana": "2026-04-20",
+    "km": 15.9
+   },
+   {
+    "semana": "2026-04-27",
+    "km": 0
+   },
+   {
+    "semana": "2026-05-04",
+    "km": 21.5
+   },
+   {
+    "semana": "2026-05-11",
+    "km": 28.1
+   },
+   {
+    "semana": "2026-05-18",
+    "km": 35.6
+   },
+   {
+    "semana": "2026-05-25",
+    "km": 17.7
+   },
+   {
+    "semana": "2026-06-01",
+    "km": 23.1
+   },
+   {
+    "semana": "2026-06-08",
+    "km": 19.8
+   },
+   {
+    "semana": "2026-06-15",
+    "km": 10.0
+   },
+   {
+    "semana": "2026-06-22",
+    "km": 32.8
+   },
+   {
+    "semana": "2026-06-29",
+    "km": 10.9
+   },
+   {
+    "semana": "2026-07-06",
+    "km": 0
+   }
+  ],
+  "longaoMes": [
+   {
+    "mes": "2026-01",
+    "km": 7.03,
+    "date": "2026-01-26"
+   },
+   {
+    "mes": "2026-02",
+    "km": 7.03,
+    "date": "2026-02-02"
+   },
+   {
+    "mes": "2026-03",
+    "km": 10.23,
+    "date": "2026-03-29"
+   },
+   {
+    "mes": "2026-04",
+    "km": 12.03,
+    "date": "2026-04-15"
+   },
+   {
+    "mes": "2026-05",
+    "km": 15.03,
+    "date": "2026-05-18"
+   },
+   {
+    "mes": "2026-06",
+    "km": 21.39,
+    "date": "2026-06-28"
+   },
+   {
+    "mes": "2026-07",
+    "km": 6.02,
+    "date": "2026-07-02"
+   }
+  ]
  }
 }

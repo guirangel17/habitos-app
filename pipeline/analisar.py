@@ -67,6 +67,10 @@ calor, trate FC alta como resposta fisiológica esperada, não como problema.
 - O limitador nº 1 do atleta em prova é ansiedade (não físico): controle de ritmo no início é sempre \
 um ponto forte digno de nota. Cadência de referência atual: ~160-165 spm; evolução gradual até ~170 \
 é bem-vinda, sem forçar.
+- derivaCardiacaPct (só nos longões ≥8 km) = quanto o custo cardíaco subiu da 1ª pra 2ª metade: \
+<5% é base aeróbica sólida pra distância (celebre nomeando a métrica); 5-8% é normal em calor ou \
+volume novo; >8% sugere começo rápido demais, hidratação ou limite atual de resistência — trate \
+como dado de calibragem do longão seguinte, nunca como falha.
 
 TOM (regra inegociável do app onde a análise aparece):
 - ZERO linguagem punitiva. PROIBIDO: "falhou", "ruim", "fraco", "erro", "abaixo do esperado", \
@@ -176,6 +180,30 @@ def tipo_atividade(a):
     return (t.get("typeKey") if isinstance(t, dict) else t) or a.get("typeKey")
 
 
+def deriva_cardiaca(lap_dtos):
+    """Decoupling FC×pace: custo cardíaco (batimentos/metro) da 2ª metade vs a 1ª, em %.
+    <5% = base aeróbica sólida pra distância; >8% = resistência/calor/hidratação no limite.
+    Só faz sentido em corrida contínua longa: ≥8 km com FC por split."""
+    laps = [l for l in (lap_dtos or [])
+            if (l.get("distance") or 0) >= 200 and l.get("averageHR")
+            and (l.get("movingDuration") or l.get("duration"))]
+    total = sum(l["distance"] for l in laps)
+    if total < 8000 or len(laps) < 6:
+        return None
+    metade1, metade2, acumulado = [], [], 0
+    for l in laps:
+        (metade1 if acumulado < total / 2 else metade2).append(l)
+        acumulado += l["distance"]
+    if not metade1 or not metade2:
+        return None
+
+    def custo(ls):  # batimentos por metro
+        bat = sum(l["averageHR"] * (l.get("movingDuration") or l["duration"]) / 60 for l in ls)
+        return bat / sum(l["distance"] for l in ls)
+
+    return round((custo(metade2) / custo(metade1) - 1) * 100, 1)
+
+
 def corrida_do_dia(date, corridas):
     """CORRIDAS é lista de [data, tipo, nome]; retorna dict ou None."""
     for d, tipo, nome in corridas:
@@ -209,14 +237,21 @@ def compactar_atividade(a, corridas):
         "vo2max": a.get("vO2MaxValue"),
         "teAerobico": round(a["aerobicTrainingEffect"], 1) if a.get("aerobicTrainingEffect") is not None else None,
         "paradoPct": round(100 * (1 - a["movingDuration"] / a["duration"])) if a.get("movingDuration") and a.get("duration") else None,
+        # eficiência aeróbica: metros percorridos por batimento — sobe quando o motor melhora,
+        # comparável entre corridas de esforços diferentes (controla a FC por construção)
+        "ef": round((a.get("distance") or 0) / (a["averageHR"] * dur / 60), 3) if a.get("averageHR") and dur and (a.get("distance") or 0) >= 1000 else None,
         "tipoPlano": plano["tipo"] if plano else None,
     }
 
 
+def eh_corrida_limpa(c):
+    """Treino de verdade: ≥3 km e sem paradas de corrida social."""
+    return (c.get("distanciaKm") or 0) >= 3 and (c.get("paradoPct") or 0) <= PARADO_MAX_PCT
+
+
 def eh_corrida_z2(c):
     return (bool(c.get("fcMedia")) and c["fcMedia"] <= 152
-            and (c.get("distanciaKm") or 0) >= 3 and bool(c.get("paceSeg"))
-            and (c.get("paradoPct") or 0) <= PARADO_MAX_PCT)
+            and bool(c.get("paceSeg")) and eh_corrida_limpa(c))
 
 
 def media_pace(corridas):
@@ -237,6 +272,32 @@ def calcular_tendencias(corridas, hoje):
     cad = [c["cadencia"] for c in ult4 if c.get("cadencia") and (c.get("paradoPct") or 0) <= PARADO_MAX_PCT]
     vo2 = [c["vo2max"] for c in corridas if c.get("vo2max")]
     vo2_antigas = [c["vo2max"] for c in corridas if c.get("vo2max") and c["date"] <= ref]
+
+    # eficiência aeróbica: corridas limpas até Z3 (FC ≤165) — mais pontos que só-Z2, sem a
+    # distorção de tiro/prova (anaeróbio infla) nem de longão muito longo (deriva derruba)
+    efs = [c for c in corridas if c.get("ef") and eh_corrida_limpa(c)
+           and c.get("fcMedia") and c["fcMedia"] <= 165]
+    ef_media = lambda cs: round(sum(c["ef"] for c in cs) / len(cs), 3) if cs else None
+    ef_antigas = [c for c in efs if c["date"] <= ref]
+
+    # volume: 12 semanas fechando na semana de `hoje` (segunda a segunda, semanas vazias = 0)
+    dt_hoje = datetime.strptime(hoje, "%Y-%m-%d")
+    seg_atual = dt_hoje - timedelta(days=dt_hoje.weekday())
+    km_semanas = []
+    for i in range(11, -1, -1):
+        ini = seg_atual - timedelta(days=7 * i)
+        fim = ini + timedelta(days=6)
+        km = sum(c["distanciaKm"] for c in corridas
+                 if ini.strftime("%Y-%m-%d") <= c["date"] <= fim.strftime("%Y-%m-%d"))
+        km_semanas.append({"semana": ini.strftime("%Y-%m-%d"), "km": round(km, 1)})
+
+    # longão: a maior corrida de cada mês, do primeiro mês com dado até hoje
+    longao = {}
+    for c in corridas:
+        mes = c["date"][:7]
+        if (c.get("distanciaKm") or 0) > longao.get(mes, {}).get("km", 0):
+            longao[mes] = {"mes": mes, "km": c["distanciaKm"], "date": c["date"]}
+
     return {
         "paceZ2Serie": serie,
         "paceZ2Atual": fmt_pace(atual),
@@ -244,6 +305,11 @@ def calcular_tendencias(corridas, hoje):
         "vo2max": {"atual": vo2[-1] if vo2 else None, "ha8Sem": vo2_antigas[-1] if vo2_antigas else None},
         "cadencia4Sem": round(sum(cad) / len(cad)) if cad else None,
         "kmPorSemana4Sem": round(sum(c["distanciaKm"] for c in ult4) / 4, 1),
+        "efSerie": [{"date": c["date"], "ef": c["ef"]} for c in efs],
+        "efAtual": ef_media(efs[-3:]),
+        "efHa8Sem": ef_media(ef_antigas[-3:]),
+        "kmSemanas": km_semanas,
+        "longaoMes": [longao[m] for m in sorted(longao)],
     }
 
 
@@ -296,7 +362,7 @@ def chamar_gemini(chave, contexto):
             raise
 
 
-def analisar_uma(a, detalhe, splits, zonas, plano_dia, guia, hist_ctx, prox, chave):
+def analisar_uma(a, detalhe, splits, deriva, zonas, plano_dia, guia, hist_ctx, prox, chave):
     date = (a.get("startTimeLocal") or "")[:10]
     dur = a.get("movingDuration") or a.get("duration")
     sumario = (detalhe or {}).get("summaryDTO") or {}
@@ -321,6 +387,7 @@ def analisar_uma(a, detalhe, splits, zonas, plano_dia, guia, hist_ctx, prox, cha
         "temperaturaC": a.get("maxTemperature"),
         "splits": splits,
         "zonasFc": zonas,  # canônicas (FCmax 190) — None se a série de FC não veio
+        "derivaCardiacaPct": deriva,  # decoupling FC×pace nos longões (≥8 km); None nos curtos
     }
     plano = None
     if plano_dia:
@@ -412,7 +479,9 @@ def main():
                 date = (a.get("startTimeLocal") or "")[:10]
                 try:
                     detalhe = garmin_get(f"/activity-service/activity/{aid}")
-                    splits = resumir_splits((garmin_get(f"/activity-service/activity/{aid}/splits") or {}).get("lapDTOs"))
+                    laps = (garmin_get(f"/activity-service/activity/{aid}/splits") or {}).get("lapDTOs")
+                    splits = resumir_splits(laps)
+                    deriva = deriva_cardiaca(laps)
                     try:
                         pontos = extrair_fc_details(garmin_get(f"/activity-service/activity/{aid}/details", maxChartSize=2000))
                         zonas = zonas_de_pontos(pontos)
@@ -433,7 +502,7 @@ def main():
                     prox = proxima_corrida(date, corridas_plano)
                     if prox:
                         prox = dict(prox, paceAlvo=(guias.get(prox["tipo"]) or {}).get("pace"))
-                    entrada = analisar_uma(a, detalhe, splits, zonas, plano_dia, guia, hist_ctx, prox, chave)
+                    entrada = analisar_uma(a, detalhe, splits, deriva, zonas, plano_dia, guia, hist_ctx, prox, chave)
                     doc["analises"].append(entrada)
                     ja_no_dia[date] = ja_no_dia.get(date, 0) + 1
                     geradas += 1

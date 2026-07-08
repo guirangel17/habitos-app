@@ -4,8 +4,8 @@ import unittest
 
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, corrida_do_dia,
-    eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg, proxima_corrida, resumir_splits,
-    tipo_atividade, validar_ia, zonas_de_pontos,
+    deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg, proxima_corrida,
+    resumir_splits, tipo_atividade, validar_ia, zonas_de_pontos,
 )
 
 CORRIDAS = [
@@ -84,6 +84,20 @@ class TestPuras(unittest.TestCase):
         self.assertNotIn(tipo_atividade({"activityType": {"typeKey": "cycling"}}), TIPOS_CORRIDA)
         self.assertIsNone(tipo_atividade({}))
 
+    def test_deriva_cardiaca(self):
+        # 10 km a 6:00/km: 1ª metade FC 145, 2ª metade FC 152 no mesmo pace →
+        # custo cardíaco sobe 152/145 - 1 = +4.8%
+        laps = [{"distance": 1000, "movingDuration": 360.0, "averageHR": 145 if i < 5 else 152}
+                for i in range(10)]
+        self.assertAlmostEqual(deriva_cardiaca(laps), 4.8, places=1)
+        # FC e pace idênticos nas duas metades → deriva 0
+        constantes = [{"distance": 1000, "movingDuration": 360.0, "averageHR": 148} for _ in range(10)]
+        self.assertEqual(deriva_cardiaca(constantes), 0.0)
+        # curta demais (<8 km) ou sem FC → None
+        self.assertIsNone(deriva_cardiaca(laps[:6]))
+        self.assertIsNone(deriva_cardiaca([{"distance": 1000, "movingDuration": 360.0}] * 10))
+        self.assertIsNone(deriva_cardiaca(None))
+
     def test_corrida_do_dia_e_proxima(self):
         self.assertEqual(corrida_do_dia("2026-07-08", CORRIDAS)["tipo"], "leve")
         self.assertIsNone(corrida_do_dia("2026-07-09", CORRIDAS))
@@ -99,6 +113,7 @@ class TestPuras(unittest.TestCase):
         self.assertEqual(c["tipoPlano"], "prova")
         self.assertEqual(c["paceMedio"], "6:31")
         self.assertEqual(c["paradoPct"], 0)  # 1900.4s em movimento de 1903s totais
+        self.assertAlmostEqual(c["ef"], 4860.4 / (158.0 * 1900.4 / 60), places=3)  # m/batimento
         self.assertFalse(eh_corrida_z2(c))  # FC 158 > 152
         c2 = dict(c, fcMedia=145, distanciaKm=10.0)
         self.assertTrue(eh_corrida_z2(c2))
@@ -108,16 +123,31 @@ class TestPuras(unittest.TestCase):
 
     def test_tendencias(self):
         corridas = [
-            {"date": "2026-04-01", "paceSeg": 450, "fcMedia": 145, "distanciaKm": 10, "cadencia": 158, "vo2max": 46},
-            {"date": "2026-04-15", "paceSeg": 440, "fcMedia": 148, "distanciaKm": 12, "cadencia": 159, "vo2max": 46},
-            {"date": "2026-06-20", "paceSeg": 415, "fcMedia": 147, "distanciaKm": 12, "cadencia": 162, "vo2max": 48},
-            {"date": "2026-07-01", "paceSeg": 410, "fcMedia": 146, "distanciaKm": 14, "cadencia": 163, "vo2max": 48},
-            {"date": "2026-07-02", "paceSeg": 481, "fcMedia": 127, "distanciaKm": 6, "cadencia": 120, "vo2max": 47, "paradoPct": 27},  # social
-            {"date": "2026-07-06", "paceSeg": 590, "fcMedia": 170, "distanciaKm": 5, "cadencia": 165, "vo2max": 48},  # não-Z2
+            {"date": "2026-04-01", "paceSeg": 450, "fcMedia": 145, "distanciaKm": 10, "cadencia": 158, "vo2max": 46, "ef": 0.90},
+            {"date": "2026-04-15", "paceSeg": 440, "fcMedia": 148, "distanciaKm": 12, "cadencia": 159, "vo2max": 46, "ef": 0.91},
+            {"date": "2026-06-20", "paceSeg": 415, "fcMedia": 147, "distanciaKm": 12, "cadencia": 162, "vo2max": 48, "ef": 0.95},
+            {"date": "2026-07-01", "paceSeg": 410, "fcMedia": 146, "distanciaKm": 14, "cadencia": 163, "vo2max": 48, "ef": 0.97},
+            {"date": "2026-07-02", "paceSeg": 481, "fcMedia": 127, "distanciaKm": 6, "cadencia": 120, "vo2max": 47, "paradoPct": 27, "ef": 1.10},  # social
+            {"date": "2026-07-06", "paceSeg": 590, "fcMedia": 170, "distanciaKm": 5, "cadencia": 165, "vo2max": 48, "ef": 0.88},  # não-Z2
         ]
         t = calcular_tendencias(corridas, "2026-07-08")
         self.assertEqual(len(t["paceZ2Serie"]), 4)  # FC 170 e a social (27% parada) ficam fora
         self.assertEqual(t["cadencia4Sem"], round((162 + 163 + 165) / 3))  # social não derruba a cadência
+        # EF usa as limpas até Z3: FC 170 (esforço anaeróbio) e social ficam fora
+        self.assertEqual(len(t["efSerie"]), 4)
+        self.assertEqual(t["efAtual"], round((0.91 + 0.95 + 0.97) / 3, 3))
+        self.assertEqual(t["efHa8Sem"], round((0.90 + 0.91) / 2, 3))  # só as ≤ 2026-05-13
+        # 12 semanas de volume, segunda a segunda, semana vazia = 0
+        self.assertEqual(len(t["kmSemanas"]), 12)
+        self.assertEqual(t["kmSemanas"][-1], {"semana": "2026-07-06", "km": 5})
+        self.assertEqual(t["kmSemanas"][-2], {"semana": "2026-06-29", "km": 20.0})  # 14 + social 6 (volume conta tudo)
+        self.assertEqual(t["kmSemanas"][0]["km"], 0)
+        # longão por mês
+        self.assertEqual(t["longaoMes"], [
+            {"mes": "2026-04", "km": 12, "date": "2026-04-15"},
+            {"mes": "2026-06", "km": 12, "date": "2026-06-20"},
+            {"mes": "2026-07", "km": 14, "date": "2026-07-01"},
+        ])
         self.assertEqual(t["paceZ2Ha8Sem"], fmt_pace((450 + 440) / 2))  # só as ≤ 2026-05-13
         self.assertIsNotNone(t["paceZ2Atual"])
         self.assertEqual(t["vo2max"]["atual"], 48)

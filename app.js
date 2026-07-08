@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.1'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.2'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -192,20 +192,27 @@ function renderHoje(root) {
   if (!mostrarColheita) {
     const ouroDomingo = rv.id === 'jantar' && tipo === 'DESCANSO';
     const destaque16 = rv.id === 'lanche2' && agoraMin >= 13 * 60;
+    // pós-almoço: o outro pico de vontade de doce — 90 min após registrar o almoço
+    const evAlmoco = [...st.events].reverse().find((e) => e.type === 'meal' && e.date === key && e.meal === 'almoco');
+    const posAlmoco = !destaque16 && rv.id === 'lanche2' && evAlmoco && ['ok', 'sub'].includes(evAlmoco.status)
+      && agora().getTime() - evAlmoco.ts < 90 * 60 * 1000;
+    const escudo = destaque16 ? ' · escudo anti-doce das 15h' : posAlmoco ? ' · escudo pós-almoço' : '';
     const ajuste = rv.ajuste[tipo];
     const [rvH, rvM] = rv.hora.split(':').map(Number);
     const rotulo = agoraMin >= rvH * 60 + rvM - 45 ? 'AGORA' : 'PRÓXIMA';
-    const hero = el(`<div class="card hero-refeicao ${destaque16 ? 'destaque-16h' : ''}">
-      <div class="hero-rotulo"><span>${rotulo}${destaque16 ? ' · escudo anti-doce das 15h' : ''}</span><span class="hero-placar num">${feitas}/5 hoje</span></div>
+    const hero = el(`<div class="card hero-refeicao ${escudo ? 'destaque-16h' : ''}">
+      <div class="hero-rotulo"><span>${rotulo}${escudo}</span><span class="hero-placar num">${feitas}/5 hoje</span></div>
       <h1>${esc(rv.nome)} <span class="hora num">${esc(rv.hora)}</span></h1>
       <p class="cardapio">${esc(rv.principal)}</p>
       ${ouroDomingo ? '<span class="badge-ouro">★ Hoje o jantar é INTENSO — pré-carga do Longão. NÃO corta o carbo.</span>' : ''}
       ${ajuste && !ouroDomingo ? `<p class="ajuste-dia">Hoje (${tipo}): ${esc(ajuste)}</p>` : ''}
+      ${escudo ? `<button class="escudo-sos" id="hero-sos">🍫 Bateu a vontade agora? <b>SOS doce</b> — 10 min de onda, sem julgamento ›</button>` : ''}
       <div class="hero-acoes">
         <button class="acao-primaria" id="hero-feita">✓ Feita</button>
         <button class="acao-secundaria" id="hero-opcoes">substituições / pulei ›</button>
       </div>
     </div>`);
+    hero.querySelector('#hero-sos')?.addEventListener('click', () => sosScript('doce'));
     hero.querySelector('#hero-feita').onclick = () => {
       const e = S.addEvent({ type: 'meal', date: key, meal: rv.id, status: 'ok' });
       snackbar(`${rv.nome}: feita ✓`, () => S.removeEvent(e.id));
@@ -943,8 +950,8 @@ function blocoAnalise(a) {
   const g = a.garmin, ia = a.ia;
   const stat = (l, v) => `<div class="ana-stat"><span class="l">${l}</span><b class="num">${v ?? '–'}</b></div>`;
   const zonas = g.zonasFc ? `<div class="ana-zonas">
-      <div class="ana-zbar">${['z1', 'z2', 'z3', 'z4', 'z5'].map((z, i) => (g.zonasFc[z] ? `<span style="width:${g.zonasFc[z]}%;background:var(--seq-${i + 1})"></span>` : '')).join('')}</div>
-      <div class="ana-zleg">${['z1', 'z2', 'z3', 'z4', 'z5'].filter((z) => g.zonasFc[z]).map((z, i) => `${z.toUpperCase()} ${g.zonasFc[z]}%`).join(' · ')}</div>
+      <div class="ana-zbar">${['z1', 'z2', 'z3', 'z4', 'z5'].map((z, i) => (g.zonasFc[z] ? `<span style="width:${g.zonasFc[z]}%;background:var(--zona-${i + 1})"></span>` : '')).join('')}</div>
+      <div class="ana-zleg">${['z1', 'z2', 'z3', 'z4', 'z5'].map((z, i) => (g.zonasFc[z] ? `<span class="item"><i style="background:var(--zona-${i + 1})"></i>${z.toUpperCase()} <b class="num">${g.zonasFc[z]}%</b></span>` : '')).join('')}</div>
     </div>` : '';
   const splits = g.splits?.length ? `<div class="ana-splits">${g.splits.map((s) => `<span class="num">${s.km}k ${s.pace}${s.fc ? ` · ${s.fc}` : ''}</span>`).join('')}</div>` : '';
   return el(`<div class="analise">
@@ -956,6 +963,7 @@ function blocoAnalise(a) {
       ${stat('FC méd/máx', g.fcMedia ? `${g.fcMedia}/${g.fcMax}` : null)}
       ${stat('cadência', g.cadencia ? `${g.cadencia} spm` : null)}
       ${stat('Garmin diz', ROTULO_TE[g.trainingEffect?.label] || '–')}
+      ${g.derivaCardiacaPct != null ? stat('deriva FC', `${g.derivaCardiacaPct > 0 ? '+' : ''}${String(g.derivaCardiacaPct).replace('.', ',')}%`) : ''}
     </div>
     ${zonas}${splits}
     <div class="ana-ia">
@@ -1618,6 +1626,43 @@ function renderEvolucao(root) {
       <p style="font-size:.75rem;color:var(--muted);margin-top:8px">Cadência (4 sem): <b class="num" style="color:var(--ink)">${tend.cadencia4Sem || '–'} spm</b> · volume: <b class="num" style="color:var(--ink)">${String(tend.kmPorSemana4Sem ?? '–').replace('.', ',')} km/sem</b></p>
     </div>`);
     root.append(card);
+
+    // eficiência aeróbica: quantos metros cada batimento rende — vale para TODA corrida limpa
+    if (tend.efSerie?.length >= 3) {
+      const fmtEf = (x) => (x == null ? '–' : x.toFixed(2).replace('.', ','));
+      root.append(el(`<div class="card"><h2>Eficiência aeróbica <small>· metros por batimento · corridas até Z3 · ↑ = motor melhor</small></h2>
+        <div class="tiles" style="margin-bottom:12px">
+          <div class="tile"><div class="l">Agora</div><div class="v num">${fmtEf(tend.efAtual)}<small> m/bat</small></div></div>
+          <div class="tile"><div class="l">Há 8 semanas</div><div class="v num">${fmtEf(tend.efHa8Sem)}<small> m/bat</small></div></div>
+        </div>
+        <div class="grafico-wrap">${graficoEF(tend.efSerie, key)}</div>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:8px">Distância ÷ batimentos da corrida: sobe quando você corre mais rápido na mesma FC. Vale todo esforço aeróbico (FC ≤165) — tiros e provas ficam fora de propósito.</p>
+      </div>`));
+    }
+
+    // rampa de volume: 12 semanas
+    if (tend.kmSemanas?.length) {
+      root.append(el(`<div class="card"><h2>Volume semanal <small>· últimas 12 semanas · social conta</small></h2>
+        <div class="grafico-wrap">${graficoVolume(tend.kmSemanas)}</div>
+        <p style="font-size:.75rem;color:var(--muted);margin-top:8px">Base pros 18 km se constrói com semanas parecidas, não com picos. Média (4 sem): <b class="num" style="color:var(--ink)">${String(tend.kmPorSemana4Sem ?? '–').replace('.', ',')} km</b>.</p>
+      </div>`));
+    }
+
+    // progressão do longão: a maior corrida de cada mês, com a régua da prova
+    if (tend.longaoMes?.length >= 2) {
+      const escala = Math.max(18, ...tend.longaoMes.map((m) => m.km)) * 1.08;
+      const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+      root.append(el(`<div class="card"><h2>Longão do mês <small>· a maior corrida de cada mês</small></h2>
+        <div class="longoes" style="--prova:${(18 / escala).toFixed(3)}">
+          ${tend.longaoMes.map((m) => `<div class="longao-linha">
+            <span class="longao-mes">${MES[+m.mes.slice(5) - 1]}</span>
+            <span class="longao-trilho"><i style="width:${(m.km / escala * 100).toFixed(1)}%"></i></span>
+            <b class="num">${String(m.km).replace('.', ',')}</b>
+          </div>`).join('')}
+          <div class="longao-prova num">18 km · prova</div>
+        </div>
+      </div>`));
+    }
   }
 
   // métricas semanais do §4 moraram aqui até a v5 — hoje vivem na aba Dieta ("Semana")
@@ -1835,6 +1880,65 @@ function graficoPaceZ2(serie, hojeKey) {
     <path d="${path}" fill="none" stroke="var(--serie-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
     ${rotuloFim}${eixoX}
   </svg>`;
+}
+
+function graficoEF(serie, hojeKey) {
+  const pontos = serie.map((p) => ({ date: p.date, valor: p.ef }));
+  const mm = D.mediaMovel7(pontos);
+  const w = 420, h = 170, padL = 40, padR = 12, padT = 12, padB = 22;
+  const d0 = pontos[0].date, d1 = hojeKey > pontos[pontos.length - 1].date ? hojeKey : pontos[pontos.length - 1].date;
+  const spanDias = Math.max(1, D.diffDays(d0, d1));
+  const vs = pontos.map((p) => p.valor);
+  let min = Math.min(...vs), max = Math.max(...vs);
+  const folga = Math.max(0.02, (max - min) * 0.12);
+  min -= folga; max += folga;
+  const x = (dk) => padL + (D.diffDays(d0, dk) / spanDias) * (w - padL - padR);
+  const y = (v) => padT + (1 - (v - min) / (max - min)) * (h - padT - padB);
+  const passo = (max - min) > 0.3 ? 0.1 : 0.05;
+  let grid = '';
+  for (let v = Math.ceil(min / passo) * passo; v <= max; v += passo) {
+    grid += `<line x1="${padL}" x2="${w - padR}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>
+      <text x="${padL - 5}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="var(--muted)" class="num">${v.toFixed(2).replace('.', ',')}</text>`;
+  }
+  const dots = pontos.map((p) => `<circle cx="${x(p.date).toFixed(1)}" cy="${y(p.valor).toFixed(1)}" r="2.5" fill="var(--muted)" opacity="0.45"/>`).join('');
+  const path = mm.map((p, i) => `${i ? 'L' : 'M'}${x(p.date).toFixed(1)},${y(p.valor).toFixed(1)}`).join(' ');
+  const fim = mm[mm.length - 1];
+  const rotuloFim = `<circle cx="${x(fim.date)}" cy="${y(fim.valor)}" r="4.5" fill="var(--serie-1)" stroke="var(--surface)" stroke-width="2"/>
+    <text x="${Math.min(x(fim.date) + 7, w - padR - 2)}" y="${y(fim.valor) - 7}" font-size="10.5" font-weight="650" fill="var(--ink)" text-anchor="${x(fim.date) > w - 60 ? 'end' : 'start'}" class="num">${fim.valor.toFixed(2).replace('.', ',')}</text>`;
+  const eixoX = `<text x="${padL}" y="${h - 6}" font-size="9" fill="var(--muted)">${fmtData(d0)}</text>
+    <text x="${w - padR}" y="${h - 6}" font-size="9" fill="var(--muted)" text-anchor="end">${fmtData(d1)}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:300px">
+    ${grid}${dots}
+    <path d="${path}" fill="none" stroke="var(--serie-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${rotuloFim}${eixoX}
+  </svg>`;
+}
+
+function graficoVolume(kmSemanas) {
+  const w = 420, h = 150, padL = 30, padR = 8, padT = 14, padB = 22;
+  const max = Math.max(10, ...kmSemanas.map((s) => s.km)) * 1.12;
+  const n = kmSemanas.length;
+  const passoX = (w - padL - padR) / n;
+  const larg = Math.min(24, passoX - 6);
+  const y = (v) => padT + (1 - v / max) * (h - padT - padB);
+  let grid = '';
+  const passo = max > 30 ? 10 : 5;
+  for (let v = passo; v <= max; v += passo) {
+    grid += `<line x1="${padL}" x2="${w - padR}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>
+      <text x="${padL - 5}" y="${y(v) + 3}" text-anchor="end" font-size="9" fill="var(--muted)" class="num">${v}</text>`;
+  }
+  const iMax = kmSemanas.reduce((m, s, i) => (s.km > kmSemanas[m].km ? i : m), 0);
+  const barras = kmSemanas.map((s, i) => {
+    const bx = padL + i * passoX + (passoX - larg) / 2;
+    const atual = i === n - 1; // semana corrente, ainda aberta
+    const rotulo = (i === iMax && s.km > 0) || (atual && s.km > 0)
+      ? `<text x="${bx + larg / 2}" y="${y(s.km) - 4}" text-anchor="middle" font-size="9" font-weight="650" fill="var(--ink)" class="num">${String(s.km).replace('.', ',')}</text>` : '';
+    return `<rect x="${bx.toFixed(1)}" y="${y(s.km).toFixed(1)}" width="${larg.toFixed(1)}" height="${Math.max(0, h - padB - y(s.km)).toFixed(1)}" rx="3"
+      fill="var(--serie-1)" opacity="${atual ? 0.45 : 1}"/>${rotulo}`;
+  }).join('');
+  const eixoX = `<text x="${padL}" y="${h - 6}" font-size="9" fill="var(--muted)">${fmtData(kmSemanas[0].semana)}</text>
+    <text x="${w - padR}" y="${h - 6}" font-size="9" fill="var(--muted)" text-anchor="end">semana atual</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:300px">${grid}${barras}${eixoX}</svg>`;
 }
 
 // ================================================================
@@ -2243,6 +2347,9 @@ if (params.get('contrato') && !D.contratoAtivo(S.getState().events, hojeKey(), a
   S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'drink' });
   S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'agua' });
   S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'drink' });
+}
+if (params.get('posalmoco')) { // dev: estado "acabei de almoçar" pro escudo pós-almoço
+  ['cafe', 'lanche1', 'almoco'].forEach((m) => S.addEvent({ type: 'meal', date: hojeKey(), meal: m, status: 'ok' }));
 }
 
 // service worker + atualização

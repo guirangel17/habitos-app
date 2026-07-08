@@ -68,6 +68,15 @@
 
 - ✅ App renomeado **Pampulha → Rotina** (feedback: "Pampulha não expressa o que o app faz"). Mudou só o nome voltado ao usuário: manifest (name/short_name), `<title>`, rodapé de Ajustes, nome do arquivo de backup. Menções à Volta da Pampulha (prova) ficam. Identificadores internos NÃO mudam: localStorage `pampulha.v1`, `app: 'pampulha'` no export, classe `.card-pampulha`, sentinela do history — renomear a chave do storage arriscaria os dados do usuário sem ganho.
 
+# Feito na v7.2 (jul/2026) — evolução real da corrida + feedback de UX
+
+- ✅ Corrida social (>10% de tempo parado) fora das tendências de pace Z2 e cadência — continua contando no volume (feito na prática junto com a v7.1).
+- ✅ Evolução → CORRIDA: **eficiência aeróbica** (metros/batimento, corridas limpas até Z3 — tiro/prova inflam, longão longo derruba), **volume semanal** (12 semanas em barras, semana atual translúcida), **longão do mês** (barras com régua tracejada dos 18 km da prova).
+- ✅ Pipeline: **deriva cardíaca** (decoupling FC×pace, 2ª metade vs 1ª pelos splits) nos longões ≥8 km — stat "deriva FC" no sheet + interpretação no prompt do Gemini (<5% sólido, >8% calibrar).
+- ✅ Sheet (bottom-sheet): alça visual no topo + respiro — o texto da análise estava colado na borda.
+- ✅ Barra de zonas de FC: cores por matiz (`--zona-1..5`: cinza→azul→aqua→âmbar→laranja; Z2 = azul protagonista de propósito) e legenda com chips e espaço — era tudo azul e apertado.
+- ✅ **Escudo pós-almoço**: 90 min após registrar o almoço, o hero ganha borda âmbar + botão de 1 toque pro SOS doce (mesmo botão aparece no escudo das 15h). Dev: `?posalmoco=1`.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

@@ -204,7 +204,9 @@ node --check app.js                  # sanity de sintaxe
 lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto em lógica),
 `?seed=1` (dados demo em store vazio), `?aba=hoje|dieta|treino|evolucao|relatorio|ajustes`,
 `?tema=dark|light`, `?sos=ifood|doce&passo=N`, `?ressaca=1`, `?wizard=revisao`, `?contadores=1`,
-`?contrato=1`, `?detalhe=gym|corrida`, `?dia=YYYY-MM-DD` (dia selecionado na semana do Treino).
+`?contrato=1`, `?detalhe=gym|corrida`, `?dia=YYYY-MM-DD` (dia selecionado na semana do Treino),
+`?posalmoco=1` (registra café/lanche1/almoço agora → escudo pós-almoço no hero; use `hoje` = data
+REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo).
 
 **Screenshots headless** (o Chrome clampa janela em ~500px; o truque é scale factor 2):
 ```bash
@@ -246,8 +248,10 @@ os dois temas se a mudança mexe em CSS.
   da corrida ganha a seção SUA CORRIDA: stats, zonas canônicas, splits e parecer da IA).
 - **Evolução**: hero gradiente com rota até a prova (semanas pintadas) → jardim (toque → overlay
   de anéis ao vivo) → IDENTIDADE (frase + 4 evidências) → CORPO (tiles + gráficos peso/cintura)
-  → CORRIDA (v7: pace em Z2 ao longo do tempo + VO2max + cadência/volume, lendo
-  historico.json — só aparece com dados do pipeline) → CONSTÂNCIA (linhas semanais, ✓ verde a
+  → CORRIDA (v7: pace em Z2 ao longo do tempo + VO2max + cadência/volume; v7.2: eficiência
+  aeróbica m/batimento até Z3, volume semanal 12 sem, longão do mês com régua dos 18 km — tudo
+  lendo historico.json, só aparece com dados do pipeline. Corridas sociais >10% paradas ficam
+  fora das tendências de pace/cadência/EF de propósito, mas contam no volume) → CONSTÂNCIA (linhas semanais, ✓ verde a
   28/35) → PADRÕES (ajuste da última revisão + gatilho×período quando ≥2 sem de dados, senão
   barras). As métricas da semana atual moraram aqui até a v5 — hoje vivem na aba Dieta.
 - **Relatório**: seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
