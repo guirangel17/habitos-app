@@ -3,6 +3,7 @@ import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
   FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
+  CORRIDAS, TIPO_CORRIDA_ICONE,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -32,7 +33,7 @@ function el(html) {
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-let abaAtiva = ['hoje', 'evolucao', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
+let abaAtiva = ['hoje', 'treino', 'evolucao', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
 
 // ---------- seed de demonstração (dev/testes: ?seed=1 com store vazio) ----------
 if (params.get('seed') && S.getState().events.length === 0) {
@@ -54,6 +55,12 @@ if (params.get('seed') && S.getState().events.length === 0) {
   S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -3), trigger: '15h', ts: tsEm(D.addDays(key, -3), 15) });
   S.addEvent({ type: 'sos', kind: 'ifood', outcome: 'surfed', date: D.addDays(key, -2), trigger: 'preguiça', ts: tsEm(D.addDays(key, -2), 21) });
   S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -10), trigger: 'call tensa', ts: tsEm(D.addDays(key, -10), 11) });
+  for (let i = 45; i >= 1; i--) {
+    const d = D.addDays(key, -i);
+    const plano = D.treinoDoDia(d);
+    if (plano.corrida && rnd(8)) S.addEvent({ type: 'workout', date: d, kind: 'corrida', done: true });
+    if (plano.gym && rnd(6)) S.addEvent({ type: 'workout', date: d, kind: 'gym', done: true });
+  }
   const sem = (n) => D.addDays(D.inicioSemana(key), -7 * n);
   S.addEvent({ type: 'review', week: sem(3), nota: null, ajuste: null });
   S.addEvent({ type: 'review', week: sem(2), nota: 'semana de sprint apertada', ajuste: 'Bloquear 10 min de buffer entre calls na agenda' });
@@ -199,13 +206,17 @@ function renderHoje(root) {
     }
   }
 
-  // ---- linha de streaks compacta (detalhe mora na Evolução) ----
+  // ---- linha de streaks com tempo vivo (toque → anéis estilo SugarCut) ----
+  const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
+  const tDeliv = D.tempoLimpo(D.ultimoSlipTs(st.events, 'delivery', inicioTs), Date.now());
+  const tDoce = D.tempoLimpo(D.ultimoSlipTs(st.events, 'sweet', inicioTs), Date.now());
   const linha = el(`<button class="linha-streaks">
-    <span>🛵 <b class="num">${cDeliv.streak}</b>d sem iFood</span>
-    <span>🍫 <b class="num">${cDoce.streak}</b>d sem doce</span>
+    <span>🛵 <b class="num">${tDeliv.dias}d ${String(tDeliv.horas).padStart(2, '0')}h</b></span>
+    <span>🍫 <b class="num">${tDoce.dias}d ${String(tDoce.horas).padStart(2, '0')}h</b></span>
+    <span style="color:var(--muted)">tempo limpo</span>
     <span class="seta">→</span>
   </button>`);
-  linha.onclick = () => { abaAtiva = 'evolucao'; render(); };
+  linha.onclick = contadoresOverlay;
   root.append(linha);
 
   // ---- peso contextual: só de manhã, sem registro hoje ----
@@ -685,6 +696,160 @@ function iniciarOnda(corpo) {
 }
 
 // ================================================================
+// TELA TREINO — hoje, semana e o cronograma de corridas inteiro
+// ================================================================
+function renderTreino(root) {
+  const st = S.getState();
+  const key = hojeKey();
+  const plano = D.treinoDoDia(key);
+  const feito = D.workoutsDoDia(st.events, key);
+
+  // hoje
+  const cardHoje = el('<div class="card"><h2>Treino de hoje</h2><div style="display:grid;gap:8px" id="tr"></div></div>');
+  const tr = cardHoje.querySelector('#tr');
+  const linhaTreino = (kind, icone, nome) => {
+    const ok = !!feito[kind];
+    const b = el(`<button class="check-passo ${ok ? 'feito' : ''}">
+      <span class="caixa">${ok ? '✓' : ''}</span>
+      <span><span class="t">${icone} ${esc(nome)}</span></span>
+    </button>`);
+    b.onclick = () => {
+      const e = S.addEvent({ type: 'workout', date: key, kind, done: !ok });
+      if (!ok) snackbar('Treino no papel. 👊', () => S.removeEvent(e.id));
+    };
+    return b;
+  };
+  if (plano.corrida) tr.append(linhaTreino('corrida', TIPO_CORRIDA_ICONE[plano.corrida.tipo], plano.corrida.nome));
+  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym));
+  if (!plano.corrida && !plano.gym) tr.append(el('<p style="font-size:.85rem;color:var(--muted)">Descanso — hoje o treino é dormir 7–8h. Metade da recuperação acontece dormindo.</p>'));
+  root.append(cardHoje);
+
+  // semana
+  const sem = D.semanaTreino(st.events, key);
+  const cardSem = el(`<div class="card"><h2>Semana <small>· ${fmtData(sem.ini)} – ${fmtData(D.addDays(sem.ini, 6))}</small></h2>
+    <div class="sem-treino"></div>
+    <div class="sem-resumo">
+      <span>🏋️ Academia <b class="num">${sem.gymFeito}/${sem.gymPlan}</b></span>
+      <span>🏃 Corrida <b class="num">${sem.corridaFeita}/${sem.corridaPlan}</b></span>
+    </div></div>`);
+  const semWrap = cardSem.querySelector('.sem-treino');
+  const letras = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+  sem.dias.forEach((d, i) => {
+    const col = el(`<div class="sem-dia ${d.date === key ? 'hoje' : ''}">
+      <span class="sem-letra">${letras[i]}</span>
+      ${d.plano.corrida ? `<span class="sem-dot ${d.feito.corrida ? 'ok' : d.date < key ? 'perdido' : ''}">${TIPO_CORRIDA_ICONE[d.plano.corrida.tipo]}</span>` : ''}
+      ${d.plano.gym ? `<span class="sem-dot ${d.feito.gym ? 'ok' : d.date < key ? 'perdido' : ''}">🏋️</span>` : ''}
+      ${!d.plano.corrida && !d.plano.gym ? '<span class="sem-dot descanso">–</span>' : ''}
+    </div>`);
+    semWrap.append(col);
+  });
+  root.append(cardSem);
+
+  // cronograma completo de corridas
+  const stats = D.corridasStats(st.events, key);
+  const cardCron = el(`<div class="card"><h2>Cronograma de corridas <small>· ${stats.feitas}/${stats.passadas} feitas até hoje · ${stats.total} até a prova</small></h2>
+    <div class="cronograma" id="cron"></div></div>`);
+  const cron = cardCron.querySelector('#cron');
+  const feitasCorrida = new Map();
+  for (const e of st.events) if (e.type === 'workout' && e.kind === 'corrida') feitasCorrida.set(e.date, e.done);
+  const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  let mesAtual = '';
+  let alvoScroll = null;
+  for (const [data, tipo, nome] of CORRIDAS) {
+    const mes = MESES[D.parseKey(data).getMonth()];
+    if (mes !== mesAtual) {
+      mesAtual = mes;
+      cron.append(el(`<div class="cron-mes">${mes}/26</div>`));
+    }
+    const ok = !!feitasCorrida.get(data);
+    const passada = data < key;
+    const hoje = data === key;
+    const item = el(`<button class="cron-item ${ok ? 'feita' : ''} ${passada && !ok ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
+      <span class="caixa">${ok ? '✓' : ''}</span>
+      <span class="cron-data num">${fmtData(data)}</span>
+      <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}</span>
+    </button>`);
+    item.onclick = () => S.addEvent({ type: 'workout', date: data, kind: 'corrida', done: !ok });
+    if (!alvoScroll && data >= key) alvoScroll = item;
+    cron.append(item);
+  }
+  root.append(cardCron);
+  if (alvoScroll) setTimeout(() => alvoScroll.scrollIntoView({ block: 'center' }), 40);
+}
+
+// ================================================================
+// CONTADORES — overlay estilo SugarCut (anel + tempo vivo)
+// ================================================================
+let contadorTimer = null;
+function contadoresOverlay() {
+  fecharSOS();
+  clearInterval(contadorTimer);
+  const st = S.getState();
+  const key = hojeKey();
+  const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
+
+  const tela = el(`<div class="sos-tela">
+    <button class="fechar">✕</button>
+    <h2>Tempo limpo</h2>
+    <p class="nomeacao">Contando ao vivo desde o último deslize — e um deslize isolado não zera a streak resiliente.</p>
+    <div class="aneis" id="aneis"></div>
+  </div>`);
+  tela.querySelector('.fechar').onclick = () => { clearInterval(contadorTimer); tela.remove(); };
+  document.body.appendChild(tela);
+  const wrap = tela.querySelector('#aneis');
+
+  const defs = [
+    { type: 'delivery', icone: '🛵', nome: 'Sem iFood por impulso' },
+    { type: 'sweet', icone: '🍫', nome: 'Sem doce fora do plano' },
+  ];
+  const anelEls = defs.map((d, i) => {
+    const c = D.contadorResiliente(st.events, d.type, key, st.settings.startKey);
+    const box = el(`<div class="anel-card">
+      <svg viewBox="0 0 200 200" class="anel-svg">
+        <defs><linearGradient id="grad${i}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3987e5"/><stop offset="100%" stop-color="#1baf7a"/>
+        </linearGradient></defs>
+        <circle cx="100" cy="100" r="86" fill="none" stroke="var(--grid)" stroke-width="10"/>
+        <circle class="anel-prog" cx="100" cy="100" r="86" fill="none" stroke="url(#grad${i})" stroke-width="10"
+          stroke-linecap="round" transform="rotate(-90 100 100)"/>
+      </svg>
+      <div class="anel-centro">
+        <span class="anel-icone">${d.icone}</span>
+        <span class="anel-dias num">–</span>
+        <span class="anel-hms num">--:--:--</span>
+      </div>
+      <div class="anel-info">
+        <b>${d.nome}</b>
+        <span class="anel-marco"></span>
+        <span class="anel-sub">recorde ${c.recorde}d · streak resiliente ${c.streak}d · ${c.limpos30}/${c.janela} dias limpos</span>
+      </div>
+    </div>`);
+    wrap.append(box);
+    return { box, type: d.type };
+  });
+
+  const CIRC = 2 * Math.PI * 86;
+  const tick = () => {
+    const eventos = S.getState().events;
+    const agoraTs = Date.now();
+    for (const a of anelEls) {
+      const desde = D.ultimoSlipTs(eventos, a.type, inicioTs);
+      const t = D.tempoLimpo(desde, agoraTs);
+      const marco = D.proximoMarco(t.totalDias);
+      a.box.querySelector('.anel-dias').textContent = t.dias;
+      a.box.querySelector('.anel-hms').textContent =
+        `${String(t.horas).padStart(2, '0')}:${String(t.min).padStart(2, '0')}:${String(t.seg).padStart(2, '0')}`;
+      a.box.querySelector('.anel-prog').style.strokeDasharray = `${CIRC * marco.frac} ${CIRC}`;
+      const faltam = marco.alvo - t.totalDias;
+      a.box.querySelector('.anel-marco').textContent =
+        `próximo marco: ${marco.alvo} dias — faltam ${Math.floor(faltam)}d ${Math.floor((faltam % 1) * 24)}h`;
+    }
+  };
+  tick();
+  contadorTimer = setInterval(tick, 1000);
+}
+
+// ================================================================
 // REVISÃO DE DOMINGO — wizard de 5 passos (Protocolo §4)
 // ================================================================
 function wizardRevisao(semanaIni) {
@@ -832,9 +997,19 @@ function renderEvolucao(root) {
 
   // peso
   const pesos = D.serie(st.events, 'weight');
-  const cardPeso = el('<div class="card"><h2>Peso — a linha que importa é a média de 7 dias</h2><div class="grafico-wrap" id="g"></div><div id="rit"></div><div class="legenda" id="leg"></div></div>');
+  const cardPeso = el('<div class="card"><h2>Peso — a linha que importa é a média de 7 dias</h2><div class="tiles" id="tiles" style="margin-bottom:12px"></div><div class="grafico-wrap" id="g"></div><div id="rit"></div><div class="legenda" id="leg"></div></div>');
   if (pesos.length >= 2) {
     const mm = D.mediaMovel7(pesos);
+    const mmFim = mm[mm.length - 1];
+    const emData = (dk) => { let r = null; for (const p of mm) if (p.date <= dk) r = p; return r; };
+    const delta = (ref) => (ref ? mmFim.valor - ref.valor : null);
+    const d30 = delta(emData(D.addDays(key, -30)));
+    const dTotal = delta(mm[0]);
+    const fmtDelta = (v) => (v === null ? '–' : `${v > 0 ? '+' : ''}${v.toFixed(1).replace('.', ',')}`);
+    cardPeso.querySelector('#tiles').innerHTML = `
+      <div class="tile"><div class="l">Agora (média 7d)</div><div class="v num">${mmFim.valor.toFixed(1).replace('.', ',')}<small> kg</small></div></div>
+      <div class="tile"><div class="l">Últimos 30 dias</div><div class="v num">${fmtDelta(d30)}<small> kg</small></div></div>
+      <div class="tile"><div class="l">Desde o início</div><div class="v num">${fmtDelta(dTotal)}<small> kg</small></div></div>`;
     cardPeso.querySelector('#g').innerHTML = graficoLinha(pesos, mm, key, true);
     cardPeso.querySelector('#leg').innerHTML = `
       <span class="item"><span class="traco" style="background:var(--serie-1)"></span>média 7 dias</span>
@@ -872,19 +1047,20 @@ function renderEvolucao(root) {
     ${b.delivery === null ? '<p style="font-size:.72rem;color:var(--muted);margin-top:8px">Defina seu baseline em Ajustes para ativar as metas de −50%.</p>' : ''}
   </div>`));
 
-  // heatmap de constância
-  const hm = D.heatmapConstancia(st.events, key, 16);
-  const cardHm = el(`<div class="card"><h2>Constância <small>· refeições no plano por dia, 16 semanas</small></h2>
-    <div class="heatmap-wrap">
-      <div class="heatmap-dias"><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span><span>D</span></div>
-      <div class="heatmap">${hm.map((sem) => sem.dias.map((n) =>
-        n === null ? '<span class="cel vazio"></span>' : `<span class="cel n${n}" title="${n}/5"></span>`).join('')).join('')}</div>
-    </div>
-    <div class="legenda" style="margin-top:8px"><span class="item">0</span>
-      <span class="item"><span class="faixa cel n1" style="width:10px;height:10px;background:var(--seq-1)"></span></span>
-      <span class="item"><span class="faixa" style="width:10px;height:10px;background:var(--seq-3)"></span></span>
-      <span class="item"><span class="faixa" style="width:10px;height:10px;background:var(--seq-5)"></span></span>
-      <span class="item">5/5 · semana verde = 80% (28/35), não perfeição</span></div>
+  // constância: uma linha legível por semana, meta = 80% (28/35), não perfeição
+  const hm = D.heatmapConstancia(st.events, key, 8);
+  const cardHm = el(`<div class="card"><h2>Constância <small>· refeições no plano · meta da semana: 28/35 (80%)</small></h2>
+    <div class="const-cab"><span></span>${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((l) => `<span>${l}</span>`).join('')}<span></span></div>
+    ${hm.map((sem) => {
+      const total = sem.dias.reduce((s, n) => s + (n || 0), 0);
+      const fechada = sem.dias.every((n) => n !== null);
+      const verde = fechada && total >= 28;
+      return `<div class="const-sem">
+        <span class="const-label num">${fmtData(sem.ini)}</span>
+        ${sem.dias.map((n) => n === null ? '<span class="cel vazio"></span>' : `<span class="cel n${n}" title="${n}/5"></span>`).join('')}
+        <span class="const-total num ${verde ? 'verde' : ''}">${total}${verde ? ' ✓' : ''}</span>
+      </div>`;
+    }).join('')}
   </div>`);
   root.append(cardHm);
 
@@ -1207,6 +1383,7 @@ function render() {
   const root = $('#conteudo');
   root.innerHTML = '';
   if (abaAtiva === 'hoje') renderHoje(root);
+  else if (abaAtiva === 'treino') renderTreino(root);
   else if (abaAtiva === 'evolucao') renderEvolucao(root);
   else renderAjustes(root);
 
@@ -1229,6 +1406,7 @@ if (params.get('sos')) {
 if (params.get('ressaca') && !D.ressacaDoDia(S.getState().events, hojeKey()).on) {
   S.addEvent({ type: 'hangover_on', date: hojeKey() });
 }
+if (params.get('contadores')) contadoresOverlay();
 if (params.get('wizard') === 'revisao') {
   wizardRevisao(D.revisaoPendente(S.getState().events, hojeKey(), 20) || D.addDays(D.inicioSemana(hojeKey()), -7));
 }

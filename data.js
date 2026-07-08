@@ -144,3 +144,93 @@ export const AJUSTES_AMBIENTE = [
 
 // Opções de horário-limite do Contrato da Noite (Protocolo 3A)
 export const HORARIOS_SAIDA = ['23:00', '00:30', '02:00', 'sem limite'];
+
+// ---- TREINO (de ~/treino-pampulha/plano-hibrido-pampulha.md) ----
+
+// Musculação por dia da semana (0=Dom … 6=Sáb)
+export const GYM_POR_DIA = [
+  null,
+  null,
+  'Empurrar — peito/ombro/tríceps (~19 séries)',
+  'Puxar — costas/bíceps (~18 séries, RIR 1-2 na barra)',
+  'Pernas A — dia pesado único (~21 séries, após a corrida)',
+  'Upper C + Core (~16 séries + core)',
+  'Pernas B — preventivo/leve (RIR 3-4, protege o longão)',
+];
+
+// Calendário de corrida consolidado (Seção 7 do plano) — [data, tipo, descrição]
+// tipo: prova | longo | tiros | tempo | social | leve
+export const CORRIDAS = [
+  ['2026-07-05', 'prova', 'PROVA 5 km ⚡ — soltar o corpo, sem cobrança de pace'],
+  ['2026-07-08', 'leve', '5 km leve — cadência 165+ spm'],
+  ['2026-07-09', 'social', 'Social Run 5 km regenerativo'],
+  ['2026-07-13', 'longo', 'LONGO 10 km (Z2)'],
+  ['2026-07-15', 'tiros', 'Fartlek 6 × 400 m a 5:35–5:50 — rec. trote leve'],
+  ['2026-07-16', 'social', 'Social Run 5 km leve'],
+  ['2026-07-20', 'longo', 'LONGO 12 km (Z2)'],
+  ['2026-07-22', 'tiros', 'Fartlek 6 × 400 m a 5:35–5:50 — rec. trote leve'],
+  ['2026-07-23', 'social', 'Social Run 5 km leve'],
+  ['2026-07-27', 'longo', 'LONGO 12 km (Z2)'],
+  ['2026-07-29', 'tiros', 'TESTE 5 km contrarrelógio — define os paces de agosto'],
+  ['2026-07-30', 'social', 'Social Run 5 km leve'],
+  ['2026-08-03', 'longo', 'LONGO 12 km — últimos 2 km em ritmo de prova'],
+  ['2026-08-05', 'tiros', '5 × 800 m em ritmo de 5 km — rec. 2 min ativa'],
+  ['2026-08-06', 'social', 'Social Run 5 km Z1 + 4 strides de 100 m'],
+  ['2026-08-10', 'longo', 'LONGO 13 km — últimos 2 km em ritmo de prova'],
+  ['2026-08-12', 'tiros', '5 × 800 m ritmo de 5 km — rec. 2 min ativa'],
+  ['2026-08-13', 'social', 'Social Run 5 km regenerativo'],
+  ['2026-08-17', 'longo', 'LONGO 14 km — últimos 2 km em ritmo de prova'],
+  ['2026-08-19', 'tiros', '6 × 800 m ritmo de 5 km — rec. 2 min ativa'],
+  ['2026-08-20', 'social', 'Social Run 5 km leve + 4 strides'],
+  ['2026-08-24', 'longo', 'LONGO 14 km — últimos 3 km em ritmo de prova'],
+  ['2026-08-26', 'tiros', '6 × 800 m ritmo de 5 km — rec. 2 min ativa'],
+  ['2026-08-27', 'social', 'Social Run 5 km regenerativo'],
+  ['2026-08-31', 'longo', 'LONGO 10 km — DELOAD (academia: metade das séries)'],
+  ['2026-09-02', 'tempo', 'Tempo Run 4 km a 6:05–6:20 — contínuo'],
+  ['2026-09-03', 'social', 'Social Run 6 km leve'],
+  ['2026-09-07', 'longo', 'LONGO 14 km (5 Z2 + 5 Z3 + 4 Z2)'],
+  ['2026-09-09', 'tempo', 'Tempo Run 5 km a 6:05–6:20'],
+  ['2026-09-10', 'social', 'Social Run 6 km regenerativo'],
+  ['2026-09-14', 'longo', 'LONGO 15 km (5 Z2 + 6 Z3 + 4 Z2)'],
+  ['2026-09-16', 'tempo', 'Tempo Run 5 km a 6:05–6:20'],
+  ['2026-09-17', 'social', 'Social Run 6 km leve + 4 strides'],
+  ['2026-09-21', 'longo', 'LONGO 15 km (4 Z2 + 7 Z3 + 4 Z2)'],
+  ['2026-09-23', 'tempo', 'Tempo Run 6 km — checkpoint do alvo da prova'],
+  ['2026-09-24', 'social', 'Social Run 6 km regenerativo'],
+  ['2026-09-28', 'longo', 'LONGO 12 km — DELOAD (academia idem)'],
+  ['2026-09-30', 'tempo', 'Tempo Run 4 km moderado'],
+  ['2026-10-01', 'social', 'Social Run 7 km leve'],
+  ['2026-10-05', 'longo', 'LONGO 15 km — ritmo constante'],
+  ['2026-10-07', 'tiros', '4 × 1 km a 5:45–6:00 — rec. 2min30 ativa'],
+  ['2026-10-08', 'social', 'Social Run 7 km regenerativo'],
+  ['2026-10-12', 'longo', 'LONGO 15 km — oscilações de relevo'],
+  ['2026-10-14', 'tiros', '4 × 1 km a 5:45–6:00 — rec. 2min30 ativa'],
+  ['2026-10-15', 'social', 'Social Run 7-8 km leve + 4 strides'],
+  ['2026-10-19', 'longo', 'LONGO 16 km — passos curtos e rápidos'],
+  ['2026-10-21', 'tiros', '5 × 1 km a 5:40–5:50 — rec. 2min30 ativa'],
+  ['2026-10-22', 'social', 'Social Run 7-8 km regenerativo'],
+  ['2026-10-26', 'longo', 'LONGO 16 km progressivo'],
+  ['2026-10-28', 'tiros', '5 × 1 km a 5:40–5:50 — rec. 2min30 ativa'],
+  ['2026-10-29', 'social', 'Social Run 7-8 km leve'],
+  ['2026-11-02', 'longo', 'VOLTA COMPLETA 18 km 🔥 — simulação oficial no percurso (gel km 6 e 12)'],
+  ['2026-11-04', 'tiros', '4 × 1 km a 5:45–6:00 — rec. 2min30 ativa'],
+  ['2026-11-05', 'social', 'Social Run 6 km regenerativo'],
+  ['2026-11-09', 'longo', 'LONGO 15 km — travar ritmo'],
+  ['2026-11-11', 'tiros', '3 × 1,5 km a 5:55–6:05 — rec. 3 min'],
+  ['2026-11-12', 'social', 'Social Run 6 km leve'],
+  ['2026-11-16', 'longo', 'LONGO 14 km — início da redução'],
+  ['2026-11-18', 'tempo', 'Tempo Run 5 km a 6:10–6:20 controlado'],
+  ['2026-11-19', 'social', 'Social Run 5 km regenerativo'],
+  ['2026-11-23', 'longo', 'TAPER: 12 km com 4-5 km em ritmo de prova no meio'],
+  ['2026-11-25', 'leve', '4 km leve — giro articular'],
+  ['2026-11-26', 'social', 'Social Run 5 km muito leve'],
+  ['2026-11-30', 'longo', 'TAPER: 10 km com 3 km em ritmo de prova no final'],
+  ['2026-12-02', 'leve', '3 km ativação — trote + 3 acelerações de 50 m'],
+  ['2026-12-03', 'leve', 'Trote muito leve / caminhada — tirar a ansiedade'],
+  ['2026-12-06', 'prova', '🏅 VOLTA INTERNACIONAL DA PAMPULHA — 18 KM — alvo 6:15–6:30/km'],
+];
+
+export const TIPO_CORRIDA_ICONE = { prova: '🏅', longo: '🏃', tiros: '⚡', tempo: '⏱️', social: '👥', leve: '🌤️' };
+
+// Marcos dos contadores (estilo SugarCut: próximo marco vira a meta do anel)
+export const MARCOS_DIAS = [1, 3, 7, 14, 21, 30, 45, 60, 90, 120, 150];

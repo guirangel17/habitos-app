@@ -1,5 +1,5 @@
 // Funções puras de derivação — sem DOM, sem storage. Testáveis via node.
-import { TIPO_POR_DIA_SEMANA, FIM_DEFICIT, CARGA_CARBO, PROVA, MEAL_IDS, METAS_30D } from './data.js';
+import { TIPO_POR_DIA_SEMANA, FIM_DEFICIT, CARGA_CARBO, PROVA, MEAL_IDS, METAS_30D, CORRIDAS, GYM_POR_DIA, MARCOS_DIAS } from './data.js';
 
 export const DAY_MS = 86400000;
 
@@ -287,6 +287,78 @@ export function gatilhosPorPeriodo(events, hojeKey, dias = 28) {
     total++;
   }
   return { mapa, total };
+}
+
+// ---- Treino (corrida do calendário + musculação da estrutura semanal) ----
+const CORRIDA_POR_DATA = new Map(CORRIDAS.map(([d, tipo, nome]) => [d, { tipo, nome }]));
+
+export function treinoDoDia(key) {
+  return {
+    corrida: CORRIDA_POR_DATA.get(key) || null,
+    gym: GYM_POR_DIA[parseKey(key).getDay()] || null,
+  };
+}
+
+// workout events: {type:'workout', date, kind:'corrida'|'gym', done} — último vence
+export function workoutsDoDia(events, key) {
+  const out = {};
+  for (const e of events) if (e.type === 'workout' && e.date === key) out[e.kind] = e.done;
+  return out; // {corrida: true|false, gym: true|false}
+}
+
+export function semanaTreino(events, key) {
+  const ini = inicioSemana(key);
+  let gymPlan = 0, gymFeito = 0, corridaPlan = 0, corridaFeita = 0;
+  const dias = [];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(ini, i);
+    const plano = treinoDoDia(d);
+    const feito = workoutsDoDia(events, d);
+    if (plano.gym) { gymPlan++; if (feito.gym) gymFeito++; }
+    if (plano.corrida) { corridaPlan++; if (feito.corrida) corridaFeita++; }
+    dias.push({ date: d, plano, feito });
+  }
+  return { ini, dias, gymPlan, gymFeito, corridaPlan, corridaFeita };
+}
+
+export function corridasStats(events, hojeKey) {
+  const feitas = new Set(events.filter((e) => e.type === 'workout' && e.kind === 'corrida' && e.done).map((e) => e.date));
+  const passadas = CORRIDAS.filter(([d]) => d <= hojeKey);
+  return {
+    feitas: passadas.filter(([d]) => feitas.has(d)).length,
+    passadas: passadas.length,
+    total: CORRIDAS.length,
+  };
+}
+
+// ---- Contador com precisão de tempo (estilo SugarCut) ----
+export function ultimoSlipTs(events, type, fallbackTs) {
+  let max = null;
+  for (const e of events) {
+    const conta = e.type === type
+      || (type === 'delivery' && e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in')
+      || (type === 'sweet' && e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in');
+    if (conta && (max === null || e.ts > max)) max = e.ts;
+  }
+  return max ?? fallbackTs;
+}
+
+export function tempoLimpo(desdeTs, agoraTs) {
+  const ms = Math.max(0, agoraTs - desdeTs);
+  const s = Math.floor(ms / 1000);
+  return {
+    dias: Math.floor(s / 86400),
+    horas: Math.floor((s % 86400) / 3600),
+    min: Math.floor((s % 3600) / 60),
+    seg: s % 60,
+    totalDias: ms / 86400000,
+  };
+}
+
+export function proximoMarco(totalDias) {
+  const alvo = MARCOS_DIAS.find((m) => m > totalDias) ?? Math.ceil((totalDias + 30) / 30) * 30;
+  const anterior = [...MARCOS_DIAS].reverse().find((m) => m <= totalDias) ?? 0;
+  return { alvo, frac: Math.min(1, (totalDias - anterior) / (alvo - anterior)) };
 }
 
 // ---- Gatilhos ----

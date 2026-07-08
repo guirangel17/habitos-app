@@ -153,5 +153,37 @@ const gEvs = [
 const gp = D.gatilhosPorPeriodo(gEvs, '2026-07-07', 28);
 ok(gp.total === 3 && gp.mapa['15h'][2] === 2 && gp.mapa['preguiça'][3] === 1, 'gatilhos agregados por período do dia');
 
+// ---- v3: treino ----
+let td = D.treinoDoDia('2026-07-13'); // segunda: LONGO 10 km, sem academia
+ok(td.corrida && td.corrida.nome.includes('LONGO 10') && td.gym === null, 'segunda 13/07: longão, sem academia');
+td = D.treinoDoDia('2026-07-16'); // quinta: social run + Pernas A
+ok(td.corrida && td.corrida.tipo === 'social' && td.gym.includes('Pernas A'), 'quinta 16/07: social + Pernas A');
+td = D.treinoDoDia('2026-07-14'); // terça: só academia
+ok(td.corrida === null && td.gym.includes('Empurrar'), 'terça: só Empurrar');
+td = D.treinoDoDia('2026-07-12'); // domingo
+ok(td.corrida === null && td.gym === null, 'domingo: descanso total');
+
+const wEvs = [
+  { id: 'w1', ts: 1, type: 'workout', date: '2026-07-13', kind: 'corrida', done: true },
+  { id: 'w2', ts: 2, type: 'workout', date: '2026-07-14', kind: 'gym', done: true },
+  { id: 'w3', ts: 3, type: 'workout', date: '2026-07-15', kind: 'gym', done: true },
+  { id: 'w4', ts: 4, type: 'workout', date: '2026-07-15', kind: 'gym', done: false }, // desfez — último vence
+];
+const semT = D.semanaTreino(wEvs, '2026-07-15');
+ok(semT.gymPlan === 5 && semT.gymFeito === 1, `semana treino: academia 1/5 (veio ${semT.gymFeito}/${semT.gymPlan})`);
+ok(semT.corridaPlan === 3 && semT.corridaFeita === 1, `semana treino: corrida 1/3 (veio ${semT.corridaFeita}/${semT.corridaPlan})`);
+
+const cs = D.corridasStats(wEvs, '2026-07-16');
+ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 67, `corridas: 1/6 até 16/07, 67 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
+
+// ---- v3: tempo limpo ----
+const t0 = D.parseKey('2026-07-01').getTime();
+const tl = D.tempoLimpo(t0, t0 + (2 * 86400 + 5 * 3600 + 30 * 60 + 10) * 1000);
+ok(tl.dias === 2 && tl.horas === 5 && tl.min === 30 && tl.seg === 10, 'tempoLimpo decompõe d/h/m/s');
+ok(D.ultimoSlipTs([{ id: 'a', ts: 100, type: 'delivery' }, { id: 'b', ts: 900, type: 'sos', kind: 'ifood', outcome: 'gave_in' }], 'delivery', 5) === 900, 'ultimoSlipTs pega o mais recente (inclui sos gave_in)');
+ok(D.ultimoSlipTs([], 'delivery', 5) === 5, 'ultimoSlipTs usa fallback sem deslizes');
+const marco = D.proximoMarco(4.5);
+ok(marco.alvo === 7 && Math.abs(marco.frac - 0.375) < 1e-9, 'próximo marco: 7 dias, 37,5% do trecho 3→7');
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);
