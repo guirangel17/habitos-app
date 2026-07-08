@@ -232,5 +232,34 @@ ok(rp.delivery === 1 && rp.diasObs === 2 && Math.abs(rp.adesao - 0.9) < 1e-9 && 
 const eco = D.economiaEstimada([mk('delivery', '2026-07-05')], { baseline: { delivery: 4 }, startKey: '2026-06-23' }, '2026-07-07');
 ok(eco && eco.evitados === 7 && eco.valor === 315, `economia: 7 pedidos evitados, R$315 (veio ${eco && eco.evitados}/${eco && eco.valor})`);
 
+// marcoDashboard (v6): escolhe o contador de maior frac; celebra marco batido <24h
+const meioDia = (date) => D.parseKey(date).getTime() + 12 * 3600e3;
+// sem deslizes, início há 10 dias → ambos com 10d: marco 14, anterior 7, frac (10-7)/7
+let mdash = D.marcoDashboard([], { startKey: '2026-06-27' }, '2026-07-07', meioDia('2026-07-07'));
+ok(mdash.escolhido.marco === 14 && mdash.escolhido.dias === 10, `marcoDashboard: marco 14 aos 10d (veio ${mdash.escolhido.marco})`);
+ok(Math.abs(mdash.escolhido.frac - 3.5 / 7) < 1e-9, 'marcoDashboard: frac 3,5/7 (10,5 dias limpos)');
+ok(!mdash.escolhido.batidoHa24h, 'marcoDashboard: 10d não é celebração');
+// doce deslizou há 6 dias (frac 3/4 rumo ao marco 7) vs delivery com 10,5d (frac 1/2) → doce vence
+mdash = D.marcoDashboard([mk('sweet', '2026-07-01')], { startKey: '2026-06-27' }, '2026-07-07', meioDia('2026-07-07'));
+ok(mdash.escolhido.tipo === 'sweet' && mdash.escolhido.marco === 7, `marcoDashboard: maior frac vence (${mdash.escolhido.tipo}→${mdash.escolhido.marco})`);
+// marco de 7 batido há meio dia → celebração vence qualquer frac
+mdash = D.marcoDashboard([mk('sweet', '2026-06-30')], { startKey: '2026-06-27' }, '2026-07-07', meioDia('2026-07-07') + 12 * 3600e3);
+ok(mdash.escolhido.tipo === 'sweet' && mdash.escolhido.batidoHa24h && mdash.escolhido.marcoAnterior === 7, 'marcoDashboard: celebra marco 7 batido <24h');
+ok(mdash.ambos.length === 2, 'marcoDashboard: retorna os dois contadores');
+// proximoMarco agora expõe o marco anterior
+ok(D.proximoMarco(10).anterior === 7 && D.proximoMarco(10).alvo === 14, 'proximoMarco expõe anterior');
+
+// aberturaSemana (v6): fresh start de segunda — 2026-07-13 é segunda
+const semVerde = (ini) => [0, 1, 2, 3, 4, 5].flatMap((i) => meals5(D.addDays(ini, i), 5)); // 30/35 ≥ 28
+let ab = D.aberturaSemana([], '2026-07-13');
+ok(ab.ini === '2026-07-13' && !ab.verdeAnterior && ab.verdesSeguidas === 0 && !ab.temDados, 'aberturaSemana: sem dados');
+ab = D.aberturaSemana(semVerde('2026-07-06'), '2026-07-13');
+ok(ab.verdeAnterior && ab.verdesSeguidas === 1, 'aberturaSemana: 1 semana verde anterior');
+ab = D.aberturaSemana([...semVerde('2026-06-29'), ...semVerde('2026-07-06')], '2026-07-13');
+ok(ab.verdesSeguidas === 2, `aberturaSemana: 2 verdes seguidas (veio ${ab.verdesSeguidas})`);
+ab = D.aberturaSemana([...semVerde('2026-06-29'), ...meals5('2026-07-06', 3)], '2026-07-13');
+ok(!ab.verdeAnterior && ab.verdesSeguidas === 0 && ab.temDados, 'aberturaSemana: semana anterior não-verde zera a sequência');
+ok(D.aberturaSemana([], '2026-07-15').ini === '2026-07-13', 'aberturaSemana: quarta aponta para a segunda da semana');
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);

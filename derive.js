@@ -358,7 +358,49 @@ export function tempoLimpo(desdeTs, agoraTs) {
 export function proximoMarco(totalDias) {
   const alvo = MARCOS_DIAS.find((m) => m > totalDias) ?? Math.ceil((totalDias + 30) / 30) * 30;
   const anterior = [...MARCOS_DIAS].reverse().find((m) => m <= totalDias) ?? 0;
-  return { alvo, frac: Math.min(1, (totalDias - anterior) / (alvo - anterior)) };
+  return { alvo, anterior, frac: Math.min(1, (totalDias - anterior) / (alvo - anterior)) };
+}
+
+// ---- Dashboard da Hoje (v6) ----
+// Marco mais próximo entre os dois contadores: escolhe o de maior frac, então
+// sempre há um "quase lá" na tela (goal gradient). Marco batido há <24h ganha
+// prioridade para celebrar em vez de mostrar o anel novo quase vazio.
+export function marcoDashboard(events, settings, key, agoraTs) {
+  const inicioTs = parseKey(settings.startKey || key).getTime();
+  const ambos = ['delivery', 'sweet'].map((tipo) => {
+    const t = tempoLimpo(ultimoSlipTs(events, tipo, inicioTs), agoraTs);
+    const m = proximoMarco(t.totalDias);
+    return {
+      tipo, dias: t.dias, totalDias: t.totalDias,
+      marco: m.alvo, marcoAnterior: m.anterior, frac: m.frac,
+      batidoHa24h: m.anterior > 0 && t.totalDias - m.anterior < 1,
+    };
+  });
+  const celebrando = ambos.filter((c) => c.batidoHa24h).sort((a, b) => b.marcoAnterior - a.marcoAnterior)[0];
+  const escolhido = celebrando || (ambos[1].frac > ambos[0].frac ? ambos[1] : ambos[0]);
+  return { escolhido, ambos };
+}
+
+// ---- Abertura de semana (fresh start de segunda) ----
+// Semana "verde" = ≥28/35 refeições no plano (80%, nunca exigir 35/35).
+// O gate de "é segunda de manhã" fica na UI; aqui só os dados.
+export function aberturaSemana(events, key) {
+  const ini = inicioSemana(key);
+  const refSemana = (s) => {
+    let n = 0;
+    for (let i = 0; i < 7; i++) n += mealsDone(mealsOfDay(events, addDays(s, i)));
+    return n;
+  };
+  const refAnterior = refSemana(addDays(ini, -7));
+  let verdesSeguidas = 0;
+  for (let s = addDays(ini, -7); refSemana(s) >= 28 && verdesSeguidas < 52; s = addDays(s, -7)) verdesSeguidas++;
+  return {
+    ini,
+    restantes: semanasAteProva(key),
+    temDados: refAnterior > 0,
+    verdeAnterior: refAnterior >= 28,
+    verdesSeguidas,
+  };
 }
 
 // ================================================================

@@ -27,7 +27,7 @@ Vanilla JS com ES modules. **Zero build, zero dependências, zero backend.** pt-
 
 | Arquivo | Papel |
 |---|---|
-| `index.html` | shell: header (chip do dia + countdown), `#conteudo`, FAB SOS, nav de 5 abas |
+| `index.html` | shell: header (chip do dia + countdown + ⚙️ Ajustes), `#conteudo`, FAB SOS, nav de 5 abas (Hoje·Dieta·Treino·Evolução·Relatório) |
 | `styles.css` | tokens de cor (paleta validada p/ daltonismo, claro+escuro), todos os componentes |
 | `data.js` | constantes do plano: refeições, tipos de dia, corridas, treinos gym, paces, scripts SOS |
 | `derive.js` | **funções puras** (sem DOM/storage) — toda regra de negócio derivável. Testável via node |
@@ -86,10 +86,13 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
 1. **Zero linguagem punitiva.** Nada de vermelho em deslize, nada de "falhou", streak nunca
    "zera" na cara do usuário. Deslize registrado recebe resposta factual + lembrete do
    never-miss-twice. Culpa é o que transforma 1 deslize no dominó de 36h.
-2. **A home responde "o que eu faço AGORA" em 2 segundos.** UM hero (a refeição da vez), trilha
-   compacta, linhas discretas. **Nenhuma funcionalidade nova ganha card permanente na Hoje** —
-   tudo condicional disputa o *slot contextual único* (prioridade: ressaca > contrato > fechar
-   contrato de ontem > revisão pendente), no máximo 1 visível por vez.
+2. **A home responde "o que eu faço AGORA" em 2 segundos.** Desde a v6 a Hoje é um dashboard
+   canônico: UM hero (refeição da vez; à noite, com jantar fechado, vira "colheita do dia") +
+   linhas de altura única (fresh start de segunda, treino de hoje, anel do marco, peso matinal)
+   + slot contextual. **Esse layout é o teto — nenhuma funcionalidade nova ganha card ou linha
+   permanente na Hoje**; tudo condicional disputa o *slot contextual único* (prioridade:
+   ressaca > contrato > fechar contrato de ontem > revisão pendente), no máximo 1 visível por
+   vez. A trilha das 5 refeições e o cardápio moram na aba Dieta.
 3. **Sem gestos escondidos.** O usuário reclamou de toque longo — toda ação secundária tem
    affordance visível (botão `›`, sheet). Toque simples = ação primária óbvia.
 4. **Recompensa = evidência de dados, não decoração.** Sem XP, níveis, badges, mascotes
@@ -141,9 +144,9 @@ node --check app.js                  # sanity de sintaxe
 
 **Parâmetros de dev** (query string): `?hoje=2026-07-07&agora=15:30` (simular data/hora — TODA
 lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto em lógica),
-`?seed=1` (dados demo em store vazio), `?aba=hoje|treino|evolucao|ajustes`, `?tema=dark|light`,
-`?sos=ifood|doce&passo=N`, `?ressaca=1`, `?wizard=revisao`, `?contadores=1`, `?contrato=1`,
-`?detalhe=gym|corrida`.
+`?seed=1` (dados demo em store vazio), `?aba=hoje|dieta|treino|evolucao|relatorio|ajustes`,
+`?tema=dark|light`, `?sos=ifood|doce&passo=N`, `?ressaca=1`, `?wizard=revisao`, `?contadores=1`,
+`?contrato=1`, `?detalhe=gym|corrida`, `?dia=YYYY-MM-DD` (dia selecionado na semana do Treino).
 
 **Screenshots headless** (o Chrome clampa janela em ~500px; o truque é scale factor 2):
 ```bash
@@ -155,26 +158,39 @@ google-chrome --headless=new --disable-gpu --no-sandbox --force-device-scale-fac
 gerados com PIL (`python3` + Pillow disponíveis). Sempre olhe o screenshot antes de publicar —
 os dois temas se a mudança mexe em CSS.
 
-## Mapa do app (v5, jul/2026)
+## Mapa do app (v6, jul/2026)
 
-- **Hoje**: slot contextual (máx 1) → hero da refeição da vez (badge anti-doce 16h, badge ouro
-  domingo, ajuste por tipo de dia) → trilha de 5 marcadores → aviso never-miss-twice (só quando
-  acionável) → linha de tempo limpo ao vivo (toque → overlay) → peso contextual (manhã) →
-  "+ Registrar" (sheet: peso/delivery/doce/noite fora + link SOS).
+- **Hoje (dashboard)**: slot contextual (máx 1) → hero da refeição da vez (badge anti-doce 16h,
+  badge ouro domingo, ajuste por tipo de dia, placar X/5 no rótulo; à noite com jantar fechado
+  vira **colheita do dia** — peak-end: refeições, treino, dia limpo→jardim, marco) → linha de
+  **abertura de semana** (só segunda <12h — fresh start: recomeço ou momentum de semanas verdes)
+  → linha **treino de hoje** (check por modalidade + › para a aba Treino) → aviso
+  never-miss-twice (só quando acionável) → linha do **anel do marco mais próximo** (goal
+  gradient: maior frac entre 🛵/🍫, celebra marco batido <24h; toque → overlay de contadores) →
+  peso contextual (manhã) → "+ Registrar" (sheet: peso/delivery/doce/noite fora + link SOS).
+- **Dieta**: contexto do dia (tipo + kcal/macros da fase + porquê) → trilha de 5 marcadores
+  (migrada da Hoje; toque → sheet da refeição) → cardápio de hoje inteiro (principal + ajuste
+  do tipo + badge ouro domingo) → semana em números (3 métricas §4, movidas da Evolução +
+  refeições X/35 com selo verde a 28). 100% read-only sobre data.js — NUNCA vira editor.
 - **Modo Ressaca**: sequestra a Hoje por 24h; checklist de zero decisões; completo = "dominó
   quebrado". Oferecido (nunca automático) na manhã após `night_out`.
 - **SOS** (FAB + atalho do ícone PWA): iFood/doce = script do §5 passo a passo + suspiro
   fisiológico animado + timer-onda de 10 min; desfecho surfed/gave_in + chip de gatilho.
-- **Treino**: Semana (dots + academia X/5, corrida X/3) → Treino de hoje (checks + `›` com
+- **Treino**: Semana (7 dias como BOTÕES — tocar troca o card de baixo para "Treino de terça ·
+  15/07" com chip "‹ voltar para hoje"; dia passado = check retroativo, dia futuro = read-only
+  com `›`; estado `diaTreinoSel`, resetado ao trocar de aba) → Treino do dia (checks + `›` com
   exercícios/série×reps + fase de periodização do mês, ou guia de pace da corrida) → Cronograma
   das 67 corridas (tick + `›` por linha, auto-scroll para a próxima).
 - **Evolução**: hero gradiente com rota até a prova (semanas pintadas) → jardim (toque → overlay
   de anéis ao vivo) → IDENTIDADE (frase + 4 evidências) → CORPO (tiles + gráficos peso/cintura)
-  → HÁBITOS DA SEMANA (3 métricas §4) → CONSTÂNCIA (linhas semanais, ✓ verde a 28/35) → PADRÕES
-  (ajuste da última revisão + gatilho×período quando ≥2 sem de dados, senão barras).
+  → CONSTÂNCIA (linhas semanais, ✓ verde a 28/35) → PADRÕES (ajuste da última revisão +
+  gatilho×período quando ≥2 sem de dados, senão barras). As métricas da semana atual moraram
+  aqui até a v5 — hoje vivem na aba Dieta.
 - **Relatório**: seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
-- **Ajustes**: baseline, override do tipo de dia, backup export/import, lembretes opt-in
-  (best-effort, sem push server — dependem do app aberto), versão + buscar atualização.
+- **Ajustes** (acessível pelo ⚙️ no header, NÃO pela nav — decisão de UX da v6: destino de
+  manutenção ~1×/semana não merece slot na zona do polegar; 6 abas não cabem bem em 360px):
+  baseline, override do tipo de dia, backup export/import, lembretes opt-in (best-effort, sem
+  push server — dependem do app aberto), versão + buscar atualização.
 - **Wizard de revisão** (domingo ≥18h até terça): 5 passos — métricas prontas → gatilhos →
   1 pergunta → 1 ajuste de AMBIENTE (lista do protocolo) → frase de identidade.
 

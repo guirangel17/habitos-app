@@ -1,5 +1,5 @@
 // Pampulha — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '5.0'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '6.0'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -34,8 +34,10 @@ function el(html) {
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-let abaAtiva = ['hoje', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
+let abaAtiva = ['hoje', 'dieta', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
 let periodoRelatorio = 30; // 30 | 90 | 0 (tudo)
+let diaTreinoSel = null; // dia selecionado no card Semana da aba Treino (null = hoje)
+if (params.get('dia')) diaTreinoSel = params.get('dia'); // dev: ?aba=treino&dia=YYYY-MM-DD
 
 // ---------- seed de demonstração (dev/testes: ?seed=1 com store vazio) ----------
 if (params.get('seed') && S.getState().events.length === 0) {
@@ -141,16 +143,23 @@ function renderHoje(root) {
   // ---- slot contextual: NO MÁXIMO um card condicional por vez ----
   root.append(...slotContextual(st, key));
 
-  // ---- HERO: a refeição da vez (a única decisão do momento) ----
+  const planoT = D.treinoDoDia(key);
+  const feitoT = D.workoutsDoDia(st.events, key);
+  const md = D.marcoDashboard(st.events, st.settings, key, Date.now());
+  const icTipo = { delivery: '🛵', sweet: '🍫' };
+
+  // ---- HERO: a refeição da vez OU a colheita do dia (peak-end) ----
   const rv = refeicaoDaVez(meals);
-  if (rv) {
+  const jantarFechado = ['ok', 'sub', 'skip', 'off'].includes(meals.jantar);
+  const mostrarColheita = !rv || (jantarFechado && agora().getHours() >= 20);
+  if (!mostrarColheita) {
     const ouroDomingo = rv.id === 'jantar' && tipo === 'DESCANSO';
     const destaque16 = rv.id === 'lanche2' && agoraMin >= 13 * 60;
     const ajuste = rv.ajuste[tipo];
     const [rvH, rvM] = rv.hora.split(':').map(Number);
     const rotulo = agoraMin >= rvH * 60 + rvM - 45 ? 'AGORA' : 'PRÓXIMA';
     const hero = el(`<div class="card hero-refeicao ${destaque16 ? 'destaque-16h' : ''}">
-      <div class="hero-rotulo">${rotulo}${destaque16 ? ' · escudo anti-doce das 15h' : ''}</div>
+      <div class="hero-rotulo"><span>${rotulo}${destaque16 ? ' · escudo anti-doce das 15h' : ''}</span><span class="hero-placar num">${feitas}/5 hoje</span></div>
       <h1>${esc(rv.nome)} <span class="hora num">${esc(rv.hora)}</span></h1>
       <p class="cardapio">${esc(rv.principal)}</p>
       ${ouroDomingo ? '<span class="badge-ouro">★ Hoje o jantar é INTENSO — pré-carga do Longão. NÃO corta o carbo.</span>' : ''}
@@ -167,31 +176,59 @@ function renderHoje(root) {
     hero.querySelector('#hero-opcoes').onclick = () => sheetRefeicao(rv, meals[rv.id] || 'none', key);
     root.append(hero);
   } else {
-    const amanha = D.parseKey(key).getDay() === 6 ? 0 : D.parseKey(key).getDay() + 1;
+    // colheita do dia: a memória do dia é dominada pelo fim — o fim mostra a evidência
+    const amanha = (D.parseKey(key).getDay() + 1) % 7;
+    const limpoHoje = !D.slipDays(st.events, 'delivery').includes(key) && !D.slipDays(st.events, 'sweet').includes(key);
+    const eh = md.escolhido;
+    const partes = [];
+    if (planoT.corrida) partes.push(`${TIPO_CORRIDA_ICONE[planoT.corrida.tipo]} ${planoT.corrida.nome}${feitoT.corrida ? ' ✓' : ''}`);
+    if (planoT.gym) partes.push(`🏋️ ${planoT.gym.split(' — ')[0]}${feitoT.gym ? ' ✓' : ''}`);
+    const marcoTxt = eh.batidoHa24h
+      ? `${icTipo[eh.tipo]} marco de ${eh.marcoAnterior} dias é seu ✓ · próximo: ${eh.marco}`
+      : `${icTipo[eh.tipo]} faltam ${Math.max(1, Math.ceil(eh.marco - eh.totalDias))} dias para o marco de ${eh.marco}`;
     root.append(el(`<div class="card hero-refeicao completo">
-      <div class="hero-rotulo">DIA FECHADO</div>
+      <div class="hero-rotulo">COLHEITA DO DIA</div>
       <h1>${feitas}/5 no plano ✓</h1>
-      <p class="cardapio">${feitas === 5 ? 'Todas as refeições do dia. É assim que a identidade se constrói.' : 'Dia registrado por inteiro — tendência conta mais que perfeição.'}</p>
+      <div class="colheita">
+        ${partes.length ? `<p>${esc(partes.join(' · '))}</p>` : ''}
+        ${limpoHoje ? '<p>🌱 Dia limpo — amanhã o jardim cresce mais uma folha.</p>' : ''}
+        <p>${esc(marcoTxt)}</p>
+      </div>
+      <p class="cardapio">${feitas === 5 ? 'Todas as refeições do dia. É assim que a identidade se constrói.' : 'Tendência conta mais que perfeição — o dia está colhido.'}</p>
       <p class="ajuste-dia">Amanhã: ${esc(TREINO_POR_DIA[amanha])}</p>
     </div>`));
   }
 
-  // ---- trilha compacta do dia: 5 marcadores, toque abre opções ----
-  const trilha = el('<div class="card trilha-card"><div class="trilha"></div></div>');
-  const tWrap = trilha.querySelector('.trilha');
-  for (const r of REFEICOES) {
-    const status = meals[r.id] || 'none';
-    const cls = { ok: 'feita', sub: 'feita', skip: 'pulada', off: 'fora' }[status] || '';
-    const daVez = rv && rv.id === r.id;
-    const dot = el(`<button class="trilha-item ${cls} ${daVez ? 'da-vez' : ''}" aria-label="${esc(r.nome)}">
-      <span class="marca">${status === 'ok' || status === 'sub' ? '✓' : status === 'skip' ? '–' : status === 'off' ? '✕' : ''}</span>
-      <span class="t-nome">${esc(r.nome.split(' ')[0])}</span>
-      <span class="t-hora num">${esc(r.hora.slice(0, 5))}</span>
-    </button>`);
-    dot.onclick = () => sheetRefeicao(r, status, key);
-    tWrap.append(dot);
+  // ---- abertura de semana (fresh start): só segunda de manhã ----
+  if (D.parseKey(key).getDay() === 1 && agora().getHours() < 12) {
+    const ab = D.aberturaSemana(st.events, key);
+    const abre = planoT.corrida && planoT.corrida.tipo === 'longo' ? 'o Longão de hoje abre ela' : 'ela começa hoje';
+    const txt = ab.verdesSeguidas >= 2 ? `${ab.verdesSeguidas} semanas verdes seguidas — ${abre}.`
+      : ab.verdeAnterior ? `semana verde fechada ✓ — ${abre}.`
+      : `placar novo, 0 a 0 — ${abre}.`;
+    root.append(el(`<div class="linha-streaks linha-fresh">🌅 <span><b>Semana nova</b> <small>(${ab.restantes} até a Pampulha)</small> — ${esc(txt)}</span></div>`));
   }
-  root.append(trilha);
+
+  // ---- treino de hoje: check por modalidade + atalho para a aba ----
+  const linhaT = el('<div class="linha-streaks linha-treino"><span class="lt-itens"></span><button class="tr-ver" aria-label="abrir aba Treino">›</button></div>');
+  const itens = linhaT.querySelector('.lt-itens');
+  if (planoT.corrida || planoT.gym) {
+    const addCheck = (kind, icone, nome) => {
+      const ok = !!feitoT[kind];
+      const b = el(`<button class="lt-check ${ok ? 'feito' : ''}"><span class="caixa">${ok ? '✓' : ''}</span>${icone} ${esc(nome)}</button>`);
+      b.onclick = () => {
+        const e = S.addEvent({ type: 'workout', date: key, kind, done: !ok });
+        if (!ok) snackbar('Treino no papel. 👊', () => S.removeEvent(e.id));
+      };
+      itens.append(b);
+    };
+    if (planoT.corrida) addCheck('corrida', TIPO_CORRIDA_ICONE[planoT.corrida.tipo], planoT.corrida.nome);
+    if (planoT.gym) addCheck('gym', '🏋️', planoT.gym.split(' — ')[0]);
+  } else {
+    itens.append(el('<span style="color:var(--muted)">😴 Descanso — o treino de hoje é dormir 7–8h</span>'));
+  }
+  linhaT.querySelector('.tr-ver').onclick = () => { diaTreinoSel = null; abaAtiva = 'treino'; render(); };
+  root.append(linhaT);
 
   // ---- aviso never-miss-twice (só quando acionável) ----
   const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
@@ -209,14 +246,24 @@ function renderHoje(root) {
     }
   }
 
-  // ---- linha de streaks com tempo vivo (toque → anéis estilo SugarCut) ----
-  const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
-  const tDeliv = D.tempoLimpo(D.ultimoSlipTs(st.events, 'delivery', inicioTs), Date.now());
-  const tDoce = D.tempoLimpo(D.ultimoSlipTs(st.events, 'sweet', inicioTs), Date.now());
-  const linha = el(`<button class="linha-streaks">
-    <span>🛵 <b class="num">${tDeliv.dias}d ${String(tDeliv.horas).padStart(2, '0')}h</b></span>
-    <span>🍫 <b class="num">${tDoce.dias}d ${String(tDoce.horas).padStart(2, '0')}h</b></span>
-    <span style="color:var(--muted)">tempo limpo</span>
+  // ---- marco mais próximo (goal gradient) — absorve a antiga linha de tempo limpo ----
+  const em = md.escolhido;
+  const outro = md.ambos.find((x) => x.tipo !== em.tipo);
+  const CIRC_MINI = 2 * Math.PI * 15;
+  const marcoRotulo = em.batidoHa24h
+    ? `marco de ${em.marcoAnterior}d é seu ✓ · próximo: ${em.marco}d`
+    : `faltam ${Math.max(1, Math.ceil(em.marco - em.totalDias))}d p/ o marco de ${em.marco}`;
+  const linha = el(`<button class="linha-streaks linha-marco">
+    <svg viewBox="0 0 40 40" class="anel-mini" aria-hidden="true">
+      <defs><linearGradient id="gradMini" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#3987e5"/><stop offset="100%" stop-color="#1baf7a"/>
+      </linearGradient></defs>
+      <circle cx="20" cy="20" r="15" fill="none" stroke="var(--grid)" stroke-width="5"/>
+      <circle cx="20" cy="20" r="15" fill="none" stroke="url(#gradMini)" stroke-width="5" stroke-linecap="round"
+        transform="rotate(-90 20 20)" stroke-dasharray="${CIRC_MINI * (em.batidoHa24h ? 1 : em.frac)} ${CIRC_MINI}"/>
+    </svg>
+    <span>${icTipo[em.tipo]} <b class="num">${em.dias}d</b> <small class="marco-sub">${esc(marcoRotulo)}</small></span>
+    <span class="marco-outro">${icTipo[outro.tipo]} <b class="num">${outro.dias}d</b></span>
     <span class="seta">→</span>
   </button>`);
   linha.onclick = contadoresOverlay;
@@ -699,17 +746,93 @@ function iniciarOnda(corpo) {
 }
 
 // ================================================================
+// TELA DIETA — consulta e registro do plano alimentar (100% read-only sobre data.js)
+// ================================================================
+function renderDieta(root) {
+  const st = S.getState();
+  const key = hojeKey();
+  const tipo = D.tipoDoDia(key, st.settings.dayTypeOverrides);
+  const faseAtual = D.fase(key);
+  const metas = (faseAtual === 'deficit' ? METAS_DIA.deficit : METAS_DIA.manutencao)[tipo];
+  const meals = D.mealsOfDay(st.events, key);
+  const rv = refeicaoDaVez(meals);
+
+  // contexto do dia: o "porquê" do tipo de hoje
+  const faseTxt = { deficit: 'déficit', manutencao: 'manutenção', carga: '★ carga de carbo', prova: '🏁 prova' }[faseAtual];
+  root.append(el(`<div class="card dieta-contexto">
+    <h2>Dia ${tipo} · fase ${esc(faseTxt)}</h2>
+    <p><b class="num">${esc(metas.kcal)} kcal</b> · P ${esc(metas.p)} · C ${esc(metas.c)} · G ${esc(metas.g)}</p>
+    <p class="dieta-porque">Por quê: ${esc(TREINO_POR_DIA[D.parseKey(key).getDay()])}</p>
+  </div>`));
+
+  // trilha das 5 refeições (toque abre opções de registro)
+  const trilha = el('<div class="card trilha-card"><div class="trilha"></div></div>');
+  const tWrap = trilha.querySelector('.trilha');
+  for (const r of REFEICOES) {
+    const status = meals[r.id] || 'none';
+    const cls = { ok: 'feita', sub: 'feita', skip: 'pulada', off: 'fora' }[status] || '';
+    const daVez = rv && rv.id === r.id;
+    const dot = el(`<button class="trilha-item ${cls} ${daVez ? 'da-vez' : ''}" aria-label="${esc(r.nome)}">
+      <span class="marca">${status === 'ok' || status === 'sub' ? '✓' : status === 'skip' ? '–' : status === 'off' ? '✕' : ''}</span>
+      <span class="t-nome">${esc(r.nome.split(' ')[0])}</span>
+      <span class="t-hora num">${esc(r.hora.slice(0, 5))}</span>
+    </button>`);
+    dot.onclick = () => sheetRefeicao(r, status, key);
+    tWrap.append(dot);
+  }
+  root.append(trilha);
+
+  // cardápio do dia inteiro (principal + ajuste do tipo, sem abrir sheet por sheet)
+  const cardCardapio = el('<div class="card"><h2>Cardápio de hoje <small>· toque para registrar / ver substituições</small></h2><div class="cardapio-dia"></div></div>');
+  const cw = cardCardapio.querySelector('.cardapio-dia');
+  for (const r of REFEICOES) {
+    const status = meals[r.id] || 'none';
+    const feita = status === 'ok' || status === 'sub';
+    const ajuste = r.ajuste[tipo];
+    const ouro = r.id === 'jantar' && tipo === 'DESCANSO';
+    const item = el(`<button class="cardapio-item ${feita ? 'feita' : ''}">
+      <span class="c-hora num">${esc(r.hora)}</span>
+      <span class="c-corpo"><b>${esc(r.nome)}</b> <small>${esc(r.kcal)}</small><br>${esc(r.principal)}
+        ${ouro ? '<span class="badge-ouro">★ Domingo: jantar INTENSO — pré-carga do Longão. NÃO corta o carbo.</span>'
+    : ajuste ? `<span class="c-ajuste">Hoje (${tipo}): ${esc(ajuste)}</span>` : ''}</span>
+      <span class="c-status">${feita ? '✓' : '›'}</span>
+    </button>`);
+    item.onclick = () => sheetRefeicao(r, status, key);
+    cw.append(item);
+  }
+  root.append(cardCardapio);
+
+  // semana em números (§4) — movido da Evolução
+  const m = D.metricasSemana(st.events, key);
+  const b = st.settings.baseline;
+  let refSemana = 0;
+  for (let i = 0; i < 7; i++) refSemana += D.mealsDone(D.mealsOfDay(st.events, D.addDays(m.ini, i)));
+  root.append(el(`<div class="card"><h2>Semana <small>· metas de 30 dias do protocolo</small></h2>
+    <div class="tiles">
+      ${tileMetrica('Delivery por impulso', m.delivery, b.delivery, 'delivery')}
+      ${tileMetrica('Doces fora do plano', m.sweet, b.sweet, 'sweet')}
+      ${tileMetrica('Drinks por saída', m.drinks, b.drinks, 'drinks')}
+    </div>
+    <p class="const-linha">Refeições no plano: <b class="num">${refSemana}/35</b> ${refSemana >= 28 ? '<span style="color:var(--good-text)">✓ semana verde</span>' : '<small style="color:var(--muted)">· verde a partir de 28 (80%)</small>'}</p>
+    ${b.delivery == null ? '<p style="font-size:.72rem;color:var(--muted);margin-top:8px">Defina seu baseline em Ajustes (⚙️ no topo) para ativar as metas de −50%.</p>' : ''}
+  </div>`));
+}
+
+// ================================================================
 // TELA TREINO — hoje, semana e o cronograma de corridas inteiro
 // ================================================================
 function renderTreino(root) {
   const st = S.getState();
   const key = hojeKey();
-  const plano = D.treinoDoDia(key);
-  const feito = D.workoutsDoDia(st.events, key);
+  if (diaTreinoSel === key) diaTreinoSel = null; // tocar no dia de hoje = voltar ao padrão
+  const alvo = diaTreinoSel || key; // dia exibido no card de treino
+  const plano = D.treinoDoDia(alvo);
+  const feito = D.workoutsDoDia(st.events, alvo);
+  const futuro = alvo > key;
 
-  // semana
+  // semana — cada dia é um botão que troca o card de treino abaixo
   const sem = D.semanaTreino(st.events, key);
-  const cardSem = el(`<div class="card"><h2>Semana <small>· ${fmtData(sem.ini)} – ${fmtData(D.addDays(sem.ini, 6))}</small></h2>
+  const cardSem = el(`<div class="card"><h2>Semana <small>· ${fmtData(sem.ini)} – ${fmtData(D.addDays(sem.ini, 6))} · toque num dia para ver o treino</small></h2>
     <div class="sem-treino"></div>
     <div class="sem-resumo">
       <span>🏋️ Academia <b class="num">${sem.gymFeito}/${sem.gymPlan}</b></span>
@@ -718,38 +841,49 @@ function renderTreino(root) {
   const semWrap = cardSem.querySelector('.sem-treino');
   const letras = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
   sem.dias.forEach((d, i) => {
-    const col = el(`<div class="sem-dia ${d.date === key ? 'hoje' : ''}">
+    const col = el(`<button class="sem-dia ${d.date === key ? 'hoje' : ''} ${d.date === alvo ? 'sel' : ''}" aria-pressed="${d.date === alvo}" aria-label="ver treino de ${fmtData(d.date)}">
       <span class="sem-letra">${letras[i]}</span>
       ${d.plano.corrida ? `<span class="sem-dot ${d.feito.corrida ? 'ok' : d.date < key ? 'perdido' : ''}">${TIPO_CORRIDA_ICONE[d.plano.corrida.tipo]}</span>` : ''}
       ${d.plano.gym ? `<span class="sem-dot ${d.feito.gym ? 'ok' : d.date < key ? 'perdido' : ''}">🏋️</span>` : ''}
       ${!d.plano.corrida && !d.plano.gym ? '<span class="sem-dot descanso">–</span>' : ''}
-    </div>`);
+    </button>`);
+    col.onclick = () => { diaTreinoSel = d.date === key ? null : d.date; render(); };
     semWrap.append(col);
   });
   root.append(cardSem);
 
-  // treino de hoje (entre a semana e o cronograma)
-  const cardHoje = el('<div class="card"><h2>Treino de hoje</h2><div style="display:grid;gap:8px" id="tr"></div></div>');
+  // treino do dia exibido (hoje por padrão; outro dia se selecionado na semana)
+  const DIA_NOME = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  const titulo = diaTreinoSel
+    ? `Treino de ${DIA_NOME[D.parseKey(alvo).getDay()]} <small>· ${fmtData(alvo)}</small>`
+    : 'Treino de hoje';
+  const cardHoje = el(`<div class="card"><div class="treino-cab"><h2>${titulo}</h2>${diaTreinoSel ? '<button class="chip-voltar" id="voltar-hoje">‹ voltar para hoje</button>' : ''}</div>
+    <div style="display:grid;gap:8px" id="tr"></div></div>`);
+  if (diaTreinoSel) cardHoje.querySelector('#voltar-hoje').onclick = () => { diaTreinoSel = null; render(); };
   const tr = cardHoje.querySelector('#tr');
   const linhaTreino = (kind, icone, nome) => {
     const ok = !!feito[kind];
     const row = el(`<div class="treino-row ${ok ? 'feito' : ''}">
-      <button class="check-passo tr-check ${ok ? 'feito' : ''}">
+      ${futuro
+    ? `<div class="check-passo tr-plano"><span><span class="t">${icone} ${esc(nome)}</span></span></div>`
+    : `<button class="check-passo tr-check ${ok ? 'feito' : ''}">
         <span class="caixa">${ok ? '✓' : ''}</span>
         <span><span class="t">${icone} ${esc(nome)}</span></span>
-      </button>
+      </button>`}
       <button class="tr-ver" aria-label="ver treino completo">›</button>
     </div>`);
-    row.querySelector('.tr-check').onclick = () => {
-      const e = S.addEvent({ type: 'workout', date: key, kind, done: !ok });
-      if (!ok) snackbar('Treino no papel. 👊', () => S.removeEvent(e.id));
-    };
-    row.querySelector('.tr-ver').onclick = () => sheetTreinoDetalhe(kind, plano, key);
+    if (!futuro) {
+      row.querySelector('.tr-check').onclick = () => {
+        const e = S.addEvent({ type: 'workout', date: alvo, kind, done: !ok });
+        if (!ok) snackbar(alvo === key ? 'Treino no papel. 👊' : `Registrado em ${fmtData(alvo)} ✓`, () => S.removeEvent(e.id));
+      };
+    }
+    row.querySelector('.tr-ver').onclick = () => sheetTreinoDetalhe(kind, plano, alvo);
     return row;
   };
   if (plano.corrida) tr.append(linhaTreino('corrida', TIPO_CORRIDA_ICONE[plano.corrida.tipo], plano.corrida.nome));
   if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym));
-  if (!plano.corrida && !plano.gym) tr.append(el('<p style="font-size:.85rem;color:var(--muted)">Descanso — hoje o treino é dormir 7–8h. Metade da recuperação acontece dormindo.</p>'));
+  if (!plano.corrida && !plano.gym) tr.append(el(`<p style="font-size:.85rem;color:var(--muted)">Descanso — ${futuro ? 'o treino é' : 'hoje o treino é'} dormir 7–8h. Metade da recuperação acontece dormindo.</p>`));
   root.append(cardHoje);
 
   // cronograma completo de corridas
@@ -1184,18 +1318,7 @@ function renderEvolucao(root) {
     root.append(card);
   }
 
-  // métricas semanais do protocolo §4
-  const m = D.metricasSemana(st.events, key);
-  const b = st.settings.baseline;
-  root.append(el('<div class="secao">HÁBITOS DA SEMANA</div>'));
-  root.append(el(`<div class="card"><h2>Semana atual <small>· metas de 30 dias do protocolo</small></h2>
-    <div class="tiles">
-      ${tileMetrica('Delivery por impulso', m.delivery, b.delivery, 'delivery')}
-      ${tileMetrica('Doces fora do plano', m.sweet, b.sweet, 'sweet')}
-      ${tileMetrica('Drinks por saída', m.drinks, b.drinks, 'drinks')}
-    </div>
-    ${b.delivery === null ? '<p style="font-size:.72rem;color:var(--muted);margin-top:8px">Defina seu baseline em Ajustes para ativar as metas de −50%.</p>' : ''}
-  </div>`));
+  // métricas semanais do §4 moraram aqui até a v5 — hoje vivem na aba Dieta ("Semana")
 
   // constância: uma linha legível por semana, meta = 80% (28/35), não perfeição
   root.append(el('<div class="secao">CONSTÂNCIA</div>'));
@@ -1681,17 +1804,20 @@ function render() {
   const root = $('#conteudo');
   root.innerHTML = '';
   if (abaAtiva === 'hoje') renderHoje(root);
+  else if (abaAtiva === 'dieta') renderDieta(root);
   else if (abaAtiva === 'treino') renderTreino(root);
   else if (abaAtiva === 'evolucao') renderEvolucao(root);
   else if (abaAtiva === 'relatorio') renderRelatorio(root);
   else renderAjustes(root);
 
   document.querySelectorAll('nav.abas button').forEach((b) => b.classList.toggle('ativa', b.dataset.aba === abaAtiva));
+  $('#btn-ajustes').classList.toggle('ativa', abaAtiva === 'ajustes');
 }
 
 document.querySelectorAll('nav.abas button').forEach((b) => {
-  b.onclick = () => { abaAtiva = b.dataset.aba; render(); };
+  b.onclick = () => { if (b.dataset.aba !== 'treino') diaTreinoSel = null; abaAtiva = b.dataset.aba; render(); };
 });
+$('#btn-ajustes').onclick = () => { diaTreinoSel = null; abaAtiva = 'ajustes'; render(); };
 $('#sos-fab').onclick = abrirSOS;
 
 S.onChange(render);

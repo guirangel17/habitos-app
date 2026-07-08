@@ -26,7 +26,17 @@
 
 - ✅ Aba Relatório: placar do período (30/90/tudo) com deltas vs período anterior; insights automáticos com guarda de amostra mínima que testam o protocolo com os dados reais (escudo das 16h × doce, dominó pós-saída, taxa de sucesso do SOS, semana verde × balança, R$ economizados vs baseline); deslizes por dia da semana; totais desde o início.
 
-# v6 — ideias futuras
+# Feito na v6 (jul/2026)
+
+- ✅ Aba Dieta: contexto do dia (tipo + kcal/macros + porquê), trilha das 5 refeições (migrada da Hoje), cardápio do dia inteiro com ajustes do tipo, semana em números (métricas §4 movidas da Evolução + X/35 verde a 28).
+- ✅ Hoje redesenhada como dashboard: hero mantém a refeição da vez (+ placar X/5), linha de treino com check por modalidade, anel do marco mais próximo (goal gradient — substitui a linha de tempo limpo; celebra marco batido <24h), peso matinal, slot contextual intacto.
+- ✅ Colheita do dia (peak-end rule): o hero da noite com jantar fechado mostra refeições, treino, dia limpo → folha no jardim e distância do marco.
+- ✅ Abertura de semana (fresh start effect): linha na segunda de manhã — recomeço 0 a 0 ou momentum de semanas verdes seguidas, ancorada no Longão.
+- ✅ Ajustes saiu da nav para o ⚙️ do header; a nav ganhou a aba Dieta (5 abas mantidas — 6 não cabem bem em 360px).
+- ✅ Semana da aba Treino clicável: cada dia é botão; card vira "Treino de {dia}" com chip "‹ voltar para hoje"; passado = check retroativo, futuro = read-only.
+- ✅ derive.js: `marcoDashboard` e `aberturaSemana` (+12 asserts novos); `proximoMarco` expõe o marco anterior. Dev param novo: `?dia=YYYY-MM-DD`.
+
+# v7 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
 - Gráfico de aderência semanal × ritmo de perda (correlação visível).
