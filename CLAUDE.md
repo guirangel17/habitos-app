@@ -175,10 +175,18 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   (dispatch + crons nas janelas de treino BRT). Saídas commitadas: `data/analises.json`,
   `data/historico.json` (+ tendências), `data/pipeline-status.json` (Ajustes lê).
 - **Auth Garmin**: garth 0.8.0 (pinado; deprecado mas funcional) via Secret `GARMIN_TOKEN` —
-  o garth auto-autentica pela env `GARTH_TOKEN`. Token OAuth1 vive ~1 ano. **Runbook quando
-  status=garmin_auth**: local `cd ~/treino-pampulha/garmin && python3 login-garmin.py`, depois
-  `python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"` e colar no
-  Secret. Secret `GEMINI_API_KEY` = chave do AI Studio.
+  o garth auto-autentica pela env `GARTH_TOKEN`. Token OAuth1 vive ~1 ano em teoria, mas a
+  Garmin pode invalidar antes (aconteceu em 08/07/2026, dias depois de criado — possivelmente
+  pelos IPs variados dos runners). **Runbook quando status=garmin_auth** (validado em 08/07):
+  (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e ver o status; (2) usuário
+  sobe o túnel do notebook de casa: `ssh -R 1080 gmoura@10.54.100.234`; (3) o login é
+  INTERATIVO (getpass) — rodar `python3 ~/treino-pampulha/garmin/login-garmin.py` **no terminal
+  do túnel**, nunca pelo `!` da conversa (não tem stdin → EOFError); (4) gravar o dump num
+  arquivo em vez de imprimir no chat: `python3 -c "import garth; garth.resume('~/.garth');
+  open('/home/gmoura/garmin-token.txt','w').write(garth.client.dumps())"` — usuário copia com
+  `cat` no terminal dele, cola no Secret `GARMIN_TOKEN` no navegador e apaga o arquivo;
+  (5) redisparar e conferir `data/pipeline-status.json` no remoto. Secret `GEMINI_API_KEY` =
+  chave do AI Studio.
 - **Zonas de FC CANÔNICAS** (nunca usar as do Garmin/Connect — variam com a config do relógio):
   FCmax 190 → Z1 <133 · Z2 133–152 · Z3 153–165 · Z4 166–177 · Z5 178+ (const `ZONAS_FC` no
   analisar.py, espelha plano-hibrido-pampulha.md). Calculadas da série temporal de FC
