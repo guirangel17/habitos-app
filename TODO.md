@@ -1,11 +1,19 @@
-# v2 — ideias validadas no design, fora do MVP
+# Feito na v2 (jul/2026)
 
-- **Revisão de domingo guiada** (wizard de 5 min): 3 métricas da semana vs anterior já calculadas, gatilhos mais frequentes, 1 pergunta aberta ("o que disparou?"), escolha de UM ajuste de AMBIENTE da lista do protocolo, fechamento com a frase de identidade.
-- **Contrato da Noite completo**: pré-decisão antes de sair (nº de drinks, horário de saída, checkbox "lanche proteico feito"), compartilhar compromisso via WhatsApp, placar 1x1 drink/água em tempo real.
-- **Heatmap de gatilhos × hora do dia** com insights automáticos cruzando com adesão ao lanche das 16h (precisa de 2+ semanas de dados).
-- **Rota para a Pampulha**: timeline horizontal com marcos do plano (04/10, 05/10, 04–05/12) e marcos pessoais plotados; segmento pintado por semana cumprida.
-- **Painel de identidade**: "quem os dados dizem que eu sou" — frase que se "assina" com 4 semanas de revisão cumprida.
-- **Lembretes locais best-effort** (lanche das 16h pendente, revisão de domingo) via Notification API — confiabilidade limitada sem push server, por isso ficou de fora do MVP.
+- ✅ Redesign da tela Hoje: hero único com a refeição da vez (progressive disclosure), trilha compacta de 5 marcadores, linha de streaks, slot contextual único (máx. 1 card condicional por vez), "+ Registrar" consolidado.
+- ✅ Revisão de domingo guiada (wizard de 5 passos, tela cheia).
+- ✅ Contrato da Noite: pré-decisão + share WhatsApp + placar 1x1 no slot contextual + fechamento na manhã seguinte.
+- ✅ Mapa gatilho × período do dia (substitui as barras quando há ≥2 semanas de dados).
+- ✅ Rota até a Pampulha (timeline com marcos e semanas pintadas — absorveu o hero de contagem).
+- ✅ Painel de identidade com frase que "assina" após 4 domingos de revisão (absorveu o capital acumulado).
+- ✅ Lembretes locais opt-in em Ajustes (best-effort, sem push server).
+
+# v3 — ideias futuras
+
+- Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
+- Gráfico de aderência semanal × ritmo de perda (correlação visível).
+- Modo semana da prova (04–05/12): checklist de carga de carbo no slot contextual.
+- Exportar resumo mensal em texto para compartilhar.
 
 # Descartado de propósito (não ressuscitar sem motivo)
 
@@ -14,3 +22,4 @@
 - Editor de cardápio no app — o plano é estático nos MDs; isso viraria app genérico de dieta.
 - Inventário da prateleira de emergência — chore diária que desatualiza e mina a confiança do SOS.
 - Ativação automática do Modo Ressaca — sempre oferta de 1 toque, nunca automática.
+- Cards permanentes novos na tela Hoje — tudo condicional disputa o slot contextual único.

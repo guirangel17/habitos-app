@@ -216,6 +216,79 @@ export function saiuOntem(events, hojeKey) {
   return events.some((e) => e.type === 'night_out' && (e.date || dateKey(new Date(e.ts))) === ontem);
 }
 
+// ---- Contrato da Noite (Protocolo 3A: decidir ANTES de sair) ----
+// contract {date, maxDrinks, horaSaida} · contract_tick {date, kind:'drink'|'agua'}
+// fecha ao registrar night_out com a mesma date (ou ao descartar com contract_cancel)
+export function contratoAtivo(events, hojeKey, horaAgora = 12) {
+  // um contrato vale da criação até as 06h do dia seguinte
+  const candidatas = horaAgora < 6 ? [addDays(hojeKey, -1), hojeKey] : [hojeKey];
+  for (const d of candidatas.reverse()) {
+    const c = [...events].reverse().find((e) => e.type === 'contract' && e.date === d);
+    if (!c) continue;
+    const fechado = events.some((e) => (e.type === 'night_out' || e.type === 'contract_cancel') && e.date === d && e.ts >= c.ts);
+    if (fechado) continue;
+    const ticks = events.filter((e) => e.type === 'contract_tick' && e.date === d && e.ts >= c.ts);
+    return {
+      date: d, maxDrinks: c.maxDrinks, horaSaida: c.horaSaida,
+      drinks: ticks.filter((t) => t.kind === 'drink').length,
+      aguas: ticks.filter((t) => t.kind === 'agua').length,
+    };
+  }
+  return null;
+}
+
+// ---- Revisão de domingo (Protocolo §4) ----
+export function semanaRevisada(events, semanaIni) {
+  return events.some((e) => e.type === 'review' && e.week === semanaIni);
+}
+
+// pendente de domingo 18h até terça (graça de 2 dias), sobre a semana que termina no domingo
+export function revisaoPendente(events, hojeKey, horaAgora = 12) {
+  const dow = parseKey(hojeKey).getDay(); // 0=Dom
+  let semana = null;
+  if (dow === 0 && horaAgora >= 18) semana = inicioSemana(hojeKey);
+  else if (dow === 1 || dow === 2) semana = addDays(inicioSemana(hojeKey), -7);
+  if (!semana) return null;
+  return semanaRevisada(events, semana) ? null : semana;
+}
+
+export function semanasComRevisao(events) {
+  return new Set(events.filter((e) => e.type === 'review').map((e) => e.week));
+}
+
+// identidade "assinada": as últimas 4 semanas FECHADAS têm revisão (Protocolo §4)
+export function identidadeAssinada(events, hojeKey) {
+  const rev = semanasComRevisao(events);
+  const semanaAtual = inicioSemana(hojeKey);
+  let ok = 0;
+  for (let i = 1; i <= 4; i++) if (rev.has(addDays(semanaAtual, -7 * i))) ok++;
+  return { assinada: ok === 4, progresso: ok };
+}
+
+// ---- Gatilho × período do dia (v2: heatmap de estressores) ----
+export const PERIODOS = ['manhã', 'almoço', 'tarde', 'noite'];
+export function periodoDoTs(ts) {
+  const h = new Date(ts).getHours();
+  if (h >= 6 && h < 12) return 0;
+  if (h >= 12 && h < 15) return 1;
+  if (h >= 15 && h < 19) return 2;
+  return 3;
+}
+
+export function gatilhosPorPeriodo(events, hojeKey, dias = 28) {
+  const ini = addDays(hojeKey, -dias + 1);
+  const mapa = {};
+  let total = 0;
+  for (const e of events) {
+    const d = e.date || dateKey(new Date(e.ts));
+    if (!e.trigger || d < ini || d > hojeKey) continue;
+    if (!mapa[e.trigger]) mapa[e.trigger] = [0, 0, 0, 0];
+    mapa[e.trigger][periodoDoTs(e.ts)]++;
+    total++;
+  }
+  return { mapa, total };
+}
+
 // ---- Gatilhos ----
 export function gatilhosFrequentes(events, dias = 14, hojeKey) {
   const ini = addDays(hojeKey, -dias + 1);

@@ -2,6 +2,7 @@
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
+  FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -32,7 +33,6 @@ function el(html) {
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 let abaAtiva = ['hoje', 'evolucao', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
-let refeicaoExpandida = null;
 
 // ---------- seed de demonstração (dev/testes: ?seed=1 com store vazio) ----------
 if (params.get('seed') && S.getState().events.length === 0) {
@@ -46,12 +46,18 @@ if (params.get('seed') && S.getState().events.length === 0) {
     ['cafe', 'lanche1', 'almoco', 'lanche2', 'jantar'].slice(0, nRef).forEach((meal) =>
       S.addEvent({ type: 'meal', date: d, meal, status: rnd(6) ? 'ok' : 'sub' }));
   }
-  S.addEvent({ type: 'delivery', date: D.addDays(key, -20), trigger: 'preguiça' });
-  S.addEvent({ type: 'delivery', date: D.addDays(key, -9), trigger: 'preguiça' });
-  S.addEvent({ type: 'sweet', date: D.addDays(key, -15), trigger: '15h' });
-  S.addEvent({ type: 'sweet', date: D.addDays(key, -4), trigger: 'bug' });
-  S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -3), trigger: '15h' });
-  S.addEvent({ type: 'sos', kind: 'ifood', outcome: 'surfed', date: D.addDays(key, -2), trigger: 'preguiça' });
+  const tsEm = (d, h) => D.parseKey(d).getTime() + h * 3600e3;
+  S.addEvent({ type: 'delivery', date: D.addDays(key, -20), trigger: 'preguiça', ts: tsEm(D.addDays(key, -20), 21) });
+  S.addEvent({ type: 'delivery', date: D.addDays(key, -9), trigger: 'preguiça', ts: tsEm(D.addDays(key, -9), 20) });
+  S.addEvent({ type: 'sweet', date: D.addDays(key, -15), trigger: '15h', ts: tsEm(D.addDays(key, -15), 15) });
+  S.addEvent({ type: 'sweet', date: D.addDays(key, -4), trigger: 'bug', ts: tsEm(D.addDays(key, -4), 17) });
+  S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -3), trigger: '15h', ts: tsEm(D.addDays(key, -3), 15) });
+  S.addEvent({ type: 'sos', kind: 'ifood', outcome: 'surfed', date: D.addDays(key, -2), trigger: 'preguiça', ts: tsEm(D.addDays(key, -2), 21) });
+  S.addEvent({ type: 'sos', kind: 'doce', outcome: 'surfed', date: D.addDays(key, -10), trigger: 'call tensa', ts: tsEm(D.addDays(key, -10), 11) });
+  const sem = (n) => D.addDays(D.inicioSemana(key), -7 * n);
+  S.addEvent({ type: 'review', week: sem(3), nota: null, ajuste: null });
+  S.addEvent({ type: 'review', week: sem(2), nota: 'semana de sprint apertada', ajuste: 'Bloquear 10 min de buffer entre calls na agenda' });
+  S.addEvent({ type: 'review', week: sem(1), nota: null, ajuste: 'Repor a prateleira de emergência (frango + arroz congelados em porções)' });
   S.addEvent({ type: 'night_out', date: D.addDays(key, -13), drinks: 3 });
   const dRess = D.addDays(key, -12);
   S.addEvent({ type: 'hangover_on', date: dRess });
@@ -96,8 +102,20 @@ function chipsGatilho(onPick) {
 }
 
 // ================================================================
-// TELA HOJE
+// TELA HOJE — 1 hero (a decisão de agora) + linhas compactas + slot contextual
 // ================================================================
+function refeicaoDaVez(meals) {
+  // a primeira pendente cuja janela ainda não fechou; senão a última pendente
+  const agoraMin = agora().getHours() * 60 + agora().getMinutes();
+  const pendentes = REFEICOES.filter((r) => !['ok', 'sub', 'skip', 'off'].includes(meals[r.id]));
+  if (!pendentes.length) return null;
+  for (const r of pendentes) {
+    const [h2, m2] = r.horaFim.split(':').map(Number);
+    if (agoraMin <= h2 * 60 + m2) return r;
+  }
+  return pendentes[pendentes.length - 1];
+}
+
 function renderHoje(root) {
   const st = S.getState();
   const key = hojeKey();
@@ -108,152 +126,192 @@ function renderHoje(root) {
   const fase = D.fase(key);
   const meals = D.mealsOfDay(st.events, key);
   const feitas = D.mealsDone(meals);
+  const agoraMin = agora().getHours() * 60 + agora().getMinutes();
 
-  // oferta de modo ressaca na manhã seguinte a uma saída
-  const ofertaRessaca = D.saiuOntem(st.events, key) && !ressaca.on && agora().getHours() < 14
-    && !st.events.some((e) => e.type === 'hangover_dismiss' && e.date === key);
+  // ---- slot contextual: NO MÁXIMO um card condicional por vez ----
+  root.append(...slotContextual(st, key));
 
-  root.append(el(`<div class="card">
-    <div class="dia-resumo">
-      ${anelSVG(feitas, 5)}
-      <div class="texto">
-        <div style="font-weight:650">${feitas}/5 refeições no plano</div>
-        <div class="treino">${esc(TREINO_POR_DIA[D.parseKey(key).getDay()])}</div>
-        ${fase === 'manutencao' ? '<div class="fase-nota">Fase de manutenção — calorias mais altas, foco em performance.</div>' : ''}
-        ${fase === 'carga' ? '<div class="fase-nota">★ Carga de carbo — 6–8 g/kg, gordura baixa, pouca fibra.</div>' : ''}
-        ${fase === 'prova' ? '<div class="fase-nota">🏁 É hoje (ou já foi!). Volta da Pampulha.</div>' : ''}
+  // ---- HERO: a refeição da vez (a única decisão do momento) ----
+  const rv = refeicaoDaVez(meals);
+  if (rv) {
+    const ouroDomingo = rv.id === 'jantar' && tipo === 'DESCANSO';
+    const destaque16 = rv.id === 'lanche2' && agoraMin >= 13 * 60;
+    const ajuste = rv.ajuste[tipo];
+    const [rvH, rvM] = rv.hora.split(':').map(Number);
+    const rotulo = agoraMin >= rvH * 60 + rvM - 45 ? 'AGORA' : 'PRÓXIMA';
+    const hero = el(`<div class="card hero-refeicao ${destaque16 ? 'destaque-16h' : ''}">
+      <div class="hero-rotulo">${rotulo}${destaque16 ? ' · escudo anti-doce das 15h' : ''}</div>
+      <h1>${esc(rv.nome)} <span class="hora num">${esc(rv.hora)}</span></h1>
+      <p class="cardapio">${esc(rv.principal)}</p>
+      ${ouroDomingo ? '<span class="badge-ouro">★ Hoje o jantar é INTENSO — pré-carga do Longão. NÃO corta o carbo.</span>' : ''}
+      ${ajuste && !ouroDomingo ? `<p class="ajuste-dia">Hoje (${tipo}): ${esc(ajuste)}</p>` : ''}
+      <div class="hero-acoes">
+        <button class="acao-primaria" id="hero-feita">✓ Feita</button>
+        <button class="acao-secundaria" id="hero-opcoes">substituições / pulei / fora do plano</button>
       </div>
-    </div>
-  </div>`));
+    </div>`);
+    hero.querySelector('#hero-feita').onclick = () => {
+      const e = S.addEvent({ type: 'meal', date: key, meal: rv.id, status: 'ok' });
+      snackbar(`${rv.nome}: feita ✓`, () => S.removeEvent(e.id));
+    };
+    hero.querySelector('#hero-opcoes').onclick = () => sheetRefeicao(rv, meals[rv.id] || 'none', key);
+    root.append(hero);
+  } else {
+    const amanha = D.parseKey(key).getDay() === 6 ? 0 : D.parseKey(key).getDay() + 1;
+    root.append(el(`<div class="card hero-refeicao completo">
+      <div class="hero-rotulo">DIA FECHADO</div>
+      <h1>${feitas}/5 no plano ✓</h1>
+      <p class="cardapio">${feitas === 5 ? 'Todas as refeições do dia. É assim que a identidade se constrói.' : 'Dia registrado por inteiro — tendência conta mais que perfeição.'}</p>
+      <p class="ajuste-dia">Amanhã: ${esc(TREINO_POR_DIA[amanha])}</p>
+    </div>`));
+  }
 
+  // ---- trilha compacta do dia: 5 marcadores, toque abre opções ----
+  const trilha = el('<div class="card trilha-card"><div class="trilha"></div></div>');
+  const tWrap = trilha.querySelector('.trilha');
+  for (const r of REFEICOES) {
+    const status = meals[r.id] || 'none';
+    const cls = { ok: 'feita', sub: 'feita', skip: 'pulada', off: 'fora' }[status] || '';
+    const daVez = rv && rv.id === r.id;
+    const dot = el(`<button class="trilha-item ${cls} ${daVez ? 'da-vez' : ''}" aria-label="${esc(r.nome)}">
+      <span class="marca">${status === 'ok' || status === 'sub' ? '✓' : status === 'skip' ? '–' : status === 'off' ? '✕' : ''}</span>
+      <span class="t-nome">${esc(r.nome.split(' ')[0])}</span>
+      <span class="t-hora num">${esc(r.hora.slice(0, 5))}</span>
+    </button>`);
+    dot.onclick = () => sheetRefeicao(r, status, key);
+    tWrap.append(dot);
+  }
+  root.append(trilha);
+
+  // ---- aviso never-miss-twice (só quando acionável) ----
+  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
+  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
+  for (const [nome, c] of [['iFood', cDeliv], ['doce', cDoce]]) {
+    if (c.amassado) {
+      root.append(el(`<div class="card aviso-nmt"><b>Contador de ${nome} amassado — não quebrado.</b>
+        Um ponto fora da curva. A próxima refeição volta ao script — nunca duas vezes seguidas.</div>`));
+      break;
+    }
+    if (c.quebradoHoje) {
+      root.append(el(`<div class="card aviso-nmt"><b>Recomeço no ${nome} — e recomeço conta.</b>
+        O estrago real seria a semana inteira. Recorde de ${c.recorde} dias continua seu.</div>`));
+      break;
+    }
+  }
+
+  // ---- linha de streaks compacta (detalhe mora na Evolução) ----
+  const linha = el(`<button class="linha-streaks">
+    <span>🛵 <b class="num">${cDeliv.streak}</b>d sem iFood</span>
+    <span>🍫 <b class="num">${cDoce.streak}</b>d sem doce</span>
+    <span class="seta">→</span>
+  </button>`);
+  linha.onclick = () => { abaAtiva = 'evolucao'; render(); };
+  root.append(linha);
+
+  // ---- peso contextual: só de manhã, sem registro hoje ----
+  const pesos = D.serie(st.events, 'weight');
+  const ultimo = pesos[pesos.length - 1];
+  const pesouHoje = ultimo && ultimo.date === key;
+  if (!pesouHoje && agora().getHours() < 10) {
+    const p = el(`<button class="linha-streaks"><span>⚖️ Pesar agora</span>
+      <span style="color:var(--muted)">${ultimo ? `último: ${ultimo.valor.toFixed(1).replace('.', ',')} kg` : 'em jejum, mesma hora, mesma balança'}</span>
+      <span class="seta">→</span></button>`);
+    p.onclick = () => sheetPeso(key);
+    root.append(p);
+  }
+
+  // ---- registrar (tudo que "já aconteceu" mora aqui) ----
+  const reg = el('<button class="acao-registrar">+ Registrar <span>peso · delivery · doce · noite fora</span></button>');
+  reg.onclick = () => sheetRegistrar(key);
+  root.append(reg);
+}
+
+// slot contextual — renderiza no máximo UM card, por prioridade
+function slotContextual(st, key) {
+  const horaAgora = agora().getHours();
+
+  // 1. oferta de modo ressaca (manhã após saída)
+  const ofertaRessaca = D.saiuOntem(st.events, key) && horaAgora < 14
+    && !st.events.some((e) => e.type === 'hangover_dismiss' && e.date === key);
   if (ofertaRessaca) {
     const c = el(`<div class="card ressaca-banner"><b>Saiu ontem à noite?</b>
       Se acordou de ressaca, ative o script do dia seguinte — zero decisões, só execução.
       <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="acao-primaria" style="margin:0;padding:11px" id="btn-ressaca-on">Ativar Modo Ressaca</button>
-        <button class="acao-secundaria" style="margin:0;width:auto" id="btn-ressaca-nao">Estou bem</button>
+        <button class="acao-primaria" style="margin:0;padding:11px" id="on">Ativar Modo Ressaca</button>
+        <button class="acao-secundaria" style="margin:0;width:auto" id="nao">Estou bem</button>
       </div></div>`);
-    c.querySelector('#btn-ressaca-on').onclick = () => S.addEvent({ type: 'hangover_on', date: key });
-    c.querySelector('#btn-ressaca-nao').onclick = () => S.addEvent({ type: 'hangover_dismiss', date: key });
-    root.append(c);
+    c.querySelector('#on').onclick = () => S.addEvent({ type: 'hangover_on', date: key });
+    c.querySelector('#nao').onclick = () => S.addEvent({ type: 'hangover_dismiss', date: key });
+    return [c];
   }
 
-  // refeições
-  const cardRef = el('<div class="card"><h2>Refeições de hoje <small>· toque = feito · toque longo = opções</small></h2><div class="refeicoes"></div></div>');
-  const lista = cardRef.querySelector('.refeicoes');
-  const agoraMin = agora().getHours() * 60 + agora().getMinutes();
-  let atualMarcada = false;
+  // 2. contrato da noite ativo → placar 1x1
+  const ct = D.contratoAtivo(st.events, key, horaAgora);
+  if (ct) return [placarContrato(ct)];
 
-  for (const r of REFEICOES) {
-    const status = meals[r.id] || 'none';
-    const [h1, m1] = r.hora.split(':').map(Number);
-    const [h2, m2] = r.horaFim.split(':').map(Number);
-    const ehAtual = !atualMarcada && status === 'none' && agoraMin >= h1 * 60 + m1 - 45 && agoraMin <= h2 * 60 + m2;
-    if (ehAtual) atualMarcada = true;
-    const destaque16 = r.id === 'lanche2' && status === 'none' && agoraMin >= 13 * 60;
-    const ouroDomingo = r.id === 'jantar' && tipo === 'DESCANSO';
-    const ajuste = r.ajuste[tipo];
-    const cls = { ok: 'feita', sub: 'sub', skip: 'pulada', off: 'fora' }[status] || '';
-    const statusTxt = { ok: 'feita ✓', sub: 'substituição ✓', skip: 'pulada', off: 'fora do plano' }[status] || '';
+  // 2b. contrato de ontem ficou aberto → fechar com os drinks contados
+  const ontem = D.addDays(key, -1);
+  const ctOntem = D.contratoAtivo(st.events, ontem, 22);
+  if (ctOntem && horaAgora >= 6) {
+    const c = el(`<div class="card ressaca-banner"><b>Fechar a noite de ontem?</b>
+      Placar do contrato: ${ctOntem.drinks} drink${ctOntem.drinks === 1 ? '' : 's'} (meta era ≤ ${ctOntem.maxDrinks}).
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="acao-primaria" style="margin:0;padding:11px" id="fechar">Confirmar ${ctOntem.drinks} drinks</button>
+        <button class="acao-secundaria" style="margin:0;width:auto" id="editar">Corrigir</button>
+      </div></div>`);
+    c.querySelector('#fechar').onclick = () => S.addEvent({ type: 'night_out', date: ontem, drinks: ctOntem.drinks });
+    c.querySelector('#editar').onclick = () => sheetNoite(ontem, ctOntem.drinks);
+    return [c];
+  }
 
-    const item = el(`<button class="refeicao ${cls} ${ehAtual ? 'atual' : ''} ${destaque16 ? 'destaque-16h' : ''}">
-      <span class="marca">${status === 'ok' || status === 'sub' ? '✓' : status === 'skip' ? '–' : status === 'off' ? '✕' : ''}</span>
-      <span>
-        <span class="nome">${esc(r.nome)}<span class="hora">${esc(r.hora)}</span></span>
-        <span class="desc">${esc(r.principal)}</span>
-        ${ouroDomingo ? '<span class="badge-ouro">★ Jantar = INTENSO — pré-carga do Longão. NÃO corta o carbo.</span>' : ''}
-      </span>
-      <span class="status-txt">${statusTxt}</span>
-      ${refeicaoExpandida === r.id ? `<span class="ref-detalhe">
-        <b>${esc(r.kcal)}</b><br>
-        <b>Sub 1:</b> ${esc(r.subs[0])}<br>
-        <b>Sub 2:</b> ${esc(r.subs[1])}
-        ${ajuste && !ouroDomingo ? `<br><b>Hoje (${tipo}):</b> ${esc(ajuste)}` : ''}
-      </span>` : ''}
+  // 3. revisão de domingo pendente
+  const semanaRev = D.revisaoPendente(st.events, key, horaAgora);
+  if (semanaRev) {
+    const c = el(`<button class="card card-revisao">
+      <span><b>Revisão da semana</b><br><small>5 minutos, os números já estão prontos — feche a semana.</small></span>
+      <span class="seta">→</span>
     </button>`);
-
-    // toque = alterna feito; toque longo = sheet de opções
-    let pressTimer = null; let longPress = false;
-    item.addEventListener('pointerdown', () => {
-      longPress = false;
-      pressTimer = setTimeout(() => { longPress = true; sheetRefeicao(r, status, key); }, 480);
-    });
-    item.addEventListener('pointerup', () => clearTimeout(pressTimer));
-    item.addEventListener('pointerleave', () => clearTimeout(pressTimer));
-    item.addEventListener('click', () => {
-      if (longPress) return;
-      if (status === 'none') {
-        S.addEvent({ type: 'meal', date: key, meal: r.id, status: 'ok' });
-      } else {
-        refeicaoExpandida = refeicaoExpandida === r.id ? null : r.id;
-        render();
-      }
-    });
-    lista.append(item);
+    c.onclick = () => wizardRevisao(semanaRev);
+    return [c];
   }
-  root.append(cardRef);
 
-  // contadores resilientes
-  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
-  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
-  root.append(el(`<div class="card"><h2>Contadores <small>· never miss twice: deslize isolado não zera</small></h2>
-    <div class="contadores">
-      ${contadorHTML('Sem iFood por impulso', cDeliv)}
-      ${contadorHTML('Sem doce fora do plano', cDoce)}
-    </div>
-  </div>`));
-
-  // peso rápido
-  const pesos = D.serie(st.events, 'weight');
-  const ultimo = pesos[pesos.length - 1];
-  const cardPeso = el(`<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-    <div><h2 style="margin-bottom:2px">Peso</h2>
-    <div style="font-size:.85rem;color:var(--ink-2)">${ultimo ? `${ultimo.valor.toFixed(1).replace('.', ',')} kg <span style="color:var(--muted)">· ${ultimo.date === key ? 'hoje' : 'em ' + fmtData(ultimo.date)}</span>` : 'nenhum registro ainda'}</div></div>
-    <button class="acao-primaria" style="width:auto;margin:0;padding:11px 18px" id="btn-peso">Registrar</button>
-  </div>`);
-  cardPeso.querySelector('#btn-peso').onclick = () => sheetPeso(key);
-  root.append(cardPeso);
-
-  // eventos sem culpa
-  const cardEv = el(`<div class="card"><h2>Aconteceu? Registra e segue <small>· sem culpa — dado vira diagnóstico</small></h2>
-    <div class="eventos">
-      <button class="btn-evento" id="ev-delivery"><span class="icone">🛵</span>Pedi delivery</button>
-      <button class="btn-evento" id="ev-sweet"><span class="icone">🍫</span>Doce fora do plano</button>
-      <button class="btn-evento" id="ev-night"><span class="icone">🍻</span>Saí e bebi</button>
-    </div>
-  </div>`);
-  cardEv.querySelector('#ev-delivery').onclick = () => sheetEvento('delivery', key);
-  cardEv.querySelector('#ev-sweet').onclick = () => sheetEvento('sweet', key);
-  cardEv.querySelector('#ev-night').onclick = () => sheetNoite(key);
-  root.append(cardEv);
+  return [];
 }
 
-function contadorHTML(rotulo, c) {
-  const cls = c.amassado ? 'amassado' : c.quebradoHoje ? 'quebrado' : '';
-  const aviso = c.amassado
-    ? '<div class="aviso">Ponto fora da curva — a próxima refeição volta ao script.</div>'
-    : c.quebradoHoje ? '<div class="aviso">Recomeço conta. O estrago real seria a semana inteira.</div>' : '';
-  return `<div class="contador ${cls}">
-    <div class="rotulo">${esc(rotulo)}</div>
-    <div class="valor num">${c.streak}<small> dias</small></div>
-    <div class="sub">recorde ${c.recorde} · ${c.limpos30}/${c.janela} últimos dias limpos${c.recuperacoes ? ` · ${c.recuperacoes} deslize${c.recuperacoes > 1 ? 's' : ''} absorvido${c.recuperacoes > 1 ? 's' : ''}` : ''}</div>
-    ${aviso}
-  </div>`;
-}
-
-function anelSVG(v, total) {
-  const r = 26, c = 2 * Math.PI * r, frac = Math.min(1, v / total);
-  return `<svg width="68" height="68" viewBox="0 0 68 68" role="img" aria-label="${v} de ${total} refeições">
-    <circle cx="34" cy="34" r="${r}" fill="none" stroke="var(--grid)" stroke-width="6"/>
-    <circle cx="34" cy="34" r="${r}" fill="none" stroke="var(--serie-1)" stroke-width="6"
-      stroke-linecap="round" stroke-dasharray="${c * frac} ${c}" transform="rotate(-90 34 34)"/>
-    <text x="34" y="39" text-anchor="middle" font-size="16" font-weight="650" fill="var(--ink)">${v}/${total}</text>
-  </svg>`;
+function placarContrato(ct) {
+  const c = el(`<div class="card placar">
+    <div class="placar-topo">
+      <span><b>Contrato da noite</b> · ${ct.horaSaida === 'sem limite' ? 'sem hora' : 'até ' + ct.horaSaida}</span>
+      <span class="num ${ct.drinks > ct.maxDrinks ? 'estourou' : ''}">${ct.drinks}/${ct.maxDrinks} 🍺 · ${ct.aguas} 💧</span>
+    </div>
+    <div class="placar-botoes">
+      <button id="drink">+1 drink</button>
+      <button id="agua">+1 água</button>
+      <button id="fim">encerrar noite</button>
+    </div>
+    ${ct.drinks >= ct.maxDrinks ? `<p class="placar-nota">${ct.drinks === ct.maxDrinks ? 'Número fechado — o próximo copo é água com limão (1x1). Ninguém repara no conteúdo, só no copo.' : 'Estourou em ' + (ct.drinks - ct.maxDrinks) + ' — amassa, não quebra. Água agora e horário de saída valendo.'}</p>` : ''}
+  </div>`);
+  c.querySelector('#drink').onclick = () => S.addEvent({ type: 'contract_tick', date: ct.date, kind: 'drink' });
+  c.querySelector('#agua').onclick = () => S.addEvent({ type: 'contract_tick', date: ct.date, kind: 'agua' });
+  c.querySelector('#fim').onclick = () => {
+    S.addEvent({ type: 'night_out', date: ct.date, drinks: ct.drinks });
+    snackbar(ct.drinks <= ct.maxDrinks ? 'Contrato cumprido. 👊 Água na cabeceira antes de dormir.' : 'Noite fechada. Água na cabeceira — amanhã tem script.');
+  };
+  return c;
 }
 
 // ---------- sheets da tela Hoje ----------
 function sheetRefeicao(r, statusAtual, key) {
-  const box = el(`<div><h3>${esc(r.nome)} <small style="color:var(--muted);font-weight:400">${esc(r.hora)}</small></h3>
+  const st = S.getState();
+  const tipo = D.tipoDoDia(key, st.settings.dayTypeOverrides);
+  const ajuste = r.ajuste[tipo];
+  const box = el(`<div><h3>${esc(r.nome)} <small style="color:var(--muted);font-weight:400">${esc(r.hora)} · ${esc(r.kcal)}</small></h3>
+    <div class="sheet-cardapio">
+      <b>Principal:</b> ${esc(r.principal)}<br>
+      <b>Sub 1:</b> ${esc(r.subs[0])}<br>
+      <b>Sub 2:</b> ${esc(r.subs[1])}
+      ${ajuste ? `<br><b>Hoje (${tipo}):</b> ${esc(ajuste)}` : ''}
+    </div>
     <div class="opcoes"></div></div>`);
   const ops = box.querySelector('.opcoes');
   const add = (label, small, status) => {
@@ -292,13 +350,87 @@ function sheetEvento(tipo, key) {
   abrirSheet(box);
 }
 
-function sheetNoite(key) {
+// sheet consolidado de registro — tudo que "já aconteceu" (ou vai acontecer) mora aqui
+function sheetRegistrar(key) {
+  const box = el(`<div><h3>Registrar</h3>
+    <p style="font-size:.78rem;color:var(--muted);margin:-6px 0 10px">Já aconteceu? Registra sem culpa — vira dado, não julgamento.</p>
+    <div class="opcoes">
+      <button class="opcao" id="r-peso">⚖️ Peso / cintura</button>
+      <button class="opcao" id="r-delivery">🛵 Pedi delivery</button>
+      <button class="opcao" id="r-sweet">🍫 Doce fora do plano</button>
+      <button class="opcao" id="r-noite">🍻 Noite fora<small>vou sair (contrato) ou já saí (registrar)</small></button>
+    </div>
+    <button class="acao-secundaria" id="r-sos">Bateu a vontade AGORA e ainda não cedeu? → Abrir SOS</button></div>`);
+  box.querySelector('#r-peso').onclick = () => sheetPeso(key);
+  box.querySelector('#r-delivery').onclick = () => sheetEvento('delivery', key);
+  box.querySelector('#r-sweet').onclick = () => sheetEvento('sweet', key);
+  box.querySelector('#r-noite').onclick = () => sheetNoiteFora(key);
+  box.querySelector('#r-sos').onclick = () => { fecharSheet(); abrirSOS(); };
+  abrirSheet(box);
+}
+
+// duas rotas: pré-decisão (contrato, Protocolo 3A) ou registro após o fato
+function sheetNoiteFora(key) {
+  const box = el(`<div><h3>Noite fora</h3>
+    <div class="opcoes">
+      <button class="opcao" id="vou">📝 Vou sair — fechar contrato antes<small>Decida AGORA o número de drinks e o horário — nunca no bar.</small></button>
+      <button class="opcao" id="ja">🍻 Já saí — registrar<small>Quantos drinks foram, sem culpa.</small></button>
+    </div></div>`);
+  box.querySelector('#vou').onclick = () => sheetContrato(key);
+  box.querySelector('#ja').onclick = () => sheetNoite(key);
+  abrirSheet(box);
+}
+
+function sheetContrato(key) {
   let drinks = 3;
+  let hora = HORARIOS_SAIDA[1];
+  let lanche = false;
+  const box = el(`<div><h3>Contrato da noite</h3>
+    <p style="font-size:.8rem;color:var(--muted)">Quantos drinks hoje? (meta do protocolo: ≤ 3)</p>
+    <div class="stepper">
+      <button id="menos">−</button>
+      <div class="valor num" id="v">3<small> drinks</small></div>
+      <button id="mais">+</button>
+    </div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Volto para casa até…</p>
+    <div class="chips" id="horas"></div>
+    <button class="check-passo" id="lanche" style="margin-top:12px">
+      <span class="caixa"></span>
+      <span><span class="t">Lanche proteico feito antes de sair</span>
+      <span class="d" style="display:block">Álcool de estômago vazio = pico mais rápido + fome de madrugada.</span></span>
+    </button>
+    <button class="acao-primaria" id="fechar">Fechar contrato</button>
+    <button class="acao-secundaria" id="share">📣 Anunciar a um amigo (compromisso público)</button></div>`);
+  const v = box.querySelector('#v');
+  box.querySelector('#menos').onclick = () => { drinks = Math.max(0, drinks - 1); v.innerHTML = `${drinks}<small> drinks</small>`; };
+  box.querySelector('#mais').onclick = () => { drinks = Math.min(10, drinks + 1); v.innerHTML = `${drinks}<small> drinks</small>`; };
+  const horasEl = box.querySelector('#horas');
+  for (const h of HORARIOS_SAIDA) {
+    const b = el(`<button class="${h === hora ? 'sel' : ''}">${h}</button>`);
+    b.onclick = () => { hora = h; horasEl.querySelectorAll('button').forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); };
+    horasEl.append(b);
+  }
+  const lancheBtn = box.querySelector('#lanche');
+  lancheBtn.onclick = () => { lanche = !lanche; lancheBtn.classList.toggle('feito', lanche); lancheBtn.querySelector('.caixa').textContent = lanche ? '✓' : ''; };
+  box.querySelector('#fechar').onclick = () => {
+    S.addEvent({ type: 'contract', date: key, maxDrinks: drinks, horaSaida: hora, lancheAntes: lanche });
+    fecharSheet();
+    snackbar(`Contrato fechado: ${drinks} drinks, volta ${hora}. O placar fica na tela Hoje.`);
+  };
+  box.querySelector('#share').onclick = async () => {
+    const texto = `Contrato da noite: hoje são ${drinks} drinks e volto ${hora === 'sem limite' ? 'quando der' : 'até ' + hora}. Tô treinando pra Pampulha 🌊 Me cobra!`;
+    try { await navigator.share({ text: texto }); } catch { /* cancelado */ }
+  };
+  abrirSheet(box);
+}
+
+function sheetNoite(key, inicial = 3) {
+  let drinks = inicial;
   const box = el(`<div><h3>Saí e bebi</h3>
     <p style="font-size:.8rem;color:var(--muted)">Quantos drinks? (meta do protocolo: ≤ 3 por saída)</p>
     <div class="stepper">
       <button id="menos">−</button>
-      <div class="valor num" id="v">3<small> drinks</small></div>
+      <div class="valor num" id="v">${inicial}<small> drinks</small></div>
       <button id="mais">+</button>
     </div></div>`);
   const v = box.querySelector('#v');
@@ -553,19 +685,149 @@ function iniciarOnda(corpo) {
 }
 
 // ================================================================
+// REVISÃO DE DOMINGO — wizard de 5 passos (Protocolo §4)
+// ================================================================
+function wizardRevisao(semanaIni) {
+  const st = S.getState();
+  const m = D.metricasSemana(st.events, semanaIni);
+  const mAnt = D.metricasSemana(st.events, D.addDays(semanaIni, -7));
+  const b = st.settings.baseline;
+  const gat = st.events
+    .filter((e) => e.trigger && (e.date || '') >= semanaIni && (e.date || '') <= D.addDays(semanaIni, 6))
+    .reduce((acc, e) => { acc[e.trigger] = (acc[e.trigger] || 0) + 1; return acc; }, {});
+  const gatOrd = Object.entries(gat).sort((a, x) => x[1] - a[1]);
+
+  let nota = '';
+  let ajuste = null;
+  let passo = 0;
+
+  fecharSOS();
+  const tela = el(`<div class="sos-tela">
+    <button class="fechar">✕</button>
+    <h2>Revisão da semana</h2>
+    <p class="nomeacao">${fmtData(semanaIni)} – ${fmtData(D.addDays(semanaIni, 6))} · os números já estão contados, você só interpreta.</p>
+    <div class="sos-passo" id="corpo"></div>
+  </div>`);
+  tela.querySelector('.fechar').onclick = fecharSOS;
+  document.body.appendChild(tela);
+  const corpo = tela.querySelector('#corpo');
+
+  const linhaMetrica = (nome, v, vAnt, alvo, okFn) => {
+    const delta = vAnt === null || v === null ? '' : v < vAnt ? ' ↓' : v > vAnt ? ' ↑' : ' =';
+    const vTxt = v === null ? '–' : typeof v === 'number' && !Number.isInteger(v) ? v.toFixed(1).replace('.', ',') : v;
+    const okTxt = v !== null && okFn(v) ? ' <b style="color:var(--good-text)">✓ na meta</b>' : '';
+    return `<div class="rev-metrica"><span>${nome}</span>
+      <span class="num">${vTxt}<small style="color:var(--muted)"> (antes: ${vAnt === null ? '–' : String(vAnt).replace('.', ',')})${delta}</small>${okTxt}</span>
+      <small style="color:var(--muted)">meta ${alvo}</small></div>`;
+  };
+
+  const passos = [
+    () => {
+      corpo.innerHTML = `<div class="num-passo">PASSO 1 DE 5 · OS TRÊS NÚMEROS</div>
+        ${linhaMetrica('🛵 Delivery por impulso', m.delivery, mAnt.delivery, b.delivery != null ? `≤ ${String(b.delivery * 0.5).replace('.', ',')}` : '−50% do baseline', (v) => b.delivery != null && v <= b.delivery * 0.5)}
+        ${linhaMetrica('🍫 Doces fora do plano', m.sweet, mAnt.sweet, b.sweet != null ? `≤ ${String(b.sweet * 0.5).replace('.', ',')}` : '−50% do baseline', (v) => b.sweet != null && v <= b.sweet * 0.5)}
+        ${linhaMetrica('🍻 Drinks por saída', m.drinks, mAnt.drinks, '≤ 3', (v) => v <= 3)}
+        <p style="color:var(--ink-2);font-size:.85rem">Meta é tendência, não perfeição — de 5 para 2 é vitória enorme.</p>
+        <div id="acoes"></div>`;
+    },
+    () => {
+      corpo.innerHTML = `<div class="num-passo">PASSO 2 DE 5 · O QUE DISPAROU</div>
+        ${gatOrd.length
+          ? `<div style="display:grid;gap:6px">${gatOrd.map(([g, n]) => `<div class="rev-metrica"><span>${esc(g)}</span><span class="num">${n}×</span></div>`).join('')}</div>
+             <p style="color:var(--ink-2);font-size:.85rem;margin-top:8px">Ataque o estressor, não o chocolate.</p>`
+          : '<h3>Semana sem gatilhos registrados</h3><p>Ou foi limpa de verdade, ou os chips ficaram sem uso — os dois valem saber.</p>'}
+        <div id="acoes"></div>`;
+    },
+    () => {
+      corpo.innerHTML = `<div class="num-passo">PASSO 3 DE 5 · UMA LINHA</div>
+        <h3>O que disparou os deslizes da semana?</h3>
+        <input class="rev-input" id="nota" maxlength="120" placeholder="opcional — ex.: sprint atrasada, 3 calls seguidas…" value="${esc(nota)}">
+        <div id="acoes"></div>`;
+      corpo.querySelector('#nota').oninput = (e) => { nota = e.target.value; };
+    },
+    () => {
+      corpo.innerHTML = `<div class="num-passo">PASSO 4 DE 5 · UM AJUSTE DE AMBIENTE</div>
+        <h3>Para a próxima semana, mude o ambiente — não a força de vontade.</h3>
+        <div class="opcoes" id="ops" style="margin-top:8px"></div>
+        <div id="acoes"></div>`;
+      const ops = corpo.querySelector('#ops');
+      for (const a of AJUSTES_AMBIENTE) {
+        const btn = el(`<button class="opcao ${ajuste === a ? 'sel-opcao' : ''}" style="font-size:.85rem;padding:11px 13px">${esc(a)}</button>`);
+        btn.onclick = () => {
+          ajuste = a;
+          ops.querySelectorAll('.opcao').forEach((x) => x.classList.remove('sel-opcao'));
+          btn.classList.add('sel-opcao');
+          const prox = corpo.querySelector('#acoes button');
+          if (prox) prox.textContent = 'Próximo →';
+        };
+        ops.append(btn);
+      }
+    },
+    () => {
+      const ident = D.identidadeAssinada([...st.events, { type: 'review', week: semanaIni }], D.addDays(semanaIni, 8));
+      corpo.innerHTML = `<div class="num-passo">PASSO 5 DE 5 · FECHADO</div>
+        <h3>“${FRASE_IDENTIDADE}”</h3>
+        <p>Mais uma semana de evidência. ${ident.assinada ? 'Frase assinada — 4 domingos seguidos. ✍️' : `Assinatura: ${Math.min(ident.progresso + 1, 4)}/4 domingos de revisão.`}</p>
+        ${ajuste ? `<p style="color:var(--ink-2)">Ajuste da semana: <b>${esc(ajuste)}</b></p>` : ''}
+        <div id="acoes"></div>`;
+    },
+  ];
+
+  const mostrar = () => {
+    passos[passo]();
+    const acoes = corpo.querySelector('#acoes');
+    if (passo < passos.length - 1) {
+      const btn = el(`<button class="acao-primaria">${passo === 3 && !ajuste ? 'Pular ajuste →' : 'Próximo →'}</button>`);
+      btn.onclick = () => { passo++; mostrar(); };
+      acoes.append(btn);
+    } else {
+      const btn = el('<button class="acao-primaria">Fechar a semana ✓</button>');
+      btn.onclick = () => {
+        S.addEvent({ type: 'review', week: semanaIni, nota: nota || null, ajuste });
+        fecharSOS();
+        snackbar('Semana revisada. A rota até a Pampulha ganhou um segmento.');
+      };
+      acoes.append(btn);
+    }
+  };
+  mostrar();
+}
+
+// ================================================================
 // TELA EVOLUÇÃO
 // ================================================================
 function renderEvolucao(root) {
   const st = S.getState();
   const key = hojeKey();
-  const semanas = D.semanasAteProva(key);
   const fase = D.fase(key);
   const faseTxt = { deficit: `cutting leve até ${fmtData(FIM_DEFICIT)} · depois manutenção`, manutencao: 'manutenção — pico de corrida', carga: '★ semana da prova — carga de carbo', prova: '🏁 dia de prova' }[fase];
 
-  root.append(el(`<div class="card hero">
-    <div class="n num">${semanas}</div>
-    <div class="l">semanas até a Volta da Pampulha · 06/12/2026</div>
-    <div class="fase">${esc(faseTxt)}</div>
+  // rota até a Pampulha: cada semana revisada/cumprida pinta um segmento
+  root.append(el(`<div class="card">
+    <h2>Rota até a Pampulha <small>· ${D.semanasAteProva(key)} semanas restantes · ${esc(faseTxt)}</small></h2>
+    <div class="grafico-wrap">${rotaSVG(st, key)}</div>
+    <div class="legenda">
+      <span class="item"><span class="faixa" style="background:var(--serie-1)"></span>semana fechada com revisão</span>
+      <span class="item"><span class="ponto" style="background:var(--serie-1)"></span>você está aqui</span>
+    </div>
+  </div>`));
+
+  // painel de identidade: a frase + as evidências
+  const ident = D.identidadeAssinada(st.events, key);
+  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
+  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
+  root.append(el(`<div class="card">
+    <h2>Quem os dados dizem que eu sou</h2>
+    <p class="frase-identidade ${ident.assinada ? 'assinada' : ''}">“${FRASE_IDENTIDADE}”</p>
+    <p class="frase-status">${ident.assinada ? '✍️ Assinada — 4 domingos de revisão seguidos.' : `Assinatura: ${ident.progresso}/4 domingos de revisão seguidos.`}</p>
+    <div class="agregados">
+      <div class="contador"><div class="rotulo">🌊 Ondas surfadas</div><div class="valor num">${D.ondasSurfadas(st.events)}</div><div class="sub">cravings que passaram sem vencer você</div></div>
+      <div class="contador"><div class="rotulo">🁢 Dominós quebrados</div><div class="valor num">${D.dominosQuebrados(st.events, key)}</div><div class="sub">ressacas que NÃO viraram dia perdido</div></div>
+      <div class="contador"><div class="rotulo">🛵 Sem iFood impulso</div><div class="valor num">${cDeliv.streak}<small> dias</small></div><div class="sub">recorde ${cDeliv.recorde} · ${cDeliv.limpos30}/${cDeliv.janela} dias limpos</div></div>
+      <div class="contador"><div class="rotulo">🍫 Sem doce fora</div><div class="valor num">${cDoce.streak}<small> dias</small></div><div class="sub">recorde ${cDoce.recorde} · ${cDoce.limpos30}/${cDoce.janela} dias limpos</div></div>
+      <div class="contador"><div class="rotulo">↩︎ Recuperações</div><div class="valor num">${cDeliv.recuperacoes + cDoce.recuperacoes}</div><div class="sub">deslizes que não viraram dois</div></div>
+      <div class="contador"><div class="rotulo">📋 Revisões feitas</div><div class="valor num">${D.semanasComRevisao(st.events).size}</div><div class="sub">domingos de 5 minutos</div></div>
+    </div>
   </div>`));
 
   // peso
@@ -626,32 +888,86 @@ function renderEvolucao(root) {
   </div>`);
   root.append(cardHm);
 
-  // agregados de recompensa
-  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
-  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
-  root.append(el(`<div class="card"><h2>Capital acumulado <small>· isso ninguém tira</small></h2>
-    <div class="agregados">
-      <div class="contador"><div class="rotulo">🌊 Ondas surfadas</div><div class="valor num">${D.ondasSurfadas(st.events)}</div><div class="sub">cravings que passaram sem vencer você</div></div>
-      <div class="contador"><div class="rotulo">🁢 Dominós quebrados</div><div class="valor num">${D.dominosQuebrados(st.events, key)}</div><div class="sub">ressacas que NÃO viraram dia perdido</div></div>
-      <div class="contador"><div class="rotulo">↩︎ Recuperações</div><div class="valor num">${cDeliv.recuperacoes + cDoce.recuperacoes}</div><div class="sub">deslizes que não viraram dois — never miss twice</div></div>
-      <div class="contador"><div class="rotulo">🏆 Recordes</div><div class="valor num">${Math.max(cDeliv.recorde, cDoce.recorde)}<small> dias</small></div><div class="sub">maior streak (iFood ${cDeliv.recorde} · doce ${cDoce.recorde})</div></div>
-    </div>
-  </div>`));
+  // última revisão (o que foi decidido no domingo)
+  const revs = st.events.filter((e) => e.type === 'review').sort((a, x) => (a.week < x.week ? -1 : 1));
+  const ultRev = revs[revs.length - 1];
+  if (ultRev && ultRev.ajuste) {
+    root.append(el(`<div class="card" style="font-size:.82rem;color:var(--ink-2)">
+      <h2>Ajuste da última revisão</h2>${esc(ultRev.ajuste)}${ultRev.nota ? `<br><span style="color:var(--muted)">“${esc(ultRev.nota)}”</span>` : ''}
+    </div>`));
+  }
 
-  // gatilhos frequentes (dados dos chips)
-  const gat = D.gatilhosFrequentes(st.events, 14, key);
+  // gatilhos: com ≥2 semanas de dados vira mapa gatilho × período; antes, barras simples
+  const gp = D.gatilhosPorPeriodo(st.events, key, 28);
+  const gat = D.gatilhosFrequentes(st.events, 28, key);
   if (gat.length) {
-    const max = gat[0][1];
-    root.append(el(`<div class="card"><h2>Gatilhos — últimos 14 dias <small>· ataque o estressor, não o chocolate</small></h2>
-      <div style="display:grid;gap:6px">${gat.map(([g, n]) => `
+    const doisSemanas = (() => {
+      const dias = st.events.filter((e) => e.trigger).map((e) => e.date || '').filter(Boolean).sort();
+      return dias.length >= 2 && D.diffDays(dias[0], dias[dias.length - 1]) >= 14;
+    })();
+    let corpoGat;
+    if (doisSemanas && gp.total >= 6) {
+      const maxCel = Math.max(...Object.values(gp.mapa).flat());
+      corpoGat = `<div class="gat-mapa">
+        <div class="gat-linha gat-cab"><span></span>${D.PERIODOS.map((p) => `<span>${p}</span>`).join('')}</div>
+        ${Object.entries(gp.mapa).sort((a, x) => x[1].reduce((s, n) => s + n, 0) - a[1].reduce((s, n) => s + n, 0)).map(([g, linha]) => `
+          <div class="gat-linha"><span class="gat-nome">${esc(g)}</span>
+          ${linha.map((n) => `<span class="cel ${n ? 'n' + Math.min(5, Math.ceil((n / maxCel) * 5)) : 'n0'}" title="${n}">${n || ''}</span>`).join('')}</div>`).join('')}
+      </div>`;
+    } else {
+      const max = gat[0][1];
+      corpoGat = `<div style="display:grid;gap:6px">${gat.map(([g, n]) => `
         <div style="display:grid;grid-template-columns:80px 1fr 24px;gap:8px;align-items:center;font-size:.8rem">
           <span style="color:var(--ink-2)">${esc(g)}</span>
           <svg height="14" width="100%" preserveAspectRatio="none" viewBox="0 0 100 14"><rect x="0" y="1" width="${(n / max) * 100}" height="12" rx="4" fill="var(--serie-1)"/></svg>
           <span class="num" style="color:var(--muted)">${n}</span>
-        </div>`).join('')}</div>
+        </div>`).join('')}</div>`;
+    }
+    root.append(el(`<div class="card"><h2>Gatilhos — últimos 28 dias <small>· ataque o estressor, não o chocolate</small></h2>
+      ${corpoGat}
       ${gat.find(([g]) => g === '15h') ? '<p style="font-size:.75rem;color:var(--warning);margin-top:8px">Pico às 15h detectado → confira o lanche das 16h. Pular a refeição da tarde é o maior preditor do ataque de doce.</p>' : ''}
     </div>`));
   }
+}
+
+// timeline horizontal: início do uso → prova, com marcos fixos e semanas pintadas
+function rotaSVG(st, key) {
+  const ini = D.inicioSemana(st.settings.startKey || key);
+  const fim = PROVA;
+  const total = Math.max(1, D.diffDays(ini, fim));
+  const w = 420, h = 84, padX = 14, y = 44;
+  const x = (dk) => padX + (Math.min(Math.max(D.diffDays(ini, dk), 0), total) / total) * (w - 2 * padX);
+
+  // segmentos semanais: pintado quando a semana tem revisão OU ≥28 refeições no plano
+  const revisadas = D.semanasComRevisao(st.events);
+  let segs = '';
+  for (let s = ini; s < fim; s = D.addDays(s, 7)) {
+    const fimSeg = D.addDays(s, 7) > fim ? fim : D.addDays(s, 7);
+    let refeicoes = 0;
+    for (let d = 0; d < 7; d++) refeicoes += D.mealsDone(D.mealsOfDay(st.events, D.addDays(s, d)));
+    const cumprida = revisadas.has(s) || refeicoes >= 28;
+    const passada = fimSeg <= key;
+    segs += `<line x1="${x(s) + 1.5}" x2="${x(fimSeg) - 1.5}" y1="${y}" y2="${y}"
+      stroke="${cumprida ? 'var(--serie-1)' : passada ? 'var(--baseline)' : 'var(--grid)'}" stroke-width="${cumprida ? 5 : 3}" stroke-linecap="round"/>`;
+  }
+
+  const marcos = [
+    [ini, 'início', 'baixo'],
+    [FIM_DEFICIT, 'fim do déficit', 'cima'],
+    ['2026-12-04', 'carga', 'baixo'],
+    [fim, '🏁 prova 06/12', 'cima'],
+  ];
+  let marcosSVG = '';
+  for (const [dk, nome, pos] of marcos) {
+    if (dk < ini) continue;
+    marcosSVG += `<line x1="${x(dk)}" x2="${x(dk)}" y1="${y - 7}" y2="${y + 7}" stroke="var(--baseline)" stroke-width="1.5"/>
+      <text x="${x(dk)}" y="${pos === 'cima' ? y - 13 : y + 21}" text-anchor="${dk === fim ? 'end' : dk === ini ? 'start' : 'middle'}" font-size="9" fill="var(--muted)">${nome}</text>`;
+  }
+
+  const voce = `<circle cx="${x(key)}" cy="${y}" r="6" fill="var(--serie-1)" stroke="var(--surface)" stroke-width="2.5"/>
+    <text x="${Math.min(Math.max(x(key), 30), w - 30)}" y="${y + 34}" text-anchor="middle" font-size="9.5" font-weight="650" fill="var(--ink)">${fmtData(key)}</text>`;
+
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="min-width:320px">${segs}${marcosSVG}${voce}</svg>`;
 }
 
 function tileMetrica(rotulo, valor, baseline, tipo) {
@@ -815,8 +1131,63 @@ function renderAjustes(root) {
   });
   root.append(cardBk);
 
+  // lembretes locais (best-effort, opt-in — sem servidor de push)
+  const lem = st.settings.lembretes || {};
+  const cardLem = el(`<div class="card"><h2>Lembretes <small>· experimental — dependem do app aberto ou recente</small></h2>
+    <div class="ajuste-linha"><span>Lanche das 16h pendente<div class="d">avisa ~15h45 se o lanche da tarde não foi marcado</div></span>
+      <button class="toggle ${lem.lanche ? 'on' : ''}" id="t-lanche"><span></span></button></div>
+    <div class="ajuste-linha"><span>Revisão de domingo<div class="d">avisa domingo às 18h se a semana não foi revisada</div></span>
+      <button class="toggle ${lem.revisao ? 'on' : ''}" id="t-revisao"><span></span></button></div>
+  </div>`);
+  const liga = async (chave, btn) => {
+    const atual = (S.getState().settings.lembretes || {})[chave];
+    if (!atual && 'Notification' in window && Notification.permission !== 'granted') {
+      const p = await Notification.requestPermission();
+      if (p !== 'granted') { snackbar('Sem permissão de notificação — lembrete não ativado.'); return; }
+    }
+    S.setSetting(`lembretes.${chave}`, !atual);
+    btn.classList.toggle('on', !atual);
+    agendarLembretes();
+  };
+  cardLem.querySelector('#t-lanche').onclick = (e) => liga('lanche', e.currentTarget);
+  cardLem.querySelector('#t-revisao').onclick = (e) => liga('revisao', e.currentTarget);
+  root.append(cardLem);
+
   root.append(el(`<div class="rodape-nota">Pampulha · executa o Protocolo de Hábitos + Plano Nutricional (jul/2026).<br>
     Meta é tendência, não perfeição. Nunca duas vezes seguidas.</div>`));
+}
+
+// lembretes best-effort: só funcionam com o app aberto/recente (sem push server)
+let lembreteTimer = null;
+function agendarLembretes() {
+  clearTimeout(lembreteTimer);
+  const st = S.getState();
+  const lem = st.settings.lembretes || {};
+  if ((!lem.lanche && !lem.revisao) || !('Notification' in window) || Notification.permission !== 'granted') return;
+
+  const agr = agora();
+  const key = hojeKey();
+  const alvos = [];
+  if (lem.lanche) {
+    const alvo = new Date(agr); alvo.setHours(15, 45, 0, 0);
+    alvos.push({ quando: alvo, guarda: `notifLanche_${key}`, checa: () => !['ok', 'sub', 'skip', 'off'].includes(D.mealsOfDay(S.getState().events, hojeKey()).lanche2), titulo: 'Lanche das 16h', corpo: 'O escudo anti-doce das 15h. Pular a tarde é o maior preditor do ataque à gaveta.' });
+  }
+  if (lem.revisao && agr.getDay() === 0) {
+    const alvo = new Date(agr); alvo.setHours(18, 0, 0, 0);
+    alvos.push({ quando: alvo, guarda: `notifRevisao_${key}`, checa: () => !!D.revisaoPendente(S.getState().events, hojeKey(), 18), titulo: 'Revisão da semana — 5 min', corpo: 'Os números já estão contados. Feche a semana e pinte a rota.' });
+  }
+  const pendentes = alvos.filter((a) => a.quando > agr && !st.settings[a.guarda]);
+  if (!pendentes.length) return;
+  const prox = pendentes.sort((a, b) => a.quando - b.quando)[0];
+  lembreteTimer = setTimeout(async () => {
+    if (prox.checa() && !S.getState().settings[prox.guarda]) {
+      S.setSetting(prox.guarda, true);
+      const reg = await navigator.serviceWorker?.getRegistration();
+      if (reg) reg.showNotification(prox.titulo, { body: prox.corpo, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
+      else new Notification(prox.titulo, { body: prox.corpo, icon: 'icons/icon-192.png' });
+    }
+    agendarLembretes();
+  }, Math.min(prox.quando - agr, 2 ** 31 - 1));
 }
 
 // ================================================================
@@ -843,12 +1214,13 @@ function render() {
 }
 
 document.querySelectorAll('nav.abas button').forEach((b) => {
-  b.onclick = () => { abaAtiva = b.dataset.aba; refeicaoExpandida = null; render(); };
+  b.onclick = () => { abaAtiva = b.dataset.aba; render(); };
 });
 $('#sos-fab').onclick = abrirSOS;
 
 S.onChange(render);
 render();
+agendarLembretes();
 // atalho do ícone do PWA (?sos=1) e helpers de dev/verificação
 if (params.get('sos')) {
   if (SOS_SCRIPTS[params.get('sos')]) sosScript(params.get('sos'), Number(params.get('passo') || 0));
@@ -856,6 +1228,15 @@ if (params.get('sos')) {
 }
 if (params.get('ressaca') && !D.ressacaDoDia(S.getState().events, hojeKey()).on) {
   S.addEvent({ type: 'hangover_on', date: hojeKey() });
+}
+if (params.get('wizard') === 'revisao') {
+  wizardRevisao(D.revisaoPendente(S.getState().events, hojeKey(), 20) || D.addDays(D.inicioSemana(hojeKey()), -7));
+}
+if (params.get('contrato') && !D.contratoAtivo(S.getState().events, hojeKey(), agora().getHours())) {
+  S.addEvent({ type: 'contract', date: hojeKey(), maxDrinks: 3, horaSaida: '00:30' });
+  S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'drink' });
+  S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'agua' });
+  S.addEvent({ type: 'contract_tick', date: hojeKey(), kind: 'drink' });
 }
 
 // service worker + aviso de atualização

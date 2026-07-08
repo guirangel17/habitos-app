@@ -95,6 +95,111 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .dia-resumo .treino { font-size: 0.8rem; color: var(--ink-2); margin-top: 2px; }
 .dia-resumo .fase-nota { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
 
+/* ---------- hero da refeição da vez ---------- */
+.hero-refeicao { padding: 18px 16px; }
+.hero-refeicao .hero-rotulo { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--serie-1); margin-bottom: 6px; }
+.hero-refeicao.destaque-16h { border-color: var(--warning); }
+.hero-refeicao.destaque-16h .hero-rotulo { color: var(--warning); }
+.hero-refeicao h1 { font-size: 1.5rem; line-height: 1.2; }
+.hero-refeicao h1 .hora { font-size: 0.95rem; color: var(--muted); font-weight: 400; }
+.hero-refeicao .cardapio { font-size: 0.95rem; color: var(--ink-2); line-height: 1.5; margin-top: 8px; }
+.hero-refeicao .ajuste-dia { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+.hero-refeicao .badge-ouro { margin-top: 8px; }
+.hero-refeicao .hero-acoes { margin-top: 6px; }
+.hero-refeicao.completo h1 { color: var(--good-text); }
+
+/* ---------- trilha compacta do dia ---------- */
+.trilha-card { padding: 10px 8px; }
+.trilha { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.trilha-item { display: grid; gap: 3px; justify-items: center; padding: 6px 2px; border-radius: 10px; }
+.trilha-item .marca {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--baseline); display: grid; place-items: center;
+  font-size: 0.85rem; color: var(--surface);
+}
+.trilha-item.feita .marca { background: var(--serie-1); border-color: var(--serie-1); }
+.trilha-item.pulada .marca, .trilha-item.fora .marca { border-color: var(--muted); color: var(--muted); }
+.trilha-item.da-vez { background: var(--serie-1-wash); }
+.trilha-item.da-vez .marca { border-color: var(--serie-1); }
+.trilha-item .t-nome { font-size: 0.66rem; color: var(--ink-2); font-weight: 600; }
+.trilha-item .t-hora { font-size: 0.62rem; color: var(--muted); }
+
+/* ---------- linhas compactas ---------- */
+.linha-streaks {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; font-size: 0.82rem; color: var(--ink-2); text-align: left;
+}
+.linha-streaks b { color: var(--ink); font-size: 0.95rem; }
+.linha-streaks .seta { margin-left: auto; color: var(--muted); }
+
+.aviso-nmt { border-color: var(--warning); font-size: 0.82rem; color: var(--ink-2); line-height: 1.45; }
+.aviso-nmt b { color: var(--warning); display: block; margin-bottom: 2px; }
+
+.acao-registrar {
+  width: 100%; border: 1px dashed var(--baseline); border-radius: var(--radius);
+  padding: 13px; color: var(--ink-2); font-size: 0.9rem; font-weight: 600;
+}
+.acao-registrar span { display: block; font-weight: 400; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+/* ---------- placar do contrato ---------- */
+.placar { border-color: var(--serie-1); }
+.placar-topo { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--ink-2); }
+.placar-topo .num { font-size: 1.05rem; font-weight: 650; color: var(--ink); }
+.placar-topo .num.estourou { color: var(--warning); }
+.placar-botoes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+.placar-botoes button { border: 1px solid var(--border); border-radius: 10px; padding: 11px 4px; font-size: 0.8rem; color: var(--ink); }
+.placar-botoes #fim { color: var(--muted); font-size: 0.72rem; }
+.placar-nota { font-size: 0.75rem; color: var(--warning); margin-top: 8px; line-height: 1.4; }
+
+/* ---------- card de revisão pendente ---------- */
+.card-revisao { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left; border-color: var(--serie-1); }
+.card-revisao small { color: var(--muted); font-weight: 400; }
+.card-revisao .seta { color: var(--serie-1); font-size: 1.2rem; }
+
+/* ---------- wizard de revisão ---------- */
+.rev-metrica {
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline;
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  font-size: 0.85rem; margin-bottom: 6px;
+}
+.rev-metrica .num { font-size: 1rem; font-weight: 650; }
+.rev-metrica > small { grid-column: 1 / -1; }
+.rev-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px; font: inherit; color: var(--ink); margin-top: 8px;
+}
+.sel-opcao { border-color: var(--serie-1) !important; background: var(--serie-1-wash); }
+
+/* ---------- sheet: cardápio + toggle ---------- */
+.sheet-cardapio { font-size: 0.78rem; color: var(--ink-2); line-height: 1.5; border: 1px solid var(--grid); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.sheet-cardapio b { color: var(--ink); }
+.toggle {
+  width: 46px; height: 26px; border-radius: 999px; background: var(--baseline);
+  position: relative; flex-shrink: 0; transition: background 0.15s;
+}
+.toggle span {
+  position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--surface); transition: left 0.15s;
+}
+.toggle.on { background: var(--serie-1); }
+.toggle.on span { left: 23px; }
+
+/* ---------- identidade + mapa de gatilhos ---------- */
+.frase-identidade { font-size: 1.05rem; font-weight: 650; line-height: 1.4; color: var(--muted); }
+.frase-identidade.assinada { color: var(--ink); }
+.frase-status { font-size: 0.75rem; color: var(--muted); margin: 4px 0 12px; }
+.gat-mapa { display: grid; gap: 4px; font-size: 0.72rem; }
+.gat-linha { display: grid; grid-template-columns: 76px repeat(4, 1fr); gap: 4px; align-items: center; }
+.gat-linha .gat-nome { color: var(--ink-2); }
+.gat-linha .cel { height: 26px; width: auto; border-radius: 5px; display: grid; place-items: center; color: var(--ink); }
+.gat-cab span { color: var(--muted); text-align: center; font-size: 0.62rem; }
+.gat-linha .cel.n0 { background: var(--grid); color: transparent; }
+.gat-linha .cel.n1, .gat-linha .cel.n2 { background: var(--seq-1); }
+.gat-linha .cel.n3 { background: var(--seq-2); }
+.gat-linha .cel.n4 { background: var(--seq-3); }
+.gat-linha .cel.n5 { background: var(--seq-4); color: #fff; }
+
 /* ---------- refeições ---------- */
 .refeicoes { display: grid; gap: 8px; }
 .refeicao {

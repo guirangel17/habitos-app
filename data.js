@@ -127,3 +127,20 @@ export const RESSACA_PASSOS = [
 
 // Metas do sistema de acompanhamento (Protocolo §4)
 export const METAS_30D = { delivery: 0.5, sweet: 0.5, drinks: 3 }; // -50%, -50%, ≤3
+
+// Frase de identidade (Clear: hábito é identidade — Protocolo §4/3A)
+export const FRASE_IDENTIDADE = 'Sou um atleta que sai com os amigos e treina bem.';
+
+// Ajustes de AMBIENTE para a revisão de domingo (§4: ajuste o ambiente, não a força de vontade)
+export const AJUSTES_AMBIENTE = [
+  'Repor a prateleira de emergência (frango + arroz congelados em porções)',
+  'Tirar doce do alcance do braço (mesa, gaveta, mochila)',
+  'Deixar o kit 2-minutos visível (crepioca / iogurte+whey no balcão)',
+  'Bloquear 10 min de buffer entre calls na agenda',
+  'Desinstalar o app de delivery de novo / apagar cartão salvo',
+  'Trocar um bar da semana por social run / almoço / churrasco',
+  'Garrafa de água sempre cheia na mesa de trabalho',
+];
+
+// Opções de horário-limite do Contrato da Noite (Protocolo 3A)
+export const HORARIOS_SAIDA = ['23:00', '00:30', '02:00', 'sem limite'];

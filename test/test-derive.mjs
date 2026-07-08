@@ -110,5 +110,48 @@ ok(hm.length === 4 && hm[3].dias[1] === 2 && hm[3].dias[2] === null, 'heatmap: t
 ok(D.semanasAteProva('2026-12-06') === 0, 'dia da prova: 0 semanas');
 ok(D.semanasAteProva('2026-11-29') === 1, '1 semana antes');
 
+// ---- v2: contrato da noite ----
+let ts = D.parseKey('2026-07-10').getTime() + 20 * 3600e3; // sexta 20h
+const cEvs = [
+  { id: 'c1', ts, type: 'contract', date: '2026-07-10', maxDrinks: 3, horaSaida: '00:30' },
+  { id: 't1', ts: ts + 1e6, type: 'contract_tick', date: '2026-07-10', kind: 'drink' },
+  { id: 't2', ts: ts + 2e6, type: 'contract_tick', date: '2026-07-10', kind: 'agua' },
+  { id: 't3', ts: ts + 3e6, type: 'contract_tick', date: '2026-07-10', kind: 'drink' },
+];
+let ct = D.contratoAtivo(cEvs, '2026-07-10', 22);
+ok(ct && ct.drinks === 2 && ct.aguas === 1 && ct.maxDrinks === 3, 'contrato ativo com placar 2 drinks / 1 água');
+ct = D.contratoAtivo(cEvs, '2026-07-11', 2);
+ok(ct && ct.date === '2026-07-10', 'contrato de ontem ainda ativo às 2h da manhã');
+ct = D.contratoAtivo(cEvs, '2026-07-11', 12);
+ok(ct === null, 'contrato expira às 6h do dia seguinte');
+ct = D.contratoAtivo([...cEvs, { id: 'n1', ts: ts + 5e6, type: 'night_out', date: '2026-07-10', drinks: 2 }], '2026-07-10', 23);
+ok(ct === null, 'night_out fecha o contrato');
+
+// ---- v2: revisão de domingo ----
+// 2026-07-12 é domingo; semana = 2026-07-06
+ok(D.revisaoPendente([], '2026-07-12', 19) === '2026-07-06', 'domingo 19h: revisão pendente da semana');
+ok(D.revisaoPendente([], '2026-07-12', 15) === null, 'domingo 15h: ainda não cobra');
+ok(D.revisaoPendente([], '2026-07-13', 10) === '2026-07-06', 'segunda: graça para revisar semana anterior');
+ok(D.revisaoPendente([], '2026-07-15', 10) === null, 'quarta: janela fechou');
+const rev = [{ id: 'r', ts: 1, type: 'review', week: '2026-07-06' }];
+ok(D.revisaoPendente(rev, '2026-07-12', 20) === null, 'revisão feita: não cobra mais');
+
+// ---- v2: identidade assinada ----
+const revs4 = ['2026-06-08', '2026-06-15', '2026-06-22', '2026-06-29'].map((w, i) => ({ id: 'r' + i, ts: i, type: 'review', week: w }));
+let ident = D.identidadeAssinada(revs4, '2026-07-08'); // semana atual 06/07; 4 anteriores revisadas
+ok(ident.assinada && ident.progresso === 4, 'identidade assinada com 4 semanas revisadas');
+ident = D.identidadeAssinada(revs4.slice(1), '2026-07-08');
+ok(!ident.assinada && ident.progresso === 3, 'identidade 3/4 sem assinar');
+
+// ---- v2: gatilho × período ----
+const g1 = D.parseKey('2026-07-06').getTime();
+const gEvs = [
+  { id: 'g1', ts: g1 + 15.5 * 3600e3, type: 'sweet', date: '2026-07-06', trigger: '15h' },
+  { id: 'g2', ts: g1 + 16 * 3600e3, type: 'sos', kind: 'doce', outcome: 'surfed', date: '2026-07-06', trigger: '15h' },
+  { id: 'g3', ts: g1 + 21 * 3600e3, type: 'delivery', date: '2026-07-06', trigger: 'preguiça' },
+];
+const gp = D.gatilhosPorPeriodo(gEvs, '2026-07-07', 28);
+ok(gp.total === 3 && gp.mapa['15h'][2] === 2 && gp.mapa['preguiça'][3] === 1, 'gatilhos agregados por período do dia');
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);
