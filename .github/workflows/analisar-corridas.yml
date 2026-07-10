@@ -7,10 +7,10 @@
 #   GARMIN_TOKEN    saída de: python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"
 #   GEMINI_API_KEY  chave do Google AI Studio (aistudio.google.com/apikey)
 #
-# RUNBOOK — workflow vermelho com status "garmin_auth" (~1x/ano, token OAuth1 expirou):
-#   1. na máquina local: cd ~/treino-pampulha/garmin && python3 login-garmin.py
-#   2. python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"
-#   3. colar a saída no Secret GARMIN_TOKEN e rodar este workflow manualmente.
+# RUNBOOK — status "garmin_auth" no pipeline-status.json (~1x/ano, token OAuth1 expirou
+# de verdade — 401; bloqueio 429/403 do Cloudflare vira status "erro" e passa sozinho):
+# seguir garmin/README.md — login-garmin.py em máquina com internet aberta, colar o dump
+# no Secret GARMIN_TOKEN e rodar este workflow manualmente.
 name: Analisar corridas
 on:
   workflow_dispatch:
