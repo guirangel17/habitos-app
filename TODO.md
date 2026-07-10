@@ -108,6 +108,7 @@
 
 # v8 — ideias futuras
 
+- Parecer de IA também para musculação: o FR165 registra séries/reps/carga e o pipeline já busca as atividades de força — dá pra validar a Progressão Dupla (primeiro reps, depois carga) e apontar estagnação por exercício. Avaliar custo de quota do Gemini.
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
 - Gráfico de aderência semanal × ritmo de perda (correlação visível).
 - Modo semana da prova (04–05/12): checklist de carga de carbo no slot contextual.
