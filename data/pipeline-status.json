@@ -1,7 +1,7 @@
 {
- "ultimaExecucao": "2026-07-10T09:36:38-03:00",
- "status": "garmin_auth",
- "mensagem": "Conexão com a Garmin expirou — rodar login-garmin.py local e atualizar o Secret GARMIN_TOKEN (runbook no CLAUDE.md)",
+ "ultimaExecucao": "2026-07-10T10:31:28-03:00",
+ "status": "erro",
+ "mensagem": "Garmin bloqueou o acesso deste runner (429 no oauth) — NÃO é o token; próximo cron tenta de novo",
  "ultimaAnalise": null,
  "pendentes": 0
 }
