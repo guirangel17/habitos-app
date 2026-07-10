@@ -157,7 +157,8 @@ class TestPuras(unittest.TestCase):
              "movingDuration": 2400.0, "activityName": "Força B — inferiores",
              "activityType": {"typeKey": "strength_training"}}
         f = compactar_forca(a)
-        self.assertEqual(f, {"date": "2026-07-09", "activityId": 9, "minutos": 40,
+        # 45 = duration TOTAL (2710s), não movingDuration: descanso entre séries conta
+        self.assertEqual(f, {"date": "2026-07-09", "activityId": 9, "minutos": 45,
                              "nome": "Força B — inferiores"})
         self.assertIsNone(compactar_forca({"activityId": 1})["minutos"])  # sem duração
 

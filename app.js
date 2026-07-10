@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.7'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.7.1'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -983,11 +983,14 @@ function iniciarPollingAnalise() {
   pollAnalise = setInterval(async () => {
     if (Date.now() > fim) { clearInterval(pollAnalise); analiseAguardando = false; render(); return; }
     const antes = dadosAnalises?.doc?.atualizadoEm ?? null;
+    const antesForca = dadosForca?.doc?.atualizadoEm ?? null;
     await carregarAnalises(true);
-    if ((dadosAnalises?.doc?.atualizadoEm ?? null) !== antes) {
+    const veioCorrida = (dadosAnalises?.doc?.atualizadoEm ?? null) !== antes;
+    const veioForca = (dadosForca?.doc?.atualizadoEm ?? null) !== antesForca;
+    if (veioCorrida || veioForca) {
       clearInterval(pollAnalise);
       analiseAguardando = false;
-      snackbar('Análise da corrida pronta ✨');
+      snackbar(veioCorrida ? 'Análise da corrida pronta ✨' : 'Parecer da musculação pronto ✨');
       render();
     }
   }, 30e3);
@@ -1079,7 +1082,7 @@ function blocoAnaliseForca(a) {
   const stat = (l, v) => `<div class="ana-stat"><span class="l">${l}</span><b class="num">${v ?? '–'}</b></div>`;
   // nomes vêm como chaves do catálogo Garmin (BARBELL_BENCH_PRESS) — suaviza pra exibir
   const nomeEx = (ex) => {
-    const cru = ex.nome || ex.categoria || 'exercício';
+    const cru = [ex.nome, ex.categoria].find((v) => v && v !== 'UNKNOWN') || 'exercício';
     return cru.replaceAll('_', ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase());
   };
   const badge = (ex) => ({
@@ -1264,7 +1267,7 @@ function renderTreino(root) {
 
   // disparo rápido da análise (só com PAT configurado em Ajustes)
   if (patGarmin()) {
-    const l = el(`<button class="linha-streaks">🛰️ <span>${analiseAguardando ? 'analisando a corrida… (~2-4 min)' : 'Buscar análise do último treino'}</span><span class="seta">${analiseAguardando ? '⏳' : '→'}</span></button>`);
+    const l = el(`<button class="linha-streaks">🛰️ <span>${analiseAguardando ? 'analisando o treino… (~2-4 min)' : 'Buscar análise do último treino'}</span><span class="seta">${analiseAguardando ? '⏳' : '→'}</span></button>`);
     if (!analiseAguardando) l.onclick = () => dispararAnalise('manual');
     root.append(l);
   }

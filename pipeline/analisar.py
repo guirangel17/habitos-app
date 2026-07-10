@@ -297,8 +297,10 @@ def compactar_atividade(a, corridas):
 
 def compactar_forca(a):
     """Item da lista do Garmin (treino de força) → entrada compacta do historico.json.
-    Só o suficiente pra confirmação de 1 toque no app — sem análise de IA."""
-    dur = a.get("movingDuration") or a.get("duration")
+    Só o suficiente pra confirmação de 1 toque no app — sem análise de IA.
+    duration TOTAL de propósito: movingDuration só conta movimento e faz uma
+    sessão de 50 min parecer 13 (descanso entre séries não é pausa)."""
+    dur = a.get("duration") or a.get("movingDuration")
     return {
         "date": (a.get("startTimeLocal") or "")[:10],
         "activityId": a.get("activityId"),
@@ -678,7 +680,7 @@ def main():
                 try:
                     sets = garmin_get(f"/activity-service/activity/{aid}/exerciseSets")
                     exercicios = F.normalizar_sets(sets)
-                    dur = a.get("movingDuration") or a.get("duration")
+                    dur = a.get("duration") or a.get("movingDuration")  # total: descanso entre séries conta
                     minutos = round(dur / 60) if dur else None
                     gerado_em = datetime.now(BRT).isoformat(timespec="seconds")
                     if not exercicios:
