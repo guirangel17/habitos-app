@@ -1,5 +1,5 @@
 {
- "ultimaExecucao": "2026-07-10T01:16:28-03:00",
+ "ultimaExecucao": "2026-07-10T09:36:38-03:00",
  "status": "garmin_auth",
  "mensagem": "Conexão com a Garmin expirou — rodar login-garmin.py local e atualizar o Secret GARMIN_TOKEN (runbook no CLAUDE.md)",
  "ultimaAnalise": null,
