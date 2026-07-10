@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.6'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.7'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -890,6 +890,7 @@ function iniciarOnda(corpo) {
 const REPO_API = 'https://api.github.com/repos/guirangel17/habitos-app';
 let dadosAnalises = null;   // { doc, porData: {date: [entradas]} }
 let dadosHistorico = null;
+let dadosForca = null; // forca-analises.json — pareceres de musculação (v7.7)
 let dadosClima = null;      // { atualizadoEm, janelas: [{quando, temp, chuvaPct, umidade}] }
 
 // próxima janela de treino com previsão (6h/19h) a partir de agora; null sem dado fresco
@@ -932,21 +933,25 @@ function carregarAnalises(force = false) {
   if ((dadosAnalises || analisesTentou) && !force) return Promise.resolve();
   analisesCarregando = (async () => {
     const antes = dadosAnalises?.doc?.atualizadoEm ?? null;
-    const [an, hist, cli] = await Promise.all([fetchDados('analises.json'), fetchDados('historico.json'), fetchDados('clima.json')]);
+    const antesForca = dadosForca?.doc?.atualizadoEm ?? null;
+    const [an, hist, cli, fa] = await Promise.all([fetchDados('analises.json'), fetchDados('historico.json'), fetchDados('clima.json'), fetchDados('forca-analises.json')]);
     analisesTentou = true;
     if (hist) dadosHistorico = hist;
     if (cli) dadosClima = cli;
-    if (an) {
+    const indexar = (doc) => {
       const porData = {};
-      for (const x of an.analises || []) (porData[x.date] = porData[x.date] || []).push(x);
-      dadosAnalises = { doc: an, porData };
-      if (an.atualizadoEm !== antes) render();
-    }
+      for (const x of doc.analises || []) (porData[x.date] = porData[x.date] || []).push(x);
+      return { doc, porData };
+    };
+    if (fa) dadosForca = indexar(fa);
+    if (an) dadosAnalises = indexar(an);
+    if ((an && an.atualizadoEm !== antes) || (fa && fa.atualizadoEm !== antesForca)) render();
   })().finally(() => { analisesCarregando = null; });
   return analisesCarregando;
 }
 
 const analisesDoDia = (key) => dadosAnalises?.porData?.[key] || [];
+const forcaAnalisesDoDia = (key) => dadosForca?.porData?.[key] || [];
 
 // dispara o workflow do Actions (caminho rápido ~2-4 min) — exige PAT
 async function dispararAnalise(origem) {
@@ -1065,6 +1070,53 @@ function blocoAnalise(a) {
       ${(ia.pontos_atencao || []).map((p) => `<p class="ana-item atencao">👀 ${esc(p)}</p>`).join('')}
       <p class="ana-dica">→ ${esc(ia.proxima_dica)}</p>
     </div>
+  </div>`);
+}
+
+// parecer de musculação (forca-analises.json) — espelha blocoAnalise; tolera entrada sem ia
+function blocoAnaliseForca(a) {
+  const s = a.sessao || {}, ia = a.ia;
+  const stat = (l, v) => `<div class="ana-stat"><span class="l">${l}</span><b class="num">${v ?? '–'}</b></div>`;
+  // nomes vêm como chaves do catálogo Garmin (BARBELL_BENCH_PRESS) — suaviza pra exibir
+  const nomeEx = (ex) => {
+    const cru = ex.nome || ex.categoria || 'exercício';
+    return cru.replaceAll('_', ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase());
+  };
+  const badge = (ex) => ({
+    carga_up: `▲ carga${ex.deltaCarga ? ` +${String(ex.deltaCarga).replace('.', ',')} kg` : ''}`,
+    reps_up: `▲ reps${ex.deltaReps ? ` +${ex.deltaReps}` : ''}`,
+    igual: '= manteve', ajuste: 'ajuste', novo: 'novo', pulado: '— pulado',
+  }[ex.status] || '');
+  const resumoSeries = (ex) => {
+    const ss = ex.series || [];
+    if (!ss.length || ex.status === 'pulado') return '—';
+    const reps = ss.map((x) => x.reps).filter((r) => r > 0);
+    if (!reps.length) return `${ss.length} × ${Math.round(ss.reduce((acc, x) => acc + (x.s || 0), 0) / ss.length)}s`; // por tempo (prancha)
+    const maxKg = Math.max(...ss.map((x) => x.kg || 0));
+    const faixa = Math.min(...reps) === Math.max(...reps) ? `${reps[0]}` : `${Math.min(...reps)}-${Math.max(...reps)}`;
+    return `${ss.length} × ${faixa}${maxKg ? ` · ${String(maxKg).replace('.', ',')} kg` : ''}`;
+  };
+  const tabela = s.exercicios?.length ? `<div class="exercicios">${s.exercicios.map((ex, i) => `
+      <div class="exercicio">
+        <span class="ex-num num">${i + 1}</span>
+        <span class="ex-nome">${esc(nomeEx(ex))}<small>${esc(badge(ex))}</small></span>
+        <span class="ex-series num">${resumoSeries(ex)}</span>
+      </div>`).join('')}</div>` : '';
+  const blocoIa = ia ? `<div class="ana-ia">
+      <p>${esc(ia.resumo)}</p>
+      <p class="ana-comp">${esc(ia.comparacao_plano)}</p>
+      ${(ia.pontos_fortes || []).map((p) => `<p class="ana-item">💪 ${esc(p)}</p>`).join('')}
+      ${(ia.pontos_atencao || []).map((p) => `<p class="ana-item atencao">👀 ${esc(p)}</p>`).join('')}
+      <p class="ana-dica">→ ${esc(ia.proxima_dica)}</p>
+    </div>` : '';
+  return el(`<div class="analise">
+    <div class="ana-cab">SUA SESSÃO · GARMIN${ia?.nota_execucao ? `<span class="ana-nota num">execução ${ia.nota_execucao}/10</span>` : ''}</div>
+    <div class="ana-stats">
+      ${stat('volume', s.volumeKg ? `${s.volumeKg.toLocaleString('pt-BR')} kg` : null)}
+      ${stat('séries', s.series || null)}
+      ${stat('tempo', s.minutos ? `${s.minutos} min` : null)}
+    </div>
+    ${tabela}${blocoIa}
   </div>`);
 }
 
@@ -1206,13 +1258,13 @@ function renderTreino(root) {
     return row;
   };
   if (plano.corrida) tr.append(linhaTreino('corrida', TIPO_CORRIDA_ICONE[plano.corrida.tipo], plano.corrida.nome));
-  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym));
+  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym + (forcaAnalisesDoDia(alvo).length ? ' ✨' : '')));
   if (!plano.corrida && !plano.gym) tr.append(el(`<p style="font-size:.85rem;color:var(--muted)">Descanso — ${futuro ? 'o treino é' : 'hoje o treino é'} dormir 7–8h. Metade da recuperação acontece dormindo.</p>`));
   root.append(cardHoje);
 
   // disparo rápido da análise (só com PAT configurado em Ajustes)
   if (patGarmin()) {
-    const l = el(`<button class="linha-streaks">🛰️ <span>${analiseAguardando ? 'analisando a corrida… (~2-4 min)' : 'Buscar análise da última corrida'}</span><span class="seta">${analiseAguardando ? '⏳' : '→'}</span></button>`);
+    const l = el(`<button class="linha-streaks">🛰️ <span>${analiseAguardando ? 'analisando a corrida… (~2-4 min)' : 'Buscar análise do último treino'}</span><span class="seta">${analiseAguardando ? '⏳' : '→'}</span></button>`);
     if (!analiseAguardando) l.onclick = () => dispararAnalise('manual');
     root.append(l);
   }
@@ -1268,6 +1320,7 @@ function sheetTreinoDetalhe(kind, plano, key) {
           <span class="ex-nome">${esc(ex)}${obs ? `<small>${esc(obs)}</small>` : ''}</span>
           <span class="ex-series num">${esc(sr)}</span>
         </div>`).join('')}</div></div>`);
+    for (const a of forcaAnalisesDoDia(key)) box.append(blocoAnaliseForca(a));
   } else {
     const c = plano.corrida;
     const g = CORRIDA_GUIA[c.tipo] || {};

@@ -2,6 +2,8 @@
 """Testes das funções puras do pipeline (sem rede): python3 pipeline/test_analisar.py"""
 import unittest
 
+import forca
+
 from clima import extrair_janelas
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, compactar_forca,
@@ -200,6 +202,112 @@ class TestPuras(unittest.TestCase):
             validar_ia(dict(ok, pontos_fortes=[]))
         with self.assertRaises(ValueError):
             validar_ia(dict(ok, resumo=""))
+
+
+
+class TestForca(unittest.TestCase):
+    """Funções puras da análise de musculação (forca.py)."""
+
+    def _sets(self, *itens):
+        return {"exerciseSets": list(itens)}
+
+    def _set(self, reps, peso_g, dur=45, nome="BARBELL_BENCH_PRESS", cat="BENCH_PRESS", tipo="ACTIVE"):
+        return {"setType": tipo, "repetitionCount": reps, "weight": peso_g, "duration": dur,
+                "exercises": [{"name": nome, "category": cat}]}
+
+    def _ex(self, series, nome="BARBELL_BENCH_PRESS", cat="BENCH_PRESS"):
+        return {"nome": nome, "categoria": cat, "series": series}
+
+    def test_normalizar_sets(self):
+        payload = self._sets(
+            self._set(10, 60000),
+            {"setType": "REST", "duration": 90},                      # descartado
+            self._set(11, 60000),
+            self._set(12, 14000, nome="DUMBBELL_LATERAL_RAISE", cat="LATERAL_RAISE"),
+            self._set(8, None, nome="PULL_UP", cat="PULL_UP"),        # peso corporal
+        )
+        exs = forca.normalizar_sets(payload)
+        self.assertEqual([e["nome"] for e in exs], ["BARBELL_BENCH_PRESS", "DUMBBELL_LATERAL_RAISE", "PULL_UP"])
+        self.assertEqual(exs[0]["series"], [{"reps": 10, "kg": 60.0, "s": 45}, {"reps": 11, "kg": 60.0, "s": 45}])
+        self.assertIsNone(exs[2]["series"][0]["kg"])                  # null ≠ 0
+        self.assertEqual(forca.normalizar_sets({}), [])
+        self.assertEqual(forca.normalizar_sets(None), [])
+
+    def test_eh_pulado(self):
+        self.assertTrue(forca.eh_pulado([{"reps": 0, "kg": None, "s": 2}, {"reps": 0, "kg": 0, "s": 1}]))
+        # exercício por TEMPO (prancha): reps 0 mas 30s de duração = executado
+        self.assertFalse(forca.eh_pulado([{"reps": 0, "kg": None, "s": 30}]))
+        self.assertFalse(forca.eh_pulado([{"reps": 0, "kg": 20.0, "s": 2}]))
+        self.assertFalse(forca.eh_pulado([]))
+
+    def test_dia_semana_js(self):
+        self.assertEqual(forca.dia_semana_js("2026-07-09"), 4)   # quinta
+        self.assertEqual(forca.dia_semana_js("2026-07-12"), 0)   # domingo
+        self.assertEqual(forca.dia_semana_js("2026-07-13"), 1)   # segunda
+
+    def test_parear_exercicios(self):
+        atual = [self._ex([{"reps": 10, "kg": 60.0, "s": 45}]),
+                 self._ex([{"reps": 12, "kg": 30.0, "s": 40}], nome="DUMBBELL_LUNGE", cat="LUNGE"),
+                 self._ex([{"reps": 15, "kg": 25.0, "s": 40}], nome="NOVO_EXERCICIO", cat=None)]
+        anterior = [self._ex([{"reps": 9, "kg": 60.0, "s": 45}]),
+                    self._ex([{"reps": 10, "kg": 28.0, "s": 40}], nome="BULGARIAN_SPLIT_SQUAT", cat="LUNGE")]
+        pares = forca.parear_exercicios(atual, anterior)
+        self.assertEqual(pares[0][1]["nome"], "BARBELL_BENCH_PRESS")     # nome exato
+        self.assertEqual(pares[1][1]["nome"], "BULGARIAN_SPLIT_SQUAT")   # substituição via categoria
+        self.assertIsNone(pares[2][1])                                    # sem par = novo
+
+    def test_status_progressao(self):
+        ex = lambda kg, reps: self._ex([{"reps": reps, "kg": kg, "s": 45}])
+        up = forca.status_progressao(ex(62.5, 9), ex(60.0, 11))
+        self.assertEqual(up["status"], "carga_up")                        # ciclo da progressão dupla
+        self.assertEqual(up["deltaCarga"], 2.5)
+        self.assertEqual(up["deltaReps"], -2)                             # reps caindo = método funcionando
+        self.assertEqual(forca.status_progressao(ex(60.0, 11), ex(60.0, 10))["status"], "reps_up")
+        self.assertEqual(forca.status_progressao(ex(60.0, 10), ex(60.0, 10))["status"], "igual")
+        self.assertEqual(forca.status_progressao(ex(55.0, 10), ex(60.0, 10))["status"], "ajuste")
+        self.assertEqual(forca.status_progressao(ex(60.0, 10), None)["status"], "novo")
+        pulado = self._ex([{"reps": 0, "kg": 0, "s": 2}])
+        self.assertEqual(forca.status_progressao(pulado, ex(60.0, 10))["status"], "pulado")
+
+    def test_estagnado(self):
+        s = lambda: {"series": [{"reps": 10, "kg": 60.0, "s": 45}]}
+        self.assertTrue(forca.estagnado([s(), s(), s()]))
+        self.assertFalse(forca.estagnado([s(), s()]))
+        diferente = {"series": [{"reps": 11, "kg": 60.0, "s": 45}]}
+        self.assertFalse(forca.estagnado([s(), s(), diferente]))
+
+    def test_volume_kg(self):
+        exs = [self._ex([{"reps": 10, "kg": 60.0, "s": 45}, {"reps": 8, "kg": None, "s": 45}]),
+               self._ex([{"reps": 0, "kg": 0, "s": 2}], nome="TIBIALIS", cat=None)]
+        self.assertEqual(forca.volume_kg(exs), 600)                       # None e pulado contam 0
+
+    def test_eh_semana_deload(self):
+        corridas = [["2026-08-31", "longo", "LONGO 10 km — DELOAD (academia: metade das séries)"],
+                    ["2026-09-07", "longo", "LONGO 14km dividido"]]
+        self.assertTrue(forca.eh_semana_deload("2026-09-02", corridas))   # qua da semana do deload
+        self.assertTrue(forca.eh_semana_deload("2026-09-06", corridas))   # domingo ainda é a mesma semana
+        self.assertFalse(forca.eh_semana_deload("2026-09-09", corridas))
+        self.assertFalse(forca.eh_semana_deload("2026-08-30", corridas))  # domingo ANTES do deload
+
+    def test_resumir_sessao_e_baseline(self):
+        exercicios = [self._ex([{"reps": 11, "kg": 60.0, "s": 45}] * 4),
+                      self._ex([{"reps": 0, "kg": 0, "s": 2}] * 3, nome="TIBIALIS_RAISE", cat=None)]
+        baseline = {"date": "2026-07-02", "activityId": 1, "geradoEm": "x",
+                    "sessao": {"exercicios": [self._ex([{"reps": 10, "kg": 60.0, "s": 45}] * 4)]}}
+        sessao = forca.resumir_sessao(52, exercicios, baseline)
+        self.assertEqual(sessao["series"], 7)
+        self.assertEqual(sessao["volumeKg"], 4 * 11 * 60)
+        self.assertEqual(sessao["exercicios"][0]["status"], "reps_up")
+        self.assertEqual(sessao["exercicios"][1]["status"], "pulado")
+        # baseline: mesmo weekday mais recente; a 1ª do dia vira baseline da 2ª
+        analises = [baseline,
+                    {"date": "2026-07-09", "activityId": 2, "geradoEm": "a",
+                     "sessao": {"exercicios": [self._ex([{"reps": 1, "kg": 1, "s": 5}])]}},
+                    {"date": "2026-07-08", "activityId": 3, "geradoEm": "b",
+                     "sessao": {"exercicios": [self._ex([{"reps": 1, "kg": 1, "s": 5}])]}}]
+        b = forca.baseline_mesmo_dia("2026-07-09", 99, analises)
+        self.assertEqual(b["activityId"], 2)                              # qui 09/07 > qui 02/07; qua 08/07 fora
+        self.assertIsNone(forca.baseline_mesmo_dia("2026-07-11", 99, analises))
 
 
 if __name__ == "__main__":

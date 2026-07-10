@@ -30,6 +30,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 ARQ_ANALISES = RAIZ / "data" / "analises.json"
 ARQ_HISTORICO = RAIZ / "data" / "historico.json"
 ARQ_STATUS = RAIZ / "data" / "pipeline-status.json"
+ARQ_FORCA = RAIZ / "data" / "forca-analises.json"
 ARQ_PLANO = Path(__file__).resolve().parent / "plano.json"  # gerado por dump-plano.mjs
 
 # Zonas CANÔNICAS do plano (plano-hibrido-pampulha.md, FCmax 190). O relógio está
@@ -455,9 +456,9 @@ def garmin_get(path, **params):
     return garth.connectapi(path)
 
 
-def chamar_gemini(chave, contexto):
+def chamar_gemini(chave, contexto, system=None):
     corpo = {
-        "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+        "systemInstruction": {"parts": [{"text": system or SYSTEM_PROMPT}]},
         "contents": [{"role": "user", "parts": [{"text": json.dumps(contexto, ensure_ascii=False, indent=1)}]}],
         "generationConfig": {"temperature": 0.4, "responseMimeType": "application/json", "responseSchema": SCHEMA_IA},
     }
@@ -572,12 +573,12 @@ def main():
         # treinos de força: só datas/duração para a confirmação de 1 toque no app.
         # A busca só filtra por categoria-pai (strength_training mora em
         # fitness_equipment — typeKey direto dá 400); nunca derruba a análise de corrida.
-        forcas = []
+        forcas, brutas_forca = [], []
         try:
             brutas = garmin_get("/activitylist-service/activities/search/activities", limit=200, start=0, activityType="fitness_equipment")
-            forcas = sorted((compactar_forca(a) for a in brutas
-                             if tipo_atividade(a) == "strength_training" and (a.get("duration") or 0) >= 300),
-                            key=lambda f: f["date"])
+            brutas_forca = [a for a in brutas
+                            if tipo_atividade(a) == "strength_training" and (a.get("duration") or 0) >= 300]
+            forcas = sorted((compactar_forca(a) for a in brutas_forca), key=lambda f: f["date"])
             print(f"{len(forcas)} treinos de força no Garmin")
         except Exception as e:
             print(f"[aviso] treinos de força indisponíveis nesta execução: {e}", file=sys.stderr)
@@ -652,6 +653,82 @@ def main():
         if falhas and not geradas:
             status.update(status="gemini_quota" if falhas else "erro", mensagem=f"{falhas} análise(s) falharam — o próximo cron tenta de novo")
             codigo_saida = 1
+
+        # ---- análise de musculação (v7.7) — NUNCA derruba a análise de corrida ----
+        try:
+            import forca as F
+            doc_forca = carregar_json(ARQ_FORCA, {"schema": 1, "atualizadoEm": None, "analises": []})
+            antes_forca = len(doc_forca["analises"])
+            processados_f = {x["activityId"] for x in doc_forca["analises"]}
+            gym_treinos = plano_doc.get("GYM_TREINOS") or {}
+            gym_nomes = plano_doc.get("GYM_POR_DIA") or []
+            gym_fases = plano_doc.get("GYM_FASE_POR_MES") or {}
+            novas_f = sorted((a for a in brutas_forca
+                              if a.get("activityId") not in processados_f
+                              and (a.get("startTimeLocal") or "") >= corte),
+                             key=lambda a: a.get("startTimeLocal") or "")
+            orcamento = max(0, MAX_POR_RUN - geradas)  # corridas primeiro; o resto fica pro próximo cron
+            status["pendentes"] += max(0, len(novas_f) - orcamento)
+            novas_f = novas_f[:orcamento]
+            if novas_f:
+                print(f"{len(novas_f)} sessão(ões) de força para analisar")
+            for a in novas_f:
+                aid = a.get("activityId")
+                date = (a.get("startTimeLocal") or "")[:10]
+                try:
+                    sets = garmin_get(f"/activity-service/activity/{aid}/exerciseSets")
+                    exercicios = F.normalizar_sets(sets)
+                    dur = a.get("movingDuration") or a.get("duration")
+                    minutos = round(dur / 60) if dur else None
+                    gerado_em = datetime.now(BRT).isoformat(timespec="seconds")
+                    if not exercicios:
+                        # sessão livre / shape inesperado: entrada compacta SEM parecer (o app tolera);
+                        # amostra de chaves no log = diagnóstico caso a API mude
+                        amostra = sorted(sets.keys()) if isinstance(sets, dict) else type(sets).__name__
+                        print(f"[aviso] força {aid} sem sets estruturados (payload: {amostra}) — sem parecer")
+                        doc_forca["analises"].append({"date": date, "activityId": aid, "geradoEm": gerado_em,
+                                                      "sessao": {"minutos": minutos, "series": 0, "volumeKg": None, "exercicios": []}})
+                        continue
+                    baseline = F.baseline_mesmo_dia(date, aid, doc_forca["analises"])
+                    sessao = F.resumir_sessao(minutos, exercicios, baseline)
+                    dia = F.dia_semana_js(date)
+                    plano_dia = None
+                    if gym_treinos.get(str(dia)):
+                        plano_dia = {"nome": gym_nomes[dia] if dia < len(gym_nomes) else None,
+                                     "exercicios": gym_treinos[str(dia)]}
+                    # estagnação e skips recorrentes: sessão atual + 2 anteriores do MESMO dia da semana
+                    anteriores_dia = [x for x in doc_forca["analises"]
+                                      if x.get("activityId") != aid and x.get("date") and x["date"] <= date
+                                      and F.dia_semana_js(x["date"]) == dia
+                                      and (x.get("sessao") or {}).get("exercicios")]
+                    anteriores_dia.sort(key=lambda x: (x["date"], x.get("geradoEm") or ""), reverse=True)
+                    anteriores_dia = anteriores_dia[:2]
+                    estagnados, skips = [], []
+                    for ex in sessao["exercicios"]:
+                        mesmos = [nx for x in anteriores_dia for nx in x["sessao"]["exercicios"]
+                                  if nx.get("nome") and nx.get("nome") == ex.get("nome")]
+                        if ex["status"] == "igual" and F.estagnado([ex] + mesmos):
+                            estagnados.append(ex.get("nome"))
+                        if ex["status"] == "pulado" and any(nx.get("status") == "pulado" for nx in mesmos):
+                            skips.append({"nome": ex.get("nome"), "pulado_tambem_na_sessao_anterior": True})
+                    fase = gym_fases.get(str(int(date[5:7]))) if len(date) >= 7 else None
+                    deload = F.eh_semana_deload(date, corridas_plano)
+                    contexto = F.digest_forca(sessao, plano_dia, fase, deload, estagnados, skips)
+                    ia = chamar_gemini(os.environ["GEMINI_API_KEY"], contexto, system=F.SYSTEM_PROMPT_FORCA)
+                    if not plano_dia:
+                        ia["nota_execucao"] = None
+                    doc_forca["analises"].append({"date": date, "activityId": aid, "geradoEm": gerado_em,
+                                                  "sessao": sessao, "ia": ia})
+                    print(f"[ok] parecer de força: {date} · {a.get('activityName')} ({aid})")
+                except Exception as e:
+                    print(f"[aviso] sessão de força {aid}: {e}", file=sys.stderr)
+            if len(doc_forca["analises"]) > antes_forca:
+                doc_forca["analises"].sort(key=lambda x: (x["date"], x.get("geradoEm") or ""), reverse=True)
+                doc_forca["analises"] = doc_forca["analises"][:60]  # baseline cabe folgado; JSON não cresce sem limite
+                doc_forca["atualizadoEm"] = status["ultimaExecucao"]
+                escrever_json(ARQ_FORCA, doc_forca)
+        except Exception as e:
+            print(f"[aviso] análise de musculação indisponível nesta execução: {e}", file=sys.stderr)
     except KeyError as e:
         status.update(status="erro", mensagem=f"variável/campo ausente: {e}")
         codigo_saida = 1

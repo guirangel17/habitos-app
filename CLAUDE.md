@@ -221,8 +221,21 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
 - Confirmação de treino feito é SEMPRE 1 toque (slot contextual, prioridade mais baixa) — nunca
   automática. Vale para corrida (via analises.json; dispensa em `settings.garminDispensado_{date}`)
   e, desde a v7.6, para FORÇA: o pipeline também busca `strength_training` e grava o campo
-  `forcas` no historico.json (só date/activityId/minutos/nome — sem análise de IA); dispensa em
+  `forcas` no historico.json (só date/activityId/minutos/nome); dispensa em
   `settings.garminDispensadoGym_{date}`.
+- **v7.7 — análise de MUSCULAÇÃO** (`pipeline/forca.py`, funções puras testadas + prompt):
+  para cada sessão de força nova o pipeline busca `/activity-service/activity/{id}/exerciseSets`,
+  normaliza (kg vem em GRAMAS; sets REST descartados), compara com a sessão anterior do MESMO
+  dia da semana (baseline vive no próprio JSON — sem refetch) e calcula a **Progressão Dupla**
+  por exercício (status: carga_up/reps_up/igual/ajuste/novo/pulado). **Convenção do atleta:
+  set 0×0 = exercício PULADO de propósito** (exercícios por TEMPO, prancha/Copenhagen, têm
+  0 reps mas ≥15s — executados). Deload derivado das CORRIDAS com "DELOAD" no nome; fase do
+  mês via GYM_FASE_POR_MES (dump-plano.mjs exporta o plano de gym também). 1 chamada Gemini
+  por sessão (SYSTEM_PROMPT_FORCA, mesmo SCHEMA_IA) com orçamento compartilhado MAX_POR_RUN —
+  corridas primeiro. Saída: `data/forca-analises.json` (últimas 60). A análise de força NUNCA
+  derruba a de corrida (try/except no orquestrador). No app: sheet do treino de gym ganha
+  "SUA SESSÃO · GARMIN" (volume/séries/tempo + tabela com badges + parecer) e ✨ na linha do
+  treino; sessão livre sem sets estruturados vira entrada compacta sem parecer (render tolera).
 
 ## Fluxo de desenvolvimento e verificação
 
@@ -276,8 +289,9 @@ os dois temas se a mudança mexe em CSS.
 - **Treino**: Semana (7 dias como BOTÕES — tocar troca o card de baixo para "Treino de terça ·
   15/07" com chip "‹ voltar para hoje"; dia passado = check retroativo, dia futuro = read-only
   com `›`; estado `diaTreinoSel`, resetado ao trocar de aba) → Treino do dia (checks + `›` com
-  exercícios/série×reps + fase de periodização do mês, ou guia de pace da corrida) → linha
-  "🛰️ Buscar análise da última corrida" (só com PAT; vira "analisando…" durante o polling) →
+  exercícios/série×reps + fase de periodização do mês — desde a v7.7 com a seção SUA SESSÃO
+  do Garmin quando há parecer de musculação da data —, ou guia de pace da corrida) → linha
+  "🛰️ Buscar análise do último treino" (só com PAT; vira "analisando…" durante o polling) →
   Cronograma das 67 corridas (tick + `›` por linha, ✨ quando há análise do Garmin — o sheet
   da corrida ganha a seção SUA CORRIDA: stats, zonas canônicas, splits e parecer da IA).
 - **Evolução**: hero gradiente com rota até a prova (semanas pintadas) → jardim (toque → overlay

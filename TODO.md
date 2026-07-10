@@ -106,9 +106,13 @@
 - ✅ Confirmação de 1 toque para treino de FORÇA, igual à de corrida: o pipeline também busca `strength_training` (campo `forcas` no historico.json, só data/duração — sem análise de IA) e o slot contextual oferece "marcar feito" quando o Garmin registrou força em dia com gym planejado sem check (dispensa em `settings.garminDispensadoGym_{date}`).
 - ✅ Backup em dias de CALENDÁRIO: backup de ontem à noite aparecia como "backup hoje ✓" (floor de 24h) na saúde do sistema, no card de backup e no wizard — agora conta virada de dia (hoje/ontem/há Xd).
 
+# Feito na v7.7 (jul/2026) — o treinador chegou na academia
+
+- ✅ Análise de musculação fim-a-fim: pipeline busca as séries executadas (`/exerciseSets`), valida a **Progressão Dupla** por exercício (carga_up/reps_up/igual/ajuste/novo/pulado — fatos em funções puras `pipeline/forca.py`, 9 testes), detecta estagnação (≥3 sessões iguais) e skips recorrentes, respeita deload (derivado do "DELOAD" nas CORRIDAS) e a fase do mês, e gera 1 parecer Gemini por sessão (`SYSTEM_PROMPT_FORCA`: canelite/tibial, 0×0 = pulado de propósito, musculação serve à corrida, zero punição) em `data/forca-analises.json` (últimas 60; orçamento de quota compartilhado, corridas primeiro; força nunca derruba corrida).
+- ✅ App: sheet do treino de gym ganha "SUA SESSÃO · GARMIN" (volume/séries/tempo, tabela de exercícios com badges de progressão, parecer da IA) + ✨ na linha do treino; botão 🛰️ virou "Buscar análise do último treino".
+
 # v8 — ideias futuras
 
-- Parecer de IA também para musculação: o FR165 registra séries/reps/carga e o pipeline já busca as atividades de força — dá pra validar a Progressão Dupla (primeiro reps, depois carga) e apontar estagnação por exercício. Avaliar custo de quota do Gemini.
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
 - Gráfico de aderência semanal × ritmo de perda (correlação visível).
 - Modo semana da prova (04–05/12): checklist de carga de carbo no slot contextual.
