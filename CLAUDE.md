@@ -186,12 +186,14 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   fingerprint) os User-Agents do app mobile do garth — o exchange falhava nos runners, o
   token "morria" a cada 24h (vida do OAuth2) e o status acusava `garmin_auth` sem o OAuth1
   ter expirado; renovar o Secret todo dia não resolvia nada. Só trocar o User-Agent NÃO
-  bastou (testado 10/07 — o bloqueio é por fingerprint TLS): a correção real é o
-  `_exchange_navegador` em `pipeline/analisar.py`, que substitui `garth.sso.exchange` por
-  uma troca assinada na mão (oauthlib) e enviada via **curl_cffi impersonando Chrome**
-  (instalado no workflow). Desde então `garmin_auth` = só 401 real (renovar de verdade);
-  bloqueio 429/403 vira status `erro` transiente com mensagem própria. Nos scripts locais
-  (`garmin/garmin_api.py`) o UA de navegador basta — IP residencial não sofre o bloqueio.
+  bastou; curl_cffi impersonando Chrome (`_exchange_navegador` no analisar.py, com retry
+  de 42s) TAMBÉM levou 429 no runner (run #44) — o bloqueio aparenta ser por IP de
+  datacenter no caminho `/oauth-service/*` (as chamadas de DADOS passam dos mesmos IPs).
+  Solução definitiva: **`garmin/renovar-token.py` agendado no notebook do usuário** (IP
+  residencial) renova o OAuth2 diariamente e atualiza o Secret via API do GitHub (PAT com
+  Secrets RW em `~/.habitos-pat`) — setup no `garmin/README.md`. `garmin_auth` = só 401
+  real (renovar de verdade); bloqueio 429/403 vira status `erro` transiente com o detalhe
+  da resposta (server/cf-ray/corpo) na mensagem.
   **Runbook quando status=garmin_auth**:
   (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e conferir o status;
   (2) se persistir, seguir o **`garmin/README.md` deste repo**: em qualquer máquina com

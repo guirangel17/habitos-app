@@ -8,12 +8,38 @@ Pré-requisito: Python 3.10+ instalado (Windows: python.org ou Microsoft Store;
 Mac/Linux: já vem). A rede precisa alcançar a Garmin (casa ou hotspot — teste
 abrindo https://connect.garmin.com no navegador).
 
-## Renovar o token do pipeline (status `garmin_auth` na saúde do app)
+## Renovar o token do pipeline — automático (recomendado)
+
+Contexto: desde mar/2026 o Cloudflare da Garmin bloqueia o endpoint de oauth
+para os runners do GitHub. O OAuth2 do Secret vive 24h e a troca que o renovaria
+só passa de IP residencial — então a renovação roda AQUI, agendada, e atualiza
+o Secret via API do GitHub. Setup (uma vez):
 
 ```bash
 git clone https://github.com/guirangel17/habitos-app.git && cd habitos-app/garmin
-pip install garth                # Windows: py -m pip install garth
-python3 login-garmin.py          # pede email/senha/MFA — salva a sessão em ~/.garth
+pip install garth pynacl requests   # Windows: py -m pip install garth pynacl requests
+python3 login-garmin.py             # pede email/senha/MFA — salva a sessão em ~/.garth
+# crie um PAT fine-grained (repo habitos-app, permissão "Secrets: Read and write")
+# e salve o token puro no arquivo ~/.habitos-pat
+python3 renovar-token.py            # testa: renova o OAuth2 e atualiza o Secret
+```
+
+Agendar (só faz efeito com o notebook ligado; o app acende o aviso âmbar em
+Ajustes se o pipeline ficar >24h parado):
+
+```bash
+# Windows (Agendador de Tarefas): diário às 08:30 + a cada logon
+schtasks /Create /TN "RenovarGarmin" /SC DAILY /ST 08:30 /TR "py C:\caminho\para\habitos-app\garmin\renovar-token.py"
+schtasks /Create /TN "RenovarGarminLogon" /SC ONLOGON /TR "py C:\caminho\para\habitos-app\garmin\renovar-token.py"
+
+# Mac/Linux (cron): de hora em hora é barato (1 request por execução)
+# crontab -e →  30 * * * * cd /caminho/habitos-app/garmin && python3 renovar-token.py
+```
+
+## Renovar na mão (fallback — vale por 24h)
+
+```bash
+cd habitos-app/garmin && python3 login-garmin.py
 python3 -c "import garth; garth.resume('~/.garth'); print(garth.client.dumps())"
 ```
 
