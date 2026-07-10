@@ -1,7 +1,7 @@
 {
- "ultimaExecucao": "2026-07-10T12:18:37-03:00",
+ "ultimaExecucao": "2026-07-10T15:13:51-03:00",
  "status": "erro",
- "mensagem": "Garmin bloqueou o acesso deste runner — NÃO é o token; próximo cron tenta de novo. Detalhe: oauth exchange 429 server=cloudflare cf-ray=sim: Rate limited",
+ "mensagem": "Error in request: 400 Client Error: Bad Request for url: https://connectapi.garmin.com/activitylist-service/activities/search/activities?limit=200&start=0&activityType=strength_training",
  "ultimaAnalise": null,
  "pendentes": 0
 }
