@@ -554,12 +554,18 @@ def main():
         atividades.sort(key=lambda a: a.get("startTimeLocal") or "")
         print(f"{len(atividades)} corridas no Garmin")
 
-        # treinos de força: só datas/duração para a confirmação de 1 toque no app
-        forcas = garmin_get("/activitylist-service/activities/search/activities", limit=200, start=0, activityType="strength_training")
-        forcas = [compactar_forca(a) for a in forcas
-                  if tipo_atividade(a) == "strength_training" and (a.get("duration") or 0) >= 300]
-        forcas.sort(key=lambda f: f["date"])
-        print(f"{len(forcas)} treinos de força no Garmin")
+        # treinos de força: só datas/duração para a confirmação de 1 toque no app.
+        # A busca só filtra por categoria-pai (strength_training mora em
+        # fitness_equipment — typeKey direto dá 400); nunca derruba a análise de corrida.
+        forcas = []
+        try:
+            brutas = garmin_get("/activitylist-service/activities/search/activities", limit=200, start=0, activityType="fitness_equipment")
+            forcas = sorted((compactar_forca(a) for a in brutas
+                             if tipo_atividade(a) == "strength_training" and (a.get("duration") or 0) >= 300),
+                            key=lambda f: f["date"])
+            print(f"{len(forcas)} treinos de força no Garmin")
+        except Exception as e:
+            print(f"[aviso] treinos de força indisponíveis nesta execução: {e}", file=sys.stderr)
 
         # histórico completo + tendências (rebuild barato e idempotente a cada run)
         compactas = [compactar_atividade(a, corridas_plano) for a in atividades]
