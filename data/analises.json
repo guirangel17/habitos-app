@@ -1,7 +1,102 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-08T18:45:40-03:00",
+ "atualizadoEm": "2026-07-10T15:18:00-03:00",
  "analises": [
+  {
+   "date": "2026-07-09",
+   "activityId": 23542118688,
+   "geradoEm": "2026-07-10T15:18:11-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Social Run 5km",
+    "inicio": "2026-07-09 20:43:53",
+    "distanciaKm": 6.21,
+    "duracaoMin": 50.0,
+    "paceMedio": "8:03",
+    "fcMedia": 130,
+    "fcMax": 157,
+    "cadencia": 87,
+    "elevacaoM": 111,
+    "trainingEffect": {
+     "aerobico": 3.0,
+     "anaerobico": 0.2,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 28.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:42",
+      "fc": 120
+     },
+     {
+      "km": 2,
+      "pace": "7:33",
+      "fc": 133
+     },
+     {
+      "km": 3,
+      "pace": "7:50",
+      "fc": 131
+     },
+     {
+      "km": 4,
+      "pace": "8:51",
+      "fc": 130
+     },
+     {
+      "km": 5,
+      "pace": "8:13",
+      "fc": 136
+     },
+     {
+      "km": 6,
+      "pace": "7:40",
+      "fc": 129
+     },
+     {
+      "km": 7,
+      "pace": "10:07",
+      "fc": 128
+     }
+    ],
+    "zonasFc": {
+     "z1": 50,
+     "z2": 46,
+     "z3": 4,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 5 km regenerativo",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:56",
+    "paceZ2Ha8Sem": "7:24"
+   },
+   "ia": {
+    "resumo": "Guilherme realizou uma Social Run de 6.21 km em 50 minutos, com pace médio de 8:03/km e FC média de 130 bpm, mantendo a intensidade na zona aeróbica leve.",
+    "comparacao_plano": "O treino planejado era uma Social Run de 5 km regenerativa, com pace alvo de 6:50-7:15/km e FC alvo de até 152 bpm. Guilherme correu 6.21 km, superando a distância planejada, e manteve a FC média em 130 bpm (50% Z1, 46% Z2), bem abaixo do limite de Z2, o que é excelente para o estímulo do dia. O pace médio de 8:03/km ficou mais lento que a faixa alvo, mas foi uma consequência da priorização da FC em um dia com 28°C.",
+    "pontos_fortes": [
+     "Controle da frequência cardíaca: A FC média de 130 bpm demonstra excelente controle aeróbico, mantendo o esforço na zona correta para o objetivo regenerativo, mesmo com a temperatura de 28°C.",
+     "Aderência ao estímulo: A prioridade do treino era manter a FC baixa, e isso foi alcançado com sucesso, validando a execução correta para uma corrida leve.",
+     "Volume: Completou uma distância maior do que a planejada, indicando boa disposição e capacidade."
+    ],
+    "pontos_atencao": [
+     "Cadência: A cadência média registrada de 87 spm é significativamente mais baixa que a referência (160-165 spm). É importante observar se houve momentos de caminhada ou se o sensor pode ter tido alguma leitura atípica.",
+     "Pace vs. Z2 típico: Embora a FC estivesse correta, o pace médio foi consideravelmente mais lento que o pace Z2 típico (8:03/km vs. 6:56/km hoje). Isso pode ser uma consequência da cadência baixa ou da natureza 'social' da corrida, que pode incluir paradas ou trechos de caminhada."
+    ],
+    "proxima_dica": "No próximo longo de 10 km, procure manter uma cadência mais consistente e dentro da sua faixa de referência (160-165 spm) nos trechos de corrida, sem forçar, para otimizar a eficiência e o ritmo em Z2.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-07-08",
    "activityId": 23528695939,

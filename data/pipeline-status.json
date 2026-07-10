@@ -1,7 +1,7 @@
 {
- "ultimaExecucao": "2026-07-10T15:13:51-03:00",
- "status": "erro",
- "mensagem": "Error in request: 400 Client Error: Bad Request for url: https://connectapi.garmin.com/activitylist-service/activities/search/activities?limit=200&start=0&activityType=strength_training",
- "ultimaAnalise": null,
+ "ultimaExecucao": "2026-07-10T15:18:00-03:00",
+ "status": "ok",
+ "mensagem": "",
+ "ultimaAnalise": "2026-07-09",
  "pendentes": 0
 }

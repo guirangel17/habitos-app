@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-09T13:30:07-03:00",
+ "atualizadoEm": "2026-07-10T15:18:00-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -864,6 +864,359 @@
    "paradoPct": 2,
    "ef": 0.98,
    "tipoPlano": "leve"
+  },
+  {
+   "date": "2026-07-09",
+   "activityId": 23542118688,
+   "distanciaKm": 6.21,
+   "paceMedio": "8:03",
+   "paceSeg": 483,
+   "fcMedia": 130,
+   "fcMax": 157,
+   "cadencia": 87,
+   "vo2max": 48.0,
+   "teAerobico": 3.0,
+   "paradoPct": 31,
+   "ef": 0.956,
+   "tipoPlano": "social"
+  }
+ ],
+ "forcas": [
+  {
+   "date": "2026-01-10",
+   "activityId": 21504560733,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-13",
+   "activityId": 21538106021,
+   "minutos": 23,
+   "nome": "Terça feira - Pernas"
+  },
+  {
+   "date": "2026-01-14",
+   "activityId": 21549679430,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-15",
+   "activityId": 21559878274,
+   "minutos": 19,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-16",
+   "activityId": 21570186285,
+   "minutos": 14,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-17",
+   "activityId": 21577458211,
+   "minutos": 13,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-18",
+   "activityId": 21587204248,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-20",
+   "activityId": 21613083039,
+   "minutos": 19,
+   "nome": "Terça feira - Pernas"
+  },
+  {
+   "date": "2026-01-21",
+   "activityId": 21624508380,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-23",
+   "activityId": 21644165966,
+   "minutos": 17,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-24",
+   "activityId": 21652349450,
+   "minutos": 11,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-27",
+   "activityId": 21685667815,
+   "minutos": 12,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-29",
+   "activityId": 21705074424,
+   "minutos": 8,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-01-30",
+   "activityId": 21714474349,
+   "minutos": 8,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-02",
+   "activityId": 21738766746,
+   "minutos": 15,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-03",
+   "activityId": 21756409103,
+   "minutos": 20,
+   "nome": "Terça feira - Pernas"
+  },
+  {
+   "date": "2026-02-10",
+   "activityId": 21829318921,
+   "minutos": 18,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-11",
+   "activityId": 21838696764,
+   "minutos": 16,
+   "nome": "Quarta - Peito Ombro e Triceps"
+  },
+  {
+   "date": "2026-02-13",
+   "activityId": 21858477539,
+   "minutos": 24,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-24",
+   "activityId": 21975113198,
+   "minutos": 6,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-25",
+   "activityId": 21986787299,
+   "minutos": 9,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-26",
+   "activityId": 21997469482,
+   "minutos": 8,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-02-28",
+   "activityId": 22015329144,
+   "minutos": 14,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-02",
+   "activityId": 22040459571,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-03",
+   "activityId": 22052873058,
+   "minutos": 6,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-09",
+   "activityId": 22119427821,
+   "minutos": 15,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-11",
+   "activityId": 22144084470,
+   "minutos": 11,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-12",
+   "activityId": 22154734771,
+   "minutos": 14,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-14",
+   "activityId": 22172438627,
+   "minutos": 9,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-15",
+   "activityId": 22182828092,
+   "minutos": 16,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-17",
+   "activityId": 22208265800,
+   "minutos": 16,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-19",
+   "activityId": 22231218803,
+   "minutos": 26,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-03-24",
+   "activityId": 22289489206,
+   "minutos": 11,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-04-07",
+   "activityId": 22446156602,
+   "minutos": 18,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-04-08",
+   "activityId": 22459206362,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-04-09",
+   "activityId": 22470846084,
+   "minutos": 21,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-04-11",
+   "activityId": 22489736922,
+   "minutos": 15,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-04-21",
+   "activityId": 22606222788,
+   "minutos": 6,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-04-22",
+   "activityId": 22625060218,
+   "minutos": 16,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-05-06",
+   "activityId": 22791725830,
+   "minutos": 11,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-05-12",
+   "activityId": 22860987488,
+   "minutos": 16,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-05-13",
+   "activityId": 22872632528,
+   "minutos": 10,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-05-14",
+   "activityId": 22883518825,
+   "minutos": 17,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-05-15",
+   "activityId": 22894430013,
+   "minutos": 17,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-05-21",
+   "activityId": 22961170841,
+   "minutos": 9,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-02",
+   "activityId": 23108953187,
+   "minutos": 16,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-05",
+   "activityId": 23144001818,
+   "minutos": 11,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-06",
+   "activityId": 23154129126,
+   "minutos": 8,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-11",
+   "activityId": 23216838544,
+   "minutos": 14,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-13",
+   "activityId": 23236835805,
+   "minutos": 14,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-17",
+   "activityId": 23284059285,
+   "minutos": 14,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-19",
+   "activityId": 23310333766,
+   "minutos": 17,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-06-23",
+   "activityId": 23356937751,
+   "minutos": 16,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-07-02",
+   "activityId": 23458372087,
+   "minutos": 7,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-07-07",
+   "activityId": 23510642974,
+   "minutos": 13,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-07-09",
+   "activityId": 23536189987,
+   "minutos": 30,
+   "nome": "QUI Pernas A"
   }
  ],
  "tendencias": {
@@ -952,11 +1305,11 @@
   "paceZ2Atual": "6:56",
   "paceZ2Ha8Sem": "7:24",
   "vo2max": {
-   "atual": 47.0,
+   "atual": 48.0,
    "ha8Sem": 48.0
   },
   "cadencia4Sem": 157,
-  "kmPorSemana4Sem": 15.9,
+  "kmPorSemana4Sem": 16.2,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1088,7 +1441,7 @@
    }
   ],
   "efAtual": 0.977,
-  "efHa8Sem": 0.949,
+  "efHa8Sem": 0.951,
   "kmSemanas": [
    {
     "semana": "2026-04-20",
@@ -1136,7 +1489,7 @@
    },
    {
     "semana": "2026-07-06",
-    "km": 5.0
+    "km": 11.2
    }
   ],
   "longaoMes": [
@@ -1172,8 +1525,8 @@
    },
    {
     "mes": "2026-07",
-    "km": 6.02,
-    "date": "2026-07-02"
+    "km": 6.21,
+    "date": "2026-07-09"
    }
   ],
   "projecao18k": {
