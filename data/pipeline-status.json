@@ -1,5 +1,5 @@
 {
- "ultimaExecucao": "2026-07-10T10:31:28-03:00",
+ "ultimaExecucao": "2026-07-10T10:40:47-03:00",
  "status": "erro",
  "mensagem": "Garmin bloqueou o acesso deste runner (429 no oauth) — NÃO é o token; próximo cron tenta de novo",
  "ultimaAnalise": null,
