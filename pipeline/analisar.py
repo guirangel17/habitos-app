@@ -412,11 +412,20 @@ def _exchange_navegador(oauth1, client, *, login=False):
         urllib.parse.urlencode(data),
         {"User-Agent": UA_NAVEGADOR, "Content-Type": "application/x-www-form-urlencoded"},
     )
-    resp = crequests.post(url, headers=dict(headers), data=corpo, impersonate="chrome", timeout=15)
-    if resp.status_code != 200:
-        # "oauth" + código no texto: a classificação de erro do main() depende disso
-        raise RuntimeError(f"oauth exchange {resp.status_code}: {resp.text[:150]}")
-    return OAuth2Token(**sso.set_expirations(resp.json()))
+    for tentativa in (1, 2):
+        resp = crequests.post(url, headers=dict(headers), data=corpo, impersonate="chrome", timeout=15)
+        if resp.status_code == 200:
+            return OAuth2Token(**sso.set_expirations(resp.json()))
+        if resp.status_code in (429, 403) and tentativa == 1:
+            time.sleep(42)  # regra de velocidade do WAF — a comunidade relata que pausa de 30-45s passa
+            continue
+        break
+    # "oauth" + código no texto: a classificação de erro do main() depende disso;
+    # server/cf-ray + corpo diagnosticam Cloudflare (HTML) vs rate-limit da Garmin (JSON)
+    raise RuntimeError(
+        f"oauth exchange {resp.status_code} server={resp.headers.get('server')} "
+        f"cf-ray={'sim' if resp.headers.get('cf-ray') else 'não'}: {resp.text[:160]}"
+    )
 
 
 def garmin_get(path, **params):
@@ -634,7 +643,7 @@ def main():
         status.update(
             status="garmin_auth" if auth else "erro",
             mensagem="Conexão com a Garmin expirou — rodar login-garmin.py local e atualizar o Secret GARMIN_TOKEN (runbook no CLAUDE.md)" if auth
-            else f"Garmin bloqueou o acesso deste runner ({'429' if '429' in s else '403'} no oauth) — NÃO é o token; próximo cron tenta de novo" if bloqueio
+            else f"Garmin bloqueou o acesso deste runner — NÃO é o token; próximo cron tenta de novo. Detalhe: {s[:220]}" if bloqueio
             else s[:300],
         )
         print(f"[fatal] {e}", file=sys.stderr)
