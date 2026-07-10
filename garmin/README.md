@@ -17,7 +17,7 @@ o Secret via API do GitHub. Setup (uma vez):
 
 ```bash
 git clone https://github.com/guirangel17/habitos-app.git && cd habitos-app/garmin
-pip install garth pynacl requests   # Windows: py -m pip install garth pynacl requests
+pip install garth pynacl requests curl_cffi   # Windows: py -m pip install garth pynacl requests curl_cffi
 python3 login-garmin.py             # pede email/senha/MFA — salva a sessão em ~/.garth
 # crie um PAT fine-grained (repo habitos-app, permissão "Secrets: Read and write")
 # e salve o token puro no arquivo ~/.habitos-pat
@@ -53,7 +53,7 @@ toque o 🛰️ na aba Treino do app e confira a saúde em Ajustes.
 cd habitos-app/garmin
 
 # 2. Instale a biblioteca (uma vez)
-pip install garth          # Windows: py -m pip install garth
+pip install garth curl_cffi # Windows: py -m pip install garth curl_cffi
 
 # 3. Login na Garmin (uma vez — pede email/senha/MFA no terminal)
 python3 login-garmin.py    # Windows: py login-garmin.py

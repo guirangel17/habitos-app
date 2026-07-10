@@ -8,7 +8,7 @@ OAuth1→OAuth2 que o renovaria só passa de IP residencial. Este script roda no
 notebook (agendado — ver README) e mantém o Secret sempre com um OAuth2 fresco.
 
 Pré-requisitos (uma vez):
-  pip install garth pynacl requests
+  pip install garth pynacl requests curl_cffi
   python3 login-garmin.py            # sessão Garmin em ~/.garth (pede email/senha/MFA)
   PAT fine-grained do GitHub (repo habitos-app, permissão Secrets: Read and write)
   salvo em ~/.habitos-pat (arquivo com só o token) ou na env HABITOS_PAT
@@ -58,7 +58,10 @@ def main():
     except Exception:
         sys.exit("Sessão Garmin não encontrada — rode antes: python3 login-garmin.py")
     garmin_api.confiar_zscaler()  # resume() remonta o adaptador HTTP — reaplica o TLS
-    garth.client.refresh_oauth2()  # OAuth2 novo (24h), assinado pelo OAuth1 (~1 ano)
+    # OAuth2 novo (24h) assinado pelo OAuth1 (~1 ano), via curl_cffi — o refresh nativo
+    # do garth usa python-requests, que o Cloudflare da Garmin bloqueia por TLS
+    garth.client.oauth2_token = garmin_api.exchange_navegador(garth.client.oauth1_token)
+    garth.save("~/.garth")  # mantém a sessão local fresca também
     perfil = garth.connectapi("/userprofile-service/socialProfile") or {}
     atualizar_secret("GARMIN_TOKEN", garth.client.dumps(), token_gh)
     print(f"✅ OAuth2 renovado ({perfil.get('displayName', '?')}) e Secret GARMIN_TOKEN atualizado.")

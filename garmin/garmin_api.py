@@ -78,10 +78,121 @@ confiar_zscaler()
 
 REGISTRO = Path(__file__).parent / "garmin-criados.json"
 
+# ---------- auth com TLS de navegador (curl_cffi) ----------
+# Desde mar/2026 (endurecido em jul) o Cloudflare da Garmin bloqueia o fingerprint
+# TLS do python-requests nos endpoints de LOGIN e de troca OAuth — até de IP
+# residencial. As chamadas de DADOS continuam passando com requests. Por isso o
+# login e o exchange abaixo reimplementam o fluxo do garth.sso com curl_cffi
+# impersonando Chrome (pip install curl_cffi). Espelha pipeline/analisar.py.
+
+_CLIENT_ID = "GCM_ANDROID_DARK"
+_SERVICE = "https://mobile.integration.garmin.com/gcm/android"
+
+
+def _oauth_consumer():
+    import requests
+    from garth import sso
+    if not sso.OAUTH_CONSUMER:
+        sso.OAUTH_CONSUMER = requests.get(sso.OAUTH_CONSUMER_URL, timeout=10).json()
+    return sso.OAUTH_CONSUMER
+
+
+def exchange_navegador(oauth1, login=False):
+    """Troca OAuth1 (~1 ano) → OAuth2 (24h), assinada na mão e enviada como Chrome."""
+    import urllib.parse
+    from curl_cffi import requests as crequests
+    from garth import sso
+    from garth.auth_tokens import OAuth2Token
+    from oauthlib.oauth1 import Client as OAuth1Signer
+
+    consumer = _oauth_consumer()
+    data = {}
+    if login:
+        data["audience"] = "GARMIN_CONNECT_MOBILE_ANDROID_DI"
+    if getattr(oauth1, "mfa_token", None):
+        data["mfa_token"] = oauth1.mfa_token
+    url, headers, corpo = OAuth1Signer(
+        consumer["consumer_key"], client_secret=consumer["consumer_secret"],
+        resource_owner_key=oauth1.oauth_token, resource_owner_secret=oauth1.oauth_token_secret,
+    ).sign(
+        "https://connectapi.garmin.com/oauth-service/oauth/exchange/user/2.0", "POST",
+        urllib.parse.urlencode(data),
+        {"User-Agent": _UA_NAVEGADOR, "Content-Type": "application/x-www-form-urlencoded"},
+    )
+    r = crequests.post(url, headers=dict(headers), data=corpo, impersonate="chrome", timeout=15)
+    if r.status_code != 200:
+        raise RuntimeError(f"oauth exchange {r.status_code}: {r.text[:160]}")
+    return OAuth2Token(**sso.set_expirations(r.json()))
+
+
+def login_navegador(email, senha, pedir_mfa=None):
+    """Login SSO completo via curl_cffi. Deixa garth.client autenticado (use
+    garth.save('~/.garth') em seguida). pedir_mfa: callable que retorna o código."""
+    import time
+    import urllib.parse
+    from curl_cffi import requests as crequests
+    from garth.auth_tokens import OAuth1Token
+    from oauthlib.oauth1 import Client as OAuth1Signer
+
+    s = crequests.Session(impersonate="chrome")
+    params = {"clientId": _CLIENT_ID, "locale": "en-US", "service": _SERVICE}
+    cab = {"Accept-Language": "en-US,en;q=0.9"}
+
+    # 1. página de sign-in (cookies de sessão)
+    r = s.get("https://sso.garmin.com/mobile/sso/en/sign-in",
+              params={"clientId": _CLIENT_ID}, headers=cab, timeout=20)
+    print("(aguardando 35s antes de enviar a senha — o limitador da Garmin pune envio rápido)")
+    time.sleep(35)
+
+    # 2. credenciais
+    r = s.post("https://sso.garmin.com/mobile/api/login", params=params, headers=cab, timeout=20,
+               json={"username": email, "password": senha, "rememberMe": False, "captchaToken": ""})
+    if r.status_code != 200:
+        raise SystemExit(f"login {r.status_code}: {r.text[:200]}")
+    rj = r.json()
+    tipo = (rj.get("responseStatus") or {}).get("type")
+
+    # 3. MFA se a conta pedir
+    if tipo == "MFA_REQUIRED":
+        metodo = (rj.get("customerMfaInfo") or {}).get("mfaLastMethodUsed") or "email"
+        codigo = (pedir_mfa or (lambda: input("Código MFA: ")))()
+        r = s.post("https://sso.garmin.com/mobile/api/mfa/verifyCode", params=params, headers=cab,
+                   timeout=20, json={"mfaMethod": metodo, "mfaVerificationCode": str(codigo).strip(),
+                                     "rememberMyBrowser": False, "reconsentList": [], "mfaSetup": False})
+        if r.status_code != 200:
+            raise SystemExit(f"mfa {r.status_code}: {r.text[:200]}")
+        rj = r.json()
+        tipo = (rj.get("responseStatus") or {}).get("type")
+    if tipo != "SUCCESSFUL":
+        raise SystemExit(f"SSO respondeu {tipo}: {str(rj)[:200]}")
+
+    # 4. ticket → OAuth1 (GET assinado só com o consumer)
+    consumer = _oauth_consumer()
+    url_pre = ("https://connectapi.garmin.com/oauth-service/oauth/preauthorized"
+               f"?ticket={rj['serviceTicketId']}&login-url={_SERVICE}&accepts-mfa-tokens=true")
+    u, h, _ = OAuth1Signer(consumer["consumer_key"], client_secret=consumer["consumer_secret"]).sign(
+        url_pre, "GET", None, {"User-Agent": _UA_NAVEGADOR})
+    r = s.get(u, headers=dict(h), timeout=20)
+    if r.status_code != 200:
+        raise SystemExit(f"oauth1 {r.status_code}: {r.text[:200]}")
+    tok = {k: v[0] for k, v in urllib.parse.parse_qs(r.text).items()}
+    oauth1 = OAuth1Token(domain="garmin.com", **tok)
+
+    # 5. OAuth1 → OAuth2 e pronto: garth.client autenticado
+    garth.client.oauth1_token = oauth1
+    garth.client.oauth2_token = exchange_navegador(oauth1, login=True)
+    return garth.client.oauth1_token, garth.client.oauth2_token
+
 
 def conectar():
     garth.resume("~/.garth")
     confiar_zscaler()  # o resume() remonta o adaptador HTTP — reaplica o TLS
+    from garth.auth_tokens import OAuth2Token
+    o2 = garth.client.oauth2_token
+    if not isinstance(o2, OAuth2Token) or o2.expired:
+        # nunca deixar o garth tentar o exchange sozinho (requests = bloqueado)
+        garth.client.oauth2_token = exchange_navegador(garth.client.oauth1_token)
+        garth.save("~/.garth")
     perfil = garth.connectapi("/userprofile-service/socialProfile")
     return perfil.get("displayName") or perfil.get("fullName")
 

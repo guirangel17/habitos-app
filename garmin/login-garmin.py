@@ -15,7 +15,9 @@ import garth
 email = input("Email da conta Garmin: ").strip()
 password = getpass.getpass("Senha Garmin (não aparece ao digitar): ")
 
-garth.login(email, password)
+# garth.login() direto está bloqueado pelo Cloudflare (TLS do python-requests);
+# o fluxo abaixo é o mesmo, mas via curl_cffi imitando Chrome — ver garmin_api.py
+garmin_api.login_navegador(email, password)
 garth.save("~/.garth")
 
 profile = garth.connectapi("/userprofile-service/socialProfile")
