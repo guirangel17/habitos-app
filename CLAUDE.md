@@ -177,10 +177,19 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   (data.js → plano.json, fonte única do calendário), `.github/workflows/analisar-corridas.yml`
   (dispatch + crons nas janelas de treino BRT). Saídas commitadas: `data/analises.json`,
   `data/historico.json` (+ tendências), `data/pipeline-status.json` (Ajustes lê).
-- **Auth Garmin**: garth 0.8.0 (pinado; deprecado mas funcional) via Secret `GARMIN_TOKEN` —
-  o garth auto-autentica pela env `GARTH_TOKEN`. Token OAuth1 vive ~1 ano em teoria, mas a
-  Garmin pode invalidar antes (aconteceu em 08/07/2026, dias depois de criado — possivelmente
-  pelos IPs variados dos runners). **Runbook quando status=garmin_auth** (validado em 08/07):
+- **Auth Garmin**: garth 0.8.0 (pinado; deprecado — Garmin mudou o auth em mar/2026 e o
+  projeto parou, mas 0.8.0 segue sendo a última versão) via Secret `GARMIN_TOKEN` — o garth
+  auto-autentica pela env `GARTH_TOKEN`. O dump tem DOIS tokens: OAuth2 (Bearer das chamadas,
+  vive **24h**) e OAuth1 (~1 ano), usado para renovar o OAuth2 via exchange a cada run.
+  **Pegadinha aprendida em 08–10/07/2026**: o Cloudflare da Garmin bloqueia (429, TLS
+  fingerprint) os User-Agents do app mobile do garth — o exchange falhava nos runners, o
+  token "morria" a cada 24h (vida do OAuth2) e o status acusava `garmin_auth` sem o OAuth1
+  ter expirado; renovar o Secret todo dia não resolvia nada. Correção: UA de navegador
+  aplicado em `pipeline/analisar.py` (UA_NAVEGADOR) e `garmin/garmin_api.py` — ver
+  matin/garth#222. Desde então `garmin_auth` = só 401 real (renovar de verdade); bloqueio
+  429/403 vira status `erro` transiente com mensagem própria. Se o bloqueio voltar mesmo com
+  UA de navegador, o plano B da comunidade é curl_cffi impersonando TLS de browser.
+  **Runbook quando status=garmin_auth**:
   (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e conferir o status;
   (2) se persistir, seguir o **`garmin/README.md` deste repo**: em qualquer máquina com
   internet aberta (o notebook do usuário serve), clonar o repo, `pip install garth`,

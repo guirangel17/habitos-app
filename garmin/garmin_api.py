@@ -26,6 +26,14 @@ def _proxy_reverso():
 _proxy_reverso()
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import garth  # noqa: E402
+from garth import sso as _garth_sso  # noqa: E402
+
+# Desde mar/2026 o Cloudflare da Garmin bloqueia (429) os User-Agents do app mobile
+# que o garth usa — no login e na troca OAuth1→OAuth2. UA de navegador passa
+# (matin/garth#222). Mesma correção existe em pipeline/analisar.py.
+_UA_NAVEGADOR = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+garth.client.sess.headers["User-Agent"] = _UA_NAVEGADOR
+_garth_sso.OAUTH_USER_AGENT["User-Agent"] = _UA_NAVEGADOR
 
 
 _BUNDLE = Path(__file__).parent / "zscaler-ca.pem"

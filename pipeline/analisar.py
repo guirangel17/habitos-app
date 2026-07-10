@@ -363,8 +363,18 @@ def validar_ia(ia):
 
 # ---------------- Garmin / Gemini (rede) ----------------
 
+# Desde mar/2026 o Cloudflare da Garmin bloqueia (429) os User-Agents do app mobile
+# que o garth usa — inclusive na troca OAuth1→OAuth2, que roda quando o OAuth2 (vida
+# de 24h) expira. Sem isso o pipeline "perde o token" a cada 24h mesmo com o OAuth1
+# de 1 ano válido. UA de navegador passa (matin/garth#222).
+UA_NAVEGADOR = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+
+
 def garmin_get(path, **params):
     import garth
+    from garth import sso
+    sso.OAUTH_USER_AGENT["User-Agent"] = UA_NAVEGADOR   # troca OAuth1→OAuth2
+    garth.client.sess.headers["User-Agent"] = UA_NAVEGADOR  # chamadas de dados
     if not os.environ.get("GARTH_TOKEN"):
         garth.resume(str(Path.home() / ".garth"))  # uso local
     if params:
@@ -560,10 +570,16 @@ def main():
         status.update(status="erro", mensagem=f"variável/campo ausente: {e}")
         codigo_saida = 1
     except Exception as e:
-        auth = "401" in str(e) or "Unauthorized" in str(e) or "oauth" in str(e).lower()
+        s = str(e)
+        # 401 = token de fato inválido (renovar). 429/403 na URL do oauth = Cloudflare
+        # bloqueou o runner — o token está OK e renovar não resolve; o próximo cron tenta.
+        auth = "401" in s or "Unauthorized" in s
+        bloqueio = not auth and ("429" in s or "403" in s) and "oauth" in s.lower()
         status.update(
             status="garmin_auth" if auth else "erro",
-            mensagem="Conexão com a Garmin expirou — rodar login-garmin.py local e atualizar o Secret GARMIN_TOKEN (runbook no CLAUDE.md)" if auth else str(e)[:300],
+            mensagem="Conexão com a Garmin expirou — rodar login-garmin.py local e atualizar o Secret GARMIN_TOKEN (runbook no CLAUDE.md)" if auth
+            else f"Garmin bloqueou o acesso deste runner ({'429' if '429' in s else '403'} no oauth) — NÃO é o token; próximo cron tenta de novo" if bloqueio
+            else s[:300],
         )
         print(f"[fatal] {e}", file=sys.stderr)
         codigo_saida = 1
