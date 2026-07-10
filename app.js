@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.5'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.6'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -451,6 +451,23 @@ function slotContextual(st, key) {
       snackbar('Treino no papel. 👊');
     };
     c.querySelector('#nao').onclick = () => S.setSetting(`garminDispensado_${pend.date}`, true);
+    return [c];
+  }
+
+  // 5. treino de força registrado no Garmin sem check no app → 1 toque (nunca automático)
+  const forca = forcaPendenteConfirmacao(st, key);
+  if (forca) {
+    const c = el(`<div class="card ressaca-banner"><b>🛰️ O Garmin registrou seu treino de força de ${fmtData(forca.date)}</b>
+      ${forca.minutos ? `${forca.minutos} min de sessão. ` : ''}Marcar o treino como feito?
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="acao-primaria" style="margin:0;padding:11px" id="sim">✓ Marcar feito</button>
+        <button class="acao-secundaria" style="margin:0;width:auto" id="nao">agora não</button>
+      </div></div>`);
+    c.querySelector('#sim').onclick = () => {
+      S.addEvent({ type: 'workout', date: forca.date, kind: 'gym', done: true });
+      snackbar('Treino no papel. 👊');
+    };
+    c.querySelector('#nao').onclick = () => S.setSetting(`garminDispensadoGym_${forca.date}`, true);
     return [c];
   }
 
@@ -992,6 +1009,19 @@ function analisePendenteConfirmacao(st, key) {
   return null;
 }
 
+// confirmação de 1 toque: Garmin registrou força em dia com gym planejado sem check (últimos 3 dias)
+function forcaPendenteConfirmacao(st, key) {
+  if (!dadosHistorico?.forcas) return null;
+  for (const f of [...dadosHistorico.forcas].reverse()) {
+    if (f.date > key || f.date < D.addDays(key, -3)) continue;
+    if (!D.treinoDoDia(f.date).gym) continue;
+    if (D.workoutsDoDia(st.events, f.date).gym !== undefined) continue;
+    if (st.settings[`garminDispensadoGym_${f.date}`]) continue;
+    return f;
+  }
+  return null;
+}
+
 // guia de execução do checkpoint — ensina a distribuir o esforço (o teste se perde no km 1)
 function sheetCheckpoint(cp) {
   const box = el(`<div><h3>🎯 ${esc(cp.titulo)}</h3>
@@ -1499,6 +1529,12 @@ async function exportarBackup() {
   S.setSetting('lastBackupTs', Date.now());
 }
 
+// dias de CALENDÁRIO desde o último backup — backup ontem à noite = 1, nunca 0
+// (floor de (agora-ts)/24h dizia "backup hoje" para qualquer backup de menos de 24h atrás)
+function diasDesdeBackup(st) {
+  return st.settings.lastBackupTs ? D.diffDays(D.dateKey(new Date(st.settings.lastBackupTs)), hojeKey()) : null;
+}
+
 function wizardRevisao(semanaIni, passoInicial = 0) {
   const st = S.getState();
   const m = D.metricasSemana(st.events, semanaIni);
@@ -1602,7 +1638,7 @@ function wizardRevisao(semanaIni, passoInicial = 0) {
     },
     () => {
       const ident = D.identidadeAssinada([...st.events, { type: 'review', week: semanaIni }], D.addDays(semanaIni, 8));
-      const diasBk = st.settings.lastBackupTs ? Math.floor((Date.now() - st.settings.lastBackupTs) / 86400000) : null;
+      const diasBk = diasDesdeBackup(st);
       const bkVelho = diasBk === null || diasBk > 30;
       corpo.innerHTML = `<div class="num-passo">PASSO 6 DE 6 · FECHADO</div>
         <h3>“${FRASE_IDENTIDADE}”</h3>
@@ -2293,10 +2329,10 @@ function checarSaude(st, sp) {
   itens.push(patGarmin()
     ? { n: 'ok', txt: 'Token do GitHub salvo — disparo rápido ativo' }
     : { n: 'info', txt: 'Sem token do GitHub — análises só nos horários automáticos' });
-  const diasBk = st.settings.lastBackupTs ? Math.floor((Date.now() - st.settings.lastBackupTs) / 864e5) : null;
+  const diasBk = diasDesdeBackup(st);
   itens.push(diasBk === null ? { n: 'warn', txt: 'Nenhum backup ainda — os dados vivem só neste aparelho' }
     : diasBk > 30 ? { n: 'warn', txt: `Último backup há ${diasBk} dias` }
-      : { n: 'ok', txt: `Backup em dia (há ${diasBk === 0 ? 'hoje' : `${diasBk}d`})` });
+      : { n: 'ok', txt: `Backup em dia (${diasBk === 0 ? 'hoje' : diasBk === 1 ? 'ontem' : `há ${diasBk}d`})` });
   return itens;
 }
 
@@ -2392,9 +2428,9 @@ function renderAjustes(root) {
   root.append(cardTipo);
 
   // backup
-  const dias = st.settings.lastBackupTs ? Math.floor((Date.now() - st.settings.lastBackupTs) / 86400000) : null;
+  const dias = diasDesdeBackup(st);
   const cardBk = el(`<div class="card"><h2>Backup <small>· dados ficam SÓ neste aparelho</small></h2>
-    <p style="font-size:.78rem;color:var(--ink-2);margin-bottom:10px">${st.events.length} eventos registrados · ${dias === null ? 'nenhum backup ainda' : dias === 0 ? 'backup hoje ✓' : `último backup há ${dias} dias${dias > 30 ? ' — bora fazer um' : ''}`}</p>
+    <p style="font-size:.78rem;color:var(--ink-2);margin-bottom:10px">${st.events.length} eventos registrados · ${dias === null ? 'nenhum backup ainda' : dias === 0 ? 'backup hoje ✓' : dias === 1 ? 'último backup ontem' : `último backup há ${dias} dias${dias > 30 ? ' — bora fazer um' : ''}`}</p>
     <button class="acao-primaria" id="exp" style="margin-top:0">Exportar backup (JSON)</button>
     <button class="acao-secundaria" id="imp">Importar backup</button>
     <input type="file" accept="application/json,.json" id="arquivo" style="display:none">

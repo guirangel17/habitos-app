@@ -279,6 +279,18 @@ def compactar_atividade(a, corridas):
     }
 
 
+def compactar_forca(a):
+    """Item da lista do Garmin (treino de força) → entrada compacta do historico.json.
+    Só o suficiente pra confirmação de 1 toque no app — sem análise de IA."""
+    dur = a.get("movingDuration") or a.get("duration")
+    return {
+        "date": (a.get("startTimeLocal") or "")[:10],
+        "activityId": a.get("activityId"),
+        "minutos": round(dur / 60) if dur else None,
+        "nome": a.get("activityName"),
+    }
+
+
 def eh_corrida_limpa(c):
     """Treino de verdade: ≥3 km e sem paradas de corrida social."""
     return (c.get("distanciaKm") or 0) >= 3 and (c.get("paradoPct") or 0) <= PARADO_MAX_PCT
@@ -363,17 +375,54 @@ def validar_ia(ia):
 
 # ---------------- Garmin / Gemini (rede) ----------------
 
-# Desde mar/2026 o Cloudflare da Garmin bloqueia (429) os User-Agents do app mobile
-# que o garth usa — inclusive na troca OAuth1→OAuth2, que roda quando o OAuth2 (vida
-# de 24h) expira. Sem isso o pipeline "perde o token" a cada 24h mesmo com o OAuth1
-# de 1 ano válido. UA de navegador passa (matin/garth#222).
+# Desde mar/2026 o Cloudflare da Garmin bloqueia (429) a troca OAuth1→OAuth2 vinda
+# dos runners — que roda quando o OAuth2 (vida de 24h) expira. Sem isso o pipeline
+# "perde o token" a cada 24h mesmo com o OAuth1 de 1 ano válido. Só trocar o
+# User-Agent NÃO bastou (testado 10/07/2026): o bloqueio é por fingerprint TLS, e o
+# python-requests não parece navegador em nenhum UA. A troca é refeita abaixo com
+# curl_cffi (TLS de Chrome de verdade) — abordagem da comunidade pós-deprecação do
+# garth (matin/garth#222).
 UA_NAVEGADOR = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+
+
+def _exchange_navegador(oauth1, client, *, login=False):
+    """Substitui garth.sso.exchange: assina o OAuth1 na mão (oauthlib, mesmo HMAC-SHA1
+    do garth) e envia com curl_cffi impersonando Chrome, que passa no fingerprint TLS."""
+    import requests
+    from curl_cffi import requests as crequests
+    from garth import sso
+    from garth.auth_tokens import OAuth2Token
+    from oauthlib.oauth1 import Client as OAuth1Signer
+
+    if not sso.OAUTH_CONSUMER:
+        sso.OAUTH_CONSUMER = requests.get(sso.OAUTH_CONSUMER_URL, timeout=10).json()
+    data = {}
+    if login:
+        data["audience"] = "GARMIN_CONNECT_MOBILE_ANDROID_DI"
+    if getattr(oauth1, "mfa_token", None):
+        data["mfa_token"] = oauth1.mfa_token
+    url, headers, corpo = OAuth1Signer(
+        sso.OAUTH_CONSUMER["consumer_key"],
+        client_secret=sso.OAUTH_CONSUMER["consumer_secret"],
+        resource_owner_key=oauth1.oauth_token,
+        resource_owner_secret=oauth1.oauth_token_secret,
+    ).sign(
+        f"https://connectapi.{client.domain}/oauth-service/oauth/exchange/user/2.0",
+        "POST",
+        urllib.parse.urlencode(data),
+        {"User-Agent": UA_NAVEGADOR, "Content-Type": "application/x-www-form-urlencoded"},
+    )
+    resp = crequests.post(url, headers=dict(headers), data=corpo, impersonate="chrome", timeout=15)
+    if resp.status_code != 200:
+        # "oauth" + código no texto: a classificação de erro do main() depende disso
+        raise RuntimeError(f"oauth exchange {resp.status_code}: {resp.text[:150]}")
+    return OAuth2Token(**sso.set_expirations(resp.json()))
 
 
 def garmin_get(path, **params):
     import garth
     from garth import sso
-    sso.OAUTH_USER_AGENT["User-Agent"] = UA_NAVEGADOR   # troca OAuth1→OAuth2
+    sso.exchange = _exchange_navegador  # refresh_oauth2 resolve sso.exchange em runtime
     garth.client.sess.headers["User-Agent"] = UA_NAVEGADOR  # chamadas de dados
     if not os.environ.get("GARTH_TOKEN"):
         garth.resume(str(Path.home() / ".garth"))  # uso local
@@ -496,13 +545,20 @@ def main():
         atividades.sort(key=lambda a: a.get("startTimeLocal") or "")
         print(f"{len(atividades)} corridas no Garmin")
 
+        # treinos de força: só datas/duração para a confirmação de 1 toque no app
+        forcas = garmin_get("/activitylist-service/activities/search/activities", limit=200, start=0, activityType="strength_training")
+        forcas = [compactar_forca(a) for a in forcas
+                  if tipo_atividade(a) == "strength_training" and (a.get("duration") or 0) >= 300]
+        forcas.sort(key=lambda f: f["date"])
+        print(f"{len(forcas)} treinos de força no Garmin")
+
         # histórico completo + tendências (rebuild barato e idempotente a cada run)
         compactas = [compactar_atividade(a, corridas_plano) for a in atividades]
         tend = calcular_tendencias(compactas, hoje)
         escrever_json(ARQ_HISTORICO, {
             "schema": 1, "atualizadoEm": status["ultimaExecucao"], "fcMax": FC_MAX,
             "zonas": {z: [lo, hi] for z, lo, hi in ZONAS_FC},
-            "corridas": compactas, "tendencias": tend,
+            "corridas": compactas, "forcas": forcas, "tendencias": tend,
         })
 
         corte = (agora - timedelta(days=JANELA_DIAS)).strftime("%Y-%m-%d")

@@ -100,6 +100,12 @@
 
 - ✅ Pasta `garmin/` no repo: scripts locais de renovação do token (login-garmin.py + garmin_api.py) e de criação dos treinos estruturados (criar.py + treinos_*.py + garmin-criados.json), com README de uso no notebook. A VM onde o app nasceu foi descomissionada — o repo agora carrega tudo que o app precisa pra viver. Fora do repo de propósito: dados brutos de atividade (saúde pessoal, repo é público) e a CA corporativa (o garmin_api.py a detecta como opcional).
 
+# Feito na v7.6 (jul/2026) — pipeline sobrevive ao Cloudflare + força no radar
+
+- ✅ Troca OAuth1→OAuth2 do garth reimplementada com curl_cffi (TLS de Chrome): o Cloudflare da Garmin passou a bloquear o fingerprint do python-requests nos runners (429) e o pipeline "perdia o token" a cada 24h — a vida do OAuth2 — mesmo com o OAuth1 de 1 ano válido. Só trocar o User-Agent não bastou (testado 10/07). Classificação de erro agora separa 401 real (`garmin_auth`, renovar) de bloqueio 429/403 (`erro` transiente).
+- ✅ Confirmação de 1 toque para treino de FORÇA, igual à de corrida: o pipeline também busca `strength_training` (campo `forcas` no historico.json, só data/duração — sem análise de IA) e o slot contextual oferece "marcar feito" quando o Garmin registrou força em dia com gym planejado sem check (dispensa em `settings.garminDispensadoGym_{date}`).
+- ✅ Backup em dias de CALENDÁRIO: backup de ontem à noite aparecia como "backup hoje ✓" (floor de 24h) na saúde do sistema, no card de backup e no wizard — agora conta virada de dia (hoje/ontem/há Xd).
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

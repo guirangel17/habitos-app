@@ -101,7 +101,8 @@ Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qua
    permanente na Hoje**; tudo condicional disputa o *slot contextual único* (prioridade:
    ressaca > contrato > fechar contrato de ontem > checkpoint do plano (véspera ≥17h/dia —
    antes da revisão de propósito: a véspera cai sempre em terça, onde a revisão pendente ainda
-   mora) > revisão pendente > corrida do Garmin a confirmar), no máximo 1 visível por vez. A trilha das 5 refeições e o cardápio moram na aba
+   mora) > revisão pendente > corrida do Garmin a confirmar > força do Garmin a confirmar),
+   no máximo 1 visível por vez. A trilha das 5 refeições e o cardápio moram na aba
    Dieta.
 3. **Sem gestos escondidos.** O usuário reclamou de toque longo — toda ação secundária tem
    affordance visível (botão `›`, sheet). Toque simples = ação primária óbvia.
@@ -184,11 +185,13 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   **Pegadinha aprendida em 08–10/07/2026**: o Cloudflare da Garmin bloqueia (429, TLS
   fingerprint) os User-Agents do app mobile do garth — o exchange falhava nos runners, o
   token "morria" a cada 24h (vida do OAuth2) e o status acusava `garmin_auth` sem o OAuth1
-  ter expirado; renovar o Secret todo dia não resolvia nada. Correção: UA de navegador
-  aplicado em `pipeline/analisar.py` (UA_NAVEGADOR) e `garmin/garmin_api.py` — ver
-  matin/garth#222. Desde então `garmin_auth` = só 401 real (renovar de verdade); bloqueio
-  429/403 vira status `erro` transiente com mensagem própria. Se o bloqueio voltar mesmo com
-  UA de navegador, o plano B da comunidade é curl_cffi impersonando TLS de browser.
+  ter expirado; renovar o Secret todo dia não resolvia nada. Só trocar o User-Agent NÃO
+  bastou (testado 10/07 — o bloqueio é por fingerprint TLS): a correção real é o
+  `_exchange_navegador` em `pipeline/analisar.py`, que substitui `garth.sso.exchange` por
+  uma troca assinada na mão (oauthlib) e enviada via **curl_cffi impersonando Chrome**
+  (instalado no workflow). Desde então `garmin_auth` = só 401 real (renovar de verdade);
+  bloqueio 429/403 vira status `erro` transiente com mensagem própria. Nos scripts locais
+  (`garmin/garmin_api.py`) o UA de navegador basta — IP residencial não sofre o bloqueio.
   **Runbook quando status=garmin_auth**:
   (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e conferir o status;
   (2) se persistir, seguir o **`garmin/README.md` deste repo**: em qualquer máquina com
@@ -214,7 +217,10 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   chega; `pipeline/clima.py` (open-meteo BH, sem chave) grava `data/clima.json` com as janelas
   6h/19h de hoje+amanhã no mesmo workflow — o app mostra a PRÓXIMA janela na linha do treino.
 - Confirmação de treino feito é SEMPRE 1 toque (slot contextual, prioridade mais baixa) — nunca
-  automática. Dispensa fica em `settings.garminDispensado_{date}`.
+  automática. Vale para corrida (via analises.json; dispensa em `settings.garminDispensado_{date}`)
+  e, desde a v7.6, para FORÇA: o pipeline também busca `strength_training` e grava o campo
+  `forcas` no historico.json (só date/activityId/minutos/nome — sem análise de IA); dispensa em
+  `settings.garminDispensadoGym_{date}`.
 
 ## Fluxo de desenvolvimento e verificação
 

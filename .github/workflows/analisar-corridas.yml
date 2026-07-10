@@ -33,7 +33,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install garth==0.8.0
+      # curl_cffi: TLS de Chrome na troca OAuth1→OAuth2 (Cloudflare bloqueia o
+      # fingerprint do python-requests nos runners — ver analisar.py)
+      - run: pip install garth==0.8.0 curl_cffi
       - name: Dump do plano (data.js → JSON)
         run: node pipeline/dump-plano.mjs > pipeline/plano.json
       - name: Analisar corridas novas

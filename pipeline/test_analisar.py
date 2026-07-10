@@ -4,9 +4,9 @@ import unittest
 
 from clima import extrair_janelas
 from analisar import (
-    TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, corrida_do_dia,
-    deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg, proxima_corrida,
-    resumir_splits, tipo_atividade, validar_ia, zonas_de_pontos,
+    TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, compactar_forca,
+    corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg,
+    proxima_corrida, resumir_splits, tipo_atividade, validar_ia, zonas_de_pontos,
 )
 
 CORRIDAS = [
@@ -149,6 +149,15 @@ class TestPuras(unittest.TestCase):
         # corrida social: FC baixa e distância ok, mas 27% parado — fora da curva Z2
         self.assertFalse(eh_corrida_z2(dict(c2, paradoPct=27)))
         self.assertTrue(eh_corrida_z2(dict(c2, paradoPct=None)))  # sem movingDuration = confia
+
+    def test_compactar_forca(self):
+        a = {"activityId": 9, "startTimeLocal": "2026-07-09 19:02:11", "duration": 2710.0,
+             "movingDuration": 2400.0, "activityName": "Força B — inferiores",
+             "activityType": {"typeKey": "strength_training"}}
+        f = compactar_forca(a)
+        self.assertEqual(f, {"date": "2026-07-09", "activityId": 9, "minutos": 40,
+                             "nome": "Força B — inferiores"})
+        self.assertIsNone(compactar_forca({"activityId": 1})["minutos"])  # sem duração
 
     def test_tendencias(self):
         corridas = [
