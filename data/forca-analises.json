@@ -1,5 +1,384 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-10T15:57:12-03:00",
- "analises": []
+ "atualizadoEm": "2026-07-10T16:02:14-03:00",
+ "analises": [
+  {
+   "date": "2026-07-09",
+   "activityId": 23536189987,
+   "geradoEm": "2026-07-10T16:02:29-03:00",
+   "sessao": {
+    "minutos": 53,
+    "series": 22,
+    "volumeKg": 2918,
+    "exercicios": [
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 68
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 47
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 42
+       },
+       {
+        "reps": 0,
+        "kg": 30.0,
+        "s": 1
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 40
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 36
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 45
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "DUMBBELL_BULGARIAN_SPLIT_SQUAT",
+      "categoria": "LUNGE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 9,
+        "kg": null,
+        "s": 322
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 55
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "BARBELL_STRAIGHT_LEG_DEADLIFT",
+      "categoria": "DEADLIFT",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "STANDING_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 52.0,
+        "s": 40
+       },
+       {
+        "reps": 12,
+        "kg": 52.0,
+        "s": 42
+       },
+       {
+        "reps": 0,
+        "kg": 52.0,
+        "s": 1
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SEATED_DUMBBELL_TOE_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 18,
+        "kg": 10.0,
+        "s": 616
+       },
+       {
+        "reps": 18,
+        "kg": 10.0,
+        "s": 197
+       },
+       {
+        "reps": 8,
+        "kg": 10.0,
+        "s": 234
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de pernas foi um treino focado, com boa intensidade nos exercícios executados, mas com um volume total menor do que o planejado. Houve um bom desempenho em movimentos como Leg Press, Elevação Pélvica e Panturrilha.",
+    "comparacao_plano": "O plano para o dia era um treino de Pernas A, com aproximadamente 21 séries e foco em hipertrofia (8-12 reps). Foram completadas 13 séries efetivas, o que representa uma redução no volume total. Alguns exercícios importantes para a corrida, como a Cadeira Flexora e o Stiff, foram pulados, e outros tiveram séries incompletas.",
+    "pontos_fortes": [
+     "Excelente desempenho no Standing Calf Raise, onde você atingiu 12 repetições em duas séries, demonstrando que a carga está pronta para ser aumentada na próxima sessão para continuar o princípio da sobrecarga progressiva.",
+     "No Leg Press, você superou a faixa de repetições na primeira série (11 reps) e manteve 10 reps nas seguintes, indicando uma boa adaptação e força para progredir na carga.",
+     "A Elevação Pélvica foi executada de forma consistente, com 10 repetições em todas as séries, mantendo-se dentro da faixa de hipertrofia planejada."
+    ],
+    "pontos_atencao": [
+     "O volume total da sessão foi menor que o planejado devido a exercícios pulados (Cadeira Flexora, Stiff) e séries incompletas (Leg Press, Búlgaro, Panturrilha). Para otimizar a hipertrofia e o suporte à corrida, é importante buscar completar o volume planejado.",
+     "O Dumbbell Bulgarian Split Squat, um exercício crucial para a corrida, teve a última série pulada. Priorizar a execução completa deste movimento é fundamental para a sua preparação para a Volta Internacional da Pampulha.",
+     "No Seated Dumbbell Toe Raise (Tibial Anterior), houve uma queda significativa de repetições na última série (de 18 para 8). Este músculo é vital para a prevenção da canelite, e manter a consistência em todas as séries é importante para a sua integridade."
+    ],
+    "proxima_dica": "Para a próxima sessão de Pernas A, adicione 2.5kg por lado no Leg Press e 2.5kg no Standing Calf Raise, buscando novamente a faixa de repetições alvo. Além disso, priorize a execução completa de todos os exercícios, especialmente a Cadeira Flexora e o Stiff, que são essenciais para a força dos isquiotibiais e a performance na corrida.",
+    "nota_execucao": 7
+   }
+  },
+  {
+   "date": "2026-07-07",
+   "activityId": 23510642974,
+   "geradoEm": "2026-07-10T16:02:16-03:00",
+   "sessao": {
+    "minutos": 52,
+    "series": 21,
+    "volumeKg": 5160,
+    "exercicios": [
+     {
+      "nome": null,
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 49
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 50
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 45
+       },
+       {
+        "reps": 7,
+        "kg": 30.0,
+        "s": 35
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 49
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 44
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 45
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 32
+       },
+       {
+        "reps": 8,
+        "kg": 32.0,
+        "s": 29
+       },
+       {
+        "reps": 8,
+        "kg": 32.0,
+        "s": 30
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "PULL_UP",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 36
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 32
+       },
+       {
+        "reps": 7,
+        "kg": 32.0,
+        "s": 26
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 38
+       },
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 36
+       },
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 33
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "UNKNOWN",
+      "series": [
+       {
+        "reps": 8,
+        "kg": 9.0,
+        "s": 41
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 53
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 27
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 29
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 24
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de musculação focou em exercícios de empurrar, com um volume considerável de supino, e incluiu inesperadamente exercícios de puxada. Foram 21 séries executadas em 52 minutos, demonstrando boa capacidade de trabalho.",
+    "comparacao_plano": "O plano era um treino de \"Empurrar\" para peito, ombro e tríceps com aproximadamente 19 séries. Guilherme executou 21 séries, superando o volume planejado. Houve um foco intenso em BENCH_PRESS (10 séries), excedendo o volume planejado para supino (7 séries combinadas). A LATERAL_RAISE foi executada conforme o planejado em séries e repetições. No entanto, exercícios de puxada (PULL_UP e ROW) foram incluídos, o que não estava previsto para um dia de \"Empurrar\", e exercícios importantes como Desenvolvimento Máquina e Tríceps (Pulley e Testa) foram omitidos. A fase de hipertrofia (8-12 reps) foi bem respeitada na LATERAL_RAISE e nas primeiras séries do BENCH_PRESS.",
+    "pontos_fortes": [
+     "A Elevação Lateral foi executada com excelência, atingindo o topo da faixa de repetições (11, 11, 10 reps com 9kg), demonstrando sobrecarga progressiva e preparando o terreno para um aumento de carga.",
+     "O volume total de séries (21) superou o planejado (~19), indicando uma boa capacidade de trabalho e resiliência durante a sessão.",
+     "A tentativa de progressão de carga no BENCH_PRESS para 32kg nas séries finais é um bom sinal de busca por sobrecarga, mesmo com a fadiga acumulada."
+    ],
+    "pontos_atencao": [
+     "A inclusão de exercícios de puxada (PULL_UP, ROW) em um dia de \"Empurrar\" altera o estímulo planejado para a sessão e pode comprometer a recuperação para os dias específicos de puxada.",
+     "A ausência de exercícios de tríceps e do desenvolvimento de ombro na máquina, que eram parte essencial do plano de \"Empurrar\", significa que esses grupos musculares não receberam o estímulo previsto para o dia.",
+     "O volume de 10 séries para BENCH_PRESS foi muito alto em comparação com as 7 séries planejadas para supino, o que pode ter sido um fator que limitou o tempo ou a energia para os outros exercícios de empurrar."
+    ],
+    "proxima_dica": "Na próxima sessão de \"Empurrar\", para a LATERAL_RAISE, aumente a carga para 10-11.5kg e busque retornar à faixa de 10-12 repetições, aplicando o princípio da sobrecarga progressiva. Priorize a execução completa do plano de \"Empurrar\", garantindo que todos os exercícios de peito, ombro e tríceps sejam realizados antes de considerar variações ou adições."
+   }
+  }
+ ]
 }
