@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-07-12T20:06:40-03:00",
+ "atualizadoEm": "2026-07-12T21:08:23-03:00",
  "janelas": [
   {
    "quando": "2026-07-12T06:00",
@@ -11,11 +11,11 @@
    "quando": "2026-07-12T19:00",
    "temp": 23,
    "chuvaPct": 0,
-   "umidade": 50
+   "umidade": 47
   },
   {
    "quando": "2026-07-13T06:00",
-   "temp": 18,
+   "temp": 17,
    "chuvaPct": 0,
    "umidade": 77
   },
@@ -23,7 +23,7 @@
    "quando": "2026-07-13T19:00",
    "temp": 20,
    "chuvaPct": 22,
-   "umidade": 67
+   "umidade": 76
   }
  ]
 }
