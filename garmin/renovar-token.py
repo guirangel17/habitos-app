@@ -18,6 +18,11 @@ import os
 import sys
 from pathlib import Path
 
+# console do Windows agendado sai em cp1252 — sem isto o print final com emoji
+# estoura UnicodeEncodeError e a tarefa reporta erro DEPOIS do Secret já atualizado
+if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 import requests
 
 import garmin_api  # túnel + TLS corporativo + UA de navegador ao importar  # noqa: F401

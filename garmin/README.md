@@ -27,11 +27,29 @@ python3 renovar-token.py            # testa: renova o OAuth2 e atualiza o Secret
 Agendar (só faz efeito com o notebook ligado; o app acende o aviso âmbar em
 Ajustes se o pipeline ficar >24h parado):
 
-```bash
-# Windows (Agendador de Tarefas): diário às 08:30 + a cada logon
-schtasks /Create /TN "RenovarGarmin" /SC DAILY /ST 08:30 /TR "py C:\caminho\para\habitos-app\garmin\renovar-token.py"
-schtasks /Create /TN "RenovarGarminLogon" /SC ONLOGON /TR "py C:\caminho\para\habitos-app\garmin\renovar-token.py"
+```powershell
+# Windows (Agendador de Tarefas): diário às 08:30 + a cada logon.
+# ATENÇÃO (aprendido em 14/07/2026): NUNCA use "py"/"python" no /TR — se o Python
+# veio da Microsoft Store ou do instalador novo, esses comandos são App Execution
+# Aliases (reparse points em WindowsApps) que o Agendador NÃO consegue executar:
+# a tarefa falha todo dia com 0x80070002 ("arquivo não encontrado"), o Secret
+# nunca renova e o pipeline cai em "oauth exchange 429" no runner. Descubra o
+# executável REAL com:  python -c "import sys; print(sys.executable)"
+# Também libere bateria/StartWhenAvailable — é notebook: às 08:30 ele pode estar
+# na bateria ou dormindo, e o padrão do Agendador pula a execução nos dois casos.
+$py = (python -c "import sys; print(sys.executable)")
+$dir = "C:\caminho\para\habitos-app\garmin"
+$action = New-ScheduledTaskAction -Execute $py -Argument "$dir\renovar-token.py" -WorkingDirectory $dir
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1)
+Register-ScheduledTask -TaskName "RenovarGarmin" -Action $action -Settings $settings -Trigger (New-ScheduledTaskTrigger -Daily -At 08:30)
+Register-ScheduledTask -TaskName "RenovarGarminLogon" -Action $action -Settings $settings -Trigger (New-ScheduledTaskTrigger -AtLogOn -User "$env:COMPUTERNAME\$env:USERNAME")
 
+# Teste de verdade (rodar na mão NÃO testa o agendamento):
+Start-ScheduledTask RenovarGarmin; Start-Sleep 45
+(Get-ScheduledTaskInfo RenovarGarmin).LastTaskResult   # tem que ser 0
+```
+
+```bash
 # Mac/Linux (cron): de hora em hora é barato (1 request por execução)
 # crontab -e →  30 * * * * cd /caminho/habitos-app/garmin && python3 renovar-token.py
 ```

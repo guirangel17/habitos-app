@@ -194,6 +194,12 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   Secrets RW em `~/.habitos-pat`) — setup no `garmin/README.md`. `garmin_auth` = só 401
   real (renovar de verdade); bloqueio 429/403 vira status `erro` transiente com o detalhe
   da resposta (server/cf-ray/corpo) na mensagem.
+  **Se TODOS os runs do dia falham com `oauth exchange 429`** (aprendido em 14/07/2026):
+  não é transiente — significa que o OAuth2 do Secret venceu e o runner está tentando o
+  exchange bloqueado; a causa raiz mora no NOTEBOOK: `schtasks /Query /TN RenovarGarmin /V`
+  e olhe o Last Result (0x80070002 = tarefa apontava para o alias `py` da Store, que o
+  Agendador não executa — usar o python.exe real; ver garmin/README.md). Rodar
+  `renovar-token.py` na mão destrava na hora.
   **Runbook quando status=garmin_auth**:
   (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e conferir o status;
   (2) se persistir, seguir o **`garmin/README.md` deste repo**: em qualquer máquina com
