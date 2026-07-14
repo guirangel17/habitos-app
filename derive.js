@@ -321,6 +321,32 @@ export function semanaTreino(events, key) {
   return { ini, dias, gymPlan, gymFeito, corridaPlan, corridaFeita };
 }
 
+// ---- Grade panorâmica de FORÇA (Evolução) ----
+// Uma linha por semana (antiga→atual), colunas Ter–Sáb (os 5 dias com gym no plano).
+// forcasDates: Set de dateKeys com sessão de força registrada no Garmin — vira estado
+// 'evidencia' visual e NÃO soma em `feitos` (confirmação de treino é sempre manual).
+export function gradeForca(events, hojeKey, semanas = 16, forcasDates = new Set()) {
+  const iniAtual = inicioSemana(hojeKey);
+  const out = [];
+  for (let w = semanas - 1; w >= 0; w--) {
+    const ini = addDays(iniAtual, -7 * w);
+    const dias = [];
+    let feitos = 0;
+    for (let i = 1; i <= 5; i++) { // segunda+1 = Ter … segunda+5 = Sáb
+      const date = addDays(ini, i);
+      const feito = workoutsDoDia(events, date).gym === true;
+      if (feito) feitos++;
+      const estado = feito ? 'feito'
+        : forcasDates.has(date) && date <= hojeKey ? 'evidencia'
+          : date < hojeKey ? 'perdido'
+            : 'aberto'; // hoje ainda em aberto + futuro — nunca "perdido" antes do dia acabar
+      dias.push({ date, estado });
+    }
+    out.push({ ini, dias, feitos, plan: 5, completa: feitos === 5 });
+  }
+  return out;
+}
+
 export function corridasStats(events, hojeKey) {
   const feitas = new Set(events.filter((e) => e.type === 'workout' && e.kind === 'corrida' && e.done).map((e) => e.date));
   const passadas = CORRIDAS.filter(([d]) => d <= hojeKey);

@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.7.1'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.8'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -47,7 +47,12 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 let abaAtiva = ['hoje', 'dieta', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
 let periodoRelatorio = 30; // 30 | 90 | 0 (tudo)
 let diaTreinoSel = null; // dia selecionado no card Semana da aba Treino (null = hoje)
-if (params.get('dia')) diaTreinoSel = params.get('dia'); // dev: ?aba=treino&dia=YYYY-MM-DD
+let semTreinoIni = null; // segunda (dateKey) da semana exibida na aba Treino (null = semana atual)
+if (params.get('dia')) { // dev: ?aba=treino&dia=YYYY-MM-DD
+  diaTreinoSel = params.get('dia');
+  const w = D.inicioSemana(diaTreinoSel);
+  if (w !== D.inicioSemana(hojeKey())) semTreinoIni = w; // dia de outra semana abre já naquela semana
+}
 
 // ---------- seed de demonstração (dev/testes: ?seed=1 com store vazio) ----------
 if (params.get('seed') && S.getState().events.length === 0) {
@@ -934,6 +939,7 @@ function carregarAnalises(force = false) {
   analisesCarregando = (async () => {
     const antes = dadosAnalises?.doc?.atualizadoEm ?? null;
     const antesForca = dadosForca?.doc?.atualizadoEm ?? null;
+    const antesHist = dadosHistorico?.atualizadoEm ?? null;
     const [an, hist, cli, fa] = await Promise.all([fetchDados('analises.json'), fetchDados('historico.json'), fetchDados('clima.json'), fetchDados('forca-analises.json')]);
     analisesTentou = true;
     if (hist) dadosHistorico = hist;
@@ -945,7 +951,8 @@ function carregarAnalises(force = false) {
     };
     if (fa) dadosForca = indexar(fa);
     if (an) dadosAnalises = indexar(an);
-    if ((an && an.atualizadoEm !== antes) || (fa && fa.atualizadoEm !== antesForca)) render();
+    // historico também re-renderiza: os badges ✨ e o limite do ‹ da aba Treino dependem dele
+    if ((an && an.atualizadoEm !== antes) || (fa && fa.atualizadoEm !== antesForca) || (hist && hist.atualizadoEm !== antesHist)) render();
   })().finally(() => { analisesCarregando = null; });
   return analisesCarregando;
 }
@@ -1028,6 +1035,16 @@ function forcaPendenteConfirmacao(st, key) {
     return f;
   }
   return null;
+}
+
+// datas com sessão de força no Garmin (EVIDÊNCIA visual — nunca marca feito sozinha)
+const forcasPorData = () => new Set((dadosHistorico?.forcas || []).map((f) => f.date));
+
+// segunda mais antiga navegável na aba Treino: min(startKey, 1ª sessão de força do Garmin);
+// sem nenhum dos dois, a semana atual (a seta ‹ nasce desabilitada)
+function limiteSemanaTreino(key) {
+  const datas = [S.getState().settings.startKey, ...(dadosHistorico?.forcas || []).map((f) => f.date)].filter(Boolean);
+  return D.inicioSemana(datas.length ? datas.reduce((a, b) => (a < b ? a : b)) : key);
 }
 
 // guia de execução do checkpoint — ensina a distribuir o esforço (o teste se perde no km 1)
@@ -1204,26 +1221,45 @@ function renderTreino(root) {
   const key = hojeKey();
   carregarAnalises(); // re-renderiza sozinho quando o JSON chegar
   if (diaTreinoSel === key) diaTreinoSel = null; // tocar no dia de hoje = voltar ao padrão
+  if (semTreinoIni === D.inicioSemana(key)) semTreinoIni = null; // navegar até a semana atual = padrão
   const alvo = diaTreinoSel || key; // dia exibido no card de treino
   const plano = D.treinoDoDia(alvo);
   const feito = D.workoutsDoDia(st.events, alvo);
   const futuro = alvo > key;
 
-  // semana — cada dia é um botão que troca o card de treino abaixo
-  const sem = D.semanaTreino(st.events, key);
-  const cardSem = el(`<div class="card"><h2>Semana <small>· ${fmtData(sem.ini)} – ${fmtData(D.addDays(sem.ini, 6))} · toque num dia para ver o treino</small></h2>
+  // semana — cada dia é um botão que troca o card de treino abaixo; ‹ › navegam semanas passadas
+  const sem = D.semanaTreino(st.events, semTreinoIni || key);
+  const semanaAtualIni = D.inicioSemana(key);
+  const limite = limiteSemanaTreino(key);
+  const cardSem = el(`<div class="card"><div class="treino-cab">
+    <h2>Semana <small>· ${fmtData(sem.ini)} – ${fmtData(D.addDays(sem.ini, 6))}${semTreinoIni ? '' : ' · toque num dia para ver o treino'}</small></h2>
+    <div class="sem-nav">
+      <button class="sem-nav-btn" id="sem-ant" aria-label="semana anterior" ${sem.ini <= limite ? 'disabled' : ''}>‹</button>
+      <button class="sem-nav-btn" id="sem-prox" aria-label="semana seguinte" ${sem.ini >= semanaAtualIni ? 'disabled' : ''}>›</button>
+    </div></div>
+    ${semTreinoIni ? '<button class="chip-voltar" id="sem-atual">‹ voltar para esta semana</button>' : ''}
     <div class="sem-treino"></div>
     <div class="sem-resumo">
       <span>🏋️ Academia <b class="num">${sem.gymFeito}/${sem.gymPlan}</b></span>
       <span>🏃 Corrida <b class="num">${sem.corridaFeita}/${sem.corridaPlan}</b></span>
     </div></div>`);
+  const navegarSemana = (delta) => {
+    const novo = D.addDays(sem.ini, 7 * delta);
+    semTreinoIni = novo === semanaAtualIni ? null : novo;
+    diaTreinoSel = null; // trocar de semana limpa o dia selecionado
+    render();
+  };
+  if (sem.ini > limite) cardSem.querySelector('#sem-ant').onclick = () => navegarSemana(-1);
+  if (sem.ini < semanaAtualIni) cardSem.querySelector('#sem-prox').onclick = () => navegarSemana(1);
+  if (semTreinoIni) cardSem.querySelector('#sem-atual').onclick = () => { semTreinoIni = null; diaTreinoSel = null; render(); };
   const semWrap = cardSem.querySelector('.sem-treino');
   const letras = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+  const forcasGarmin = forcasPorData();
   sem.dias.forEach((d, i) => {
     const col = el(`<button class="sem-dia ${d.date === key ? 'hoje' : ''} ${d.date === alvo ? 'sel' : ''}" aria-pressed="${d.date === alvo}" aria-label="ver treino de ${fmtData(d.date)}">
       <span class="sem-letra">${letras[i]}</span>
       ${d.plano.corrida ? `<span class="sem-dot ${d.feito.corrida ? 'ok' : d.date < key ? 'perdido' : ''}">${TIPO_CORRIDA_ICONE[d.plano.corrida.tipo]}</span>` : ''}
-      ${d.plano.gym ? `<span class="sem-dot ${d.feito.gym ? 'ok' : d.date < key ? 'perdido' : ''}">🏋️</span>` : ''}
+      ${d.plano.gym ? `<span class="sem-dot ${d.feito.gym ? 'ok' : forcasGarmin.has(d.date) && d.date < key ? 'evid' : d.date < key ? 'perdido' : ''}">🏋️</span>` : ''}
       ${!d.plano.corrida && !d.plano.gym ? '<span class="sem-dot descanso">–</span>' : ''}
     </button>`);
     col.onclick = () => { diaTreinoSel = d.date === key ? null : d.date; render(); };
@@ -1306,7 +1342,8 @@ function renderTreino(root) {
     cron.append(item);
   }
   root.append(cardCron);
-  if (alvoScroll) setTimeout(() => alvoScroll.scrollIntoView({ block: 'center' }), 40);
+  // sem seleção/navegação ativa — senão cada toque em ‹ › ou num dia pula a viewport pro cronograma
+  if (alvoScroll && !diaTreinoSel && !semTreinoIni) setTimeout(() => alvoScroll.scrollIntoView({ block: 'center' }), 40);
 }
 
 // sheet: o treino completo do dia (exercícios da academia / guia de pace da corrida)
@@ -1324,6 +1361,12 @@ function sheetTreinoDetalhe(kind, plano, key) {
           <span class="ex-series num">${esc(sr)}</span>
         </div>`).join('')}</div></div>`);
     for (const a of forcaAnalisesDoDia(key)) box.append(blocoAnaliseForca(a));
+    // dia passado sem parecer detalhado, mas com sessão registrada no relógio (historico.json)
+    const sess = (dadosHistorico?.forcas || []).find((f) => f.date === key);
+    if (!forcaAnalisesDoDia(key).length && sess) {
+      box.append(el(`<div class="analise"><div class="ana-cab">SUA SESSÃO · GARMIN</div>
+        <p style="font-size:.82rem;color:var(--ink-2)">🛰️ ${esc(sess.nome || 'Treino de força')} · ${sess.minutos} min — registrado no relógio, sem parecer detalhado.</p></div>`));
+    }
   } else {
     const c = plano.corrida;
     const g = CORRIDA_GUIA[c.tipo] || {};
@@ -1906,6 +1949,33 @@ function renderEvolucao(root) {
   }
 
   // métricas semanais do §4 moraram aqui até a v5 — hoje vivem na aba Dieta ("Semana")
+
+  // força: musculação semana a semana — ✨ = sessão no Garmin sem check (evidência, não conta no total)
+  const forcasGarmin = forcasPorData();
+  if (st.events.some((e) => e.type === 'workout' && e.kind === 'gym') || forcasGarmin.size) {
+    root.append(el('<div class="secao">FORÇA</div>'));
+    const nSem = Math.min(16, Math.floor(D.diffDays(limiteSemanaTreino(key), D.inicioSemana(key)) / 7) + 1);
+    const gf = D.gradeForca(st.events, key, nSem, forcasGarmin);
+    const cardFor = el(`<div class="card"><h2>Musculação por semana <small>· Ter–Sáb · toque numa semana para abrir na aba Treino</small></h2>
+      <div class="for-cab"><span></span>${['T', 'Q', 'Q', 'S', 'S'].map((l) => `<span>${l}</span>`).join('')}<span></span></div>
+      <div class="for-linhas"></div></div>`);
+    const linhas = cardFor.querySelector('.for-linhas');
+    for (const s of gf) {
+      const row = el(`<button class="for-sem" aria-label="abrir a semana de ${fmtData(s.ini)} na aba Treino">
+        <span class="const-label num">${fmtData(s.ini)}</span>
+        ${s.dias.map((d) => `<span class="cel ${d.estado}">${d.estado === 'evidencia' ? '✨' : ''}</span>`).join('')}
+        <span class="const-total num ${s.completa ? 'verde' : ''}">${s.feitos}/5${s.completa ? ' ✓' : ''}</span>
+      </button>`);
+      row.onclick = () => { // mesma mecânica dos botões da nav — render() re-arma o protegerVoltar
+        semTreinoIni = s.ini === D.inicioSemana(key) ? null : s.ini;
+        diaTreinoSel = null;
+        abaAtiva = 'treino';
+        render();
+      };
+      linhas.append(row);
+    }
+    root.append(cardFor);
+  }
 
   // constância: uma linha legível por semana, meta = 80% (28/35), não perfeição
   root.append(el('<div class="secao">CONSTÂNCIA</div>'));
@@ -2653,21 +2723,22 @@ function protegerVoltar() {
   if (!sentinelaVoltar) { sentinelaVoltar = true; history.pushState({ pampulha: 1 }, ''); }
 }
 function temCamadaAberta() {
-  return !!$('.sheet-fundo') || !!$('.sos-tela') || diaTreinoSel !== null || abaAtiva !== 'hoje';
+  return !!$('.sheet-fundo') || !!$('.sos-tela') || diaTreinoSel !== null || semTreinoIni !== null || abaAtiva !== 'hoje';
 }
 window.addEventListener('popstate', () => {
   sentinelaVoltar = false;
   if ($('.sheet-fundo')) fecharSheet();
   else if ($('.sos-tela')) { clearInterval(contadorTimer); fecharSOS(); }
   else if (diaTreinoSel !== null) { diaTreinoSel = null; render(); }
+  else if (semTreinoIni !== null) { semTreinoIni = null; render(); }
   else if (abaAtiva !== 'hoje') { abaAtiva = 'hoje'; render(); }
   if (temCamadaAberta()) protegerVoltar();
 });
 
 document.querySelectorAll('nav.abas button').forEach((b) => {
-  b.onclick = () => { if (b.dataset.aba !== 'treino') diaTreinoSel = null; abaAtiva = b.dataset.aba; render(); };
+  b.onclick = () => { if (b.dataset.aba !== 'treino') { diaTreinoSel = null; semTreinoIni = null; } abaAtiva = b.dataset.aba; render(); };
 });
-$('#btn-ajustes').onclick = () => { diaTreinoSel = null; abaAtiva = 'ajustes'; render(); };
+$('#btn-ajustes').onclick = () => { diaTreinoSel = null; semTreinoIni = null; abaAtiva = 'ajustes'; render(); };
 $('#sos-fab').onclick = abrirSOS;
 
 S.onChange(render);

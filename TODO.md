@@ -111,6 +111,11 @@
 - ✅ Análise de musculação fim-a-fim: pipeline busca as séries executadas (`/exerciseSets`), valida a **Progressão Dupla** por exercício (carga_up/reps_up/igual/ajuste/novo/pulado — fatos em funções puras `pipeline/forca.py`, 9 testes), detecta estagnação (≥3 sessões iguais) e skips recorrentes, respeita deload (derivado do "DELOAD" nas CORRIDAS) e a fase do mês, e gera 1 parecer Gemini por sessão (`SYSTEM_PROMPT_FORCA`: canelite/tibial, 0×0 = pulado de propósito, musculação serve à corrida, zero punição) em `data/forca-analises.json` (últimas 60; orçamento de quota compartilhado, corridas primeiro; força nunca derruba corrida).
 - ✅ App: sheet do treino de gym ganha "SUA SESSÃO · GARMIN" (volume/séries/tempo, tabela de exercícios com badges de progressão, parecer da IA) + ✨ na linha do treino; botão 🛰️ virou "Buscar análise do último treino".
 
+# Feito na v7.8 (jul/2026) — o passado da musculação visível
+
+- ✅ Navegação de semanas na aba Treino: setas ‹ › no card Semana (+ chip "voltar para esta semana"); limite para trás = min(startKey, 1ª sessão de força do Garmin). Dias de semanas passadas continuam checáveis retroativamente; dia com sessão no Garmin sem check ganha contorno + ✨ no dot (EVIDÊNCIA — nunca marca feito sozinho) e o sheet mostra a sessão crua do historico.json quando não há parecer. Estado `semTreinoIni` entrou na cadeia do voltar (sheet → dia → semana → Hoje) e o auto-scroll do cronograma só roda sem seleção/navegação ativa.
+- ✅ Grade FORÇA na Evolução (entre CORRIDA e CONSTÂNCIA): musculação por semana (até 16), colunas Ter–Sáb, célula feito/evidência/perdido/aberto, total X/5 com ✓ verde na semana completa — evidência não soma no total (confirmação é sempre manual). Toque numa semana abre a aba Treino já naquela semana. `gradeForca` pura em derive.js com 8 asserts novos.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

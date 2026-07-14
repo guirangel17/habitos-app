@@ -261,5 +261,19 @@ ab = D.aberturaSemana([...semVerde('2026-06-29'), ...meals5('2026-07-06', 3)], '
 ok(!ab.verdeAnterior && ab.verdesSeguidas === 0 && ab.temDados, 'aberturaSemana: semana anterior não-verde zera a sequência');
 ok(D.aberturaSemana([], '2026-07-15').ini === '2026-07-13', 'aberturaSemana: quarta aponta para a segunda da semana');
 
+// gradeForca (v7.8): grade semanal de musculação, Ter–Sáb — 2026-07-15 é quarta
+const gEv = (date, done = true) => ({ id: 'g' + date + done + Math.random(), ts: D.parseKey(date).getTime(), type: 'workout', date, kind: 'gym', done });
+let gf = D.gradeForca([gEv('2026-07-14')], '2026-07-15', 2, new Set(['2026-07-08']));
+ok(gf.length === 2 && gf[0].ini === '2026-07-06' && gf[1].ini === '2026-07-13', 'gradeForca: linhas por segunda, antiga→atual');
+ok(gf[1].dias.length === 5 && gf[1].dias[0].date === '2026-07-14' && gf[1].dias[4].date === '2026-07-18', 'gradeForca: colunas Ter–Sáb');
+ok(gf[1].dias[0].estado === 'feito' && gf[1].feitos === 1, 'gradeForca: check manual = feito e soma');
+ok(gf[1].dias[1].estado === 'aberto' && gf[1].dias[2].estado === 'aberto', 'gradeForca: hoje e futuro = aberto (nunca perdido antes da hora)');
+ok(gf[0].dias[1].estado === 'evidencia' && gf[0].feitos === 0, 'gradeForca: Garmin sem check = evidência e NÃO conta no total');
+ok(gf[0].dias[0].estado === 'perdido', 'gradeForca: passado sem nada = perdido');
+gf = D.gradeForca(['2026-07-07', '2026-07-08', '2026-07-09', '2026-07-10', '2026-07-11'].map((d) => gEv(d)), '2026-07-15', 2);
+ok(gf[0].feitos === 5 && gf[0].completa, 'gradeForca: 5/5 = semana completa');
+gf = D.gradeForca([gEv('2026-07-08', true), gEv('2026-07-08', false)], '2026-07-15', 2);
+ok(gf[0].dias[1].estado === 'perdido' && gf[0].feitos === 0, 'gradeForca: desfazer check volta a perdido (último vence)');
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);

@@ -316,6 +316,14 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .sem-dot.descanso { border: none; color: var(--muted); font-size: 1rem; }
 .sem-resumo { display: flex; gap: 18px; margin-top: 10px; font-size: 0.85rem; color: var(--ink-2); }
 .sem-resumo b { color: var(--ink); font-size: 1rem; }
+.sem-nav { display: flex; gap: 6px; flex-shrink: 0; }
+.sem-nav-btn {
+  width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 10px;
+  color: var(--ink-2); font-size: 1.05rem; line-height: 1; background: none;
+}
+.sem-nav-btn:disabled { opacity: 0.3; }
+.sem-dot.evid { border-style: solid; border-color: var(--serie-2); filter: none; opacity: 0.95; position: relative; }
+.sem-dot.evid::after { content: '✨'; position: absolute; top: -5px; right: -7px; font-size: 0.55rem; }
 
 /* ---------- aba dieta ---------- */
 .dieta-contexto { font-size: 0.85rem; color: var(--ink-2); }
@@ -448,6 +456,16 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .const-label { font-size: 0.66rem; color: var(--muted); }
 .const-total { font-size: 0.7rem; color: var(--muted); text-align: right; }
 .const-total.verde { color: var(--good-text); font-weight: 700; }
+
+/* grade FORÇA (Evolução): musculação por semana, Ter–Sáb; linha inteira é botão → aba Treino */
+.for-cab, .for-sem { display: grid; grid-template-columns: 44px repeat(5, 1fr) 44px; gap: 4px; align-items: center; }
+.for-cab { margin-bottom: 4px; }
+.for-cab span { font-size: 0.62rem; color: var(--muted); text-align: center; }
+.for-sem { width: 100%; margin-bottom: 4px; padding: 0; border: none; background: none; text-align: inherit; }
+.for-sem .cel { height: 22px; border-radius: 6px; background: var(--grid); display: grid; place-items: center; font-size: 0.6rem; }
+.for-sem .cel.feito { background: var(--seq-4); }
+.for-sem .cel.evidencia { box-shadow: inset 0 0 0 1.5px var(--serie-2); }
+.for-sem .cel.aberto { background: transparent; border: 1px dashed var(--grid); }
 
 /* ---------- treino: linha com detalhe + exercícios ---------- */
 .treino-row { display: grid; grid-template-columns: 1fr 44px; gap: 6px; align-items: stretch; }
