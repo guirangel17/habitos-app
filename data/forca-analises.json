@@ -1,7 +1,351 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-10T16:02:14-03:00",
+ "atualizadoEm": "2026-07-14T17:08:31-03:00",
  "analises": [
+  {
+   "date": "2026-07-14",
+   "activityId": 23598751980,
+   "geradoEm": "2026-07-14T17:08:50-03:00",
+   "sessao": {
+    "minutos": 49,
+    "series": 19,
+    "volumeKg": 4522,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 52
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 42
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 38
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 38
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -2.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 50
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 43
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 8
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -17.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 136
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 30
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 31
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 23.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 31
+       },
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 71
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 45
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 2
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 174
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 63
+       },
+       {
+        "reps": 8,
+        "kg": 40.0,
+        "s": 60
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 8.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 20.0,
+        "s": 92
+       },
+       {
+        "reps": 11,
+        "kg": 20.0,
+        "s": 44
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 40
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de Empurrar foi concluída em 49 minutos, com 19 séries, alinhada ao volume planejado. Houve uma boa aplicação da sobrecarga progressiva em alguns movimentos, com ajustes estratégicos em outros para manter a qualidade da execução.",
+    "comparacao_plano": "O treino seguiu o plano de 19 séries para peito, ombro e tríceps. As faixas de repetições (9-11 e 10-12) foram bem respeitadas, indicando uma execução focada na fase de hipertrofia.",
+    "pontos_fortes": [
+     "No Smith Machine Overhead Press, a carga foi aumentada em 23kg, e as 10 repetições foram mantidas consistentemente por todas as séries, demonstrando uma adaptação forte à nova carga, conforme esperado pelo método de progressão dupla.",
+     "O Dumbbell Lying Triceps Extension, sendo um exercício novo, foi executado com excelência, atingindo 11, 11 e 10 repetições, já no topo da faixa de hipertrofia.",
+     "A gestão da carga no Barbell Bench Press e Incline Dumbbell Bench Press, com ajustes para garantir a qualidade da execução e a manutenção das repetições dentro da faixa, é um exemplo de inteligência na aplicação do treino, priorizando o estímulo correto."
+    ],
+    "pontos_atencao": [
+     "No Barbell Bench Press, apesar do ajuste de carga, o primeiro set atingiu 11 repetições. Para as próximas sessões, o foco será em consolidar as repetições nas séries seguintes com a nova carga.",
+     "No Incline Dumbbell Bench Press, a redução significativa da carga (-17kg) indica que a carga anterior pode ter sido excessiva. O objetivo agora é progredir as repetições com a carga atual, buscando consistência na faixa de 9-11.",
+     "Na Elevação Lateral, as repetições estão próximas do piso da faixa (9, 10, 9). O foco será em aumentar a consistência para atingir o topo da faixa de 10-12 repetições nas próximas sessões."
+    ],
+    "proxima_dica": "Para a próxima sessão de Empurrar, com base na progressão observada: no BARBELL_BENCH_PRESS, o primeiro set atingiu 11 repetições, então suba a carga para 32,5kg e retorne ao piso da faixa de 9 repetições; no DUMBBELL_LYING_TRICEPS_EXTENSION, você bateu 11, 11 e 10 repetições, então suba a carga para 22,5kg (ou o menor incremento disponível) e retorne ao piso da faixa de 9 repetições.",
+    "nota_execucao": 9
+   }
+  },
+  {
+   "date": "2026-07-11",
+   "activityId": 23560397759,
+   "geradoEm": "2026-07-14T17:08:32-03:00",
+   "sessao": {
+    "minutos": 26,
+    "series": 19,
+    "volumeKg": 3012,
+    "exercicios": [
+     {
+      "nome": "LATERAL_BAND_WALKS",
+      "categoria": "BANDED_EXERCISES",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 18.5,
+        "s": 30
+       },
+       {
+        "reps": 13,
+        "kg": 18.5,
+        "s": 33
+       },
+       {
+        "reps": 13,
+        "kg": 18.5,
+        "s": 35
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SIDE_PLANK",
+      "categoria": "PLANK",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "UNKNOWN",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 32.0,
+        "s": 63
+       },
+       {
+        "reps": 12,
+        "kg": 32.0,
+        "s": 35
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 12
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SEATED_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 13,
+        "kg": 20.0,
+        "s": 42
+       },
+       {
+        "reps": 13,
+        "kg": 20.0,
+        "s": 34
+       },
+       {
+        "reps": 13,
+        "kg": 20.0,
+        "s": 36
+       },
+       {
+        "reps": 12,
+        "kg": 20.0,
+        "s": 38
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SEATED_DUMBBELL_TOE_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 18,
+        "kg": 10.0,
+        "s": 308
+       },
+       {
+        "reps": 18,
+        "kg": 10.0,
+        "s": 95
+       },
+       {
+        "reps": 18,
+        "kg": 10.0,
+        "s": 87
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de Pernas B foi breve, com foco nos exercícios de mobilidade e panturrilha, mas com o trabalho de core e preventivos de joelho significativamente reduzido em relação ao planejado.",
+    "comparacao_plano": "O Lateral Band Walks foi bem executado, alinhado com o Abdução de Quadril planejado, com repetições dentro da faixa alvo. O Seated Calf Raise foi feito conforme o planejado para Panturrilha Sentado, com 4 séries dentro da faixa de repetições, e o Seated Dumbbell Toe Raise cumpriu o papel do Tibial Anterior, com 3 séries na faixa alvo. No entanto, o Side Plank, que cobriria o Copenhagen Plank e a Prancha Lateral com Abdução, foi executado por durações muito curtas, não atingindo o estímulo planejado de 20-30s/lado. O exercício UNKNOWN (32kg) foi realizado por duas séries, mas a terceira foi pulada, e o nome não foi registrado, dificultando a comparação com a Cadeira Extensora leve.",
+    "pontos_fortes": [
+     "A execução dos Lateral Band Walks, Seated Calf Raise e Seated Dumbbell Toe Raise foi consistente, com as repetições dentro das faixas alvo, indicando um estímulo eficaz para esses grupos musculares.",
+     "A inclusão do Tibial Anterior (Seated Dumbbell Toe Raise) é um ponto forte crucial para a prevenção da canelite crônica, demonstrando a prioridade na integridade para a corrida."
+    ],
+    "pontos_atencao": [
+     "O trabalho de core e adutores (Copenhagen Plank e Prancha Lateral com Abdução), essencial para a estabilidade na corrida e prevenção de lesões, foi comprometido pela execução muito breve do Side Plank. Lembre-se que a consistência nesses movimentos é um pilar para a sua integridade até a Volta da Pampulha.",
+     "O exercício UNKNOWN, que provavelmente seria a Cadeira Extensora, teve uma série pulada e o nome não foi registrado. É importante identificar e completar este exercício para o fortalecimento do tendão patelar, um ponto de atenção para corredores.",
+     "A duração total da sessão foi bastante reduzida, o que pode indicar que o volume total de trabalho preventivo e de suporte à corrida não foi plenamente atingido."
+    ],
+    "proxima_dica": "Na próxima sessão de Pernas B, priorize a execução completa e com o tempo de duração adequado para o Copenhagen Plank e a Prancha Lateral com Abdução, visando fortalecer o core e os adutores, que são fundamentais para a sua performance e prevenção de lesões na corrida.",
+    "nota_execucao": 7
+   }
+  },
   {
    "date": "2026-07-09",
    "activityId": 23536189987,

@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-11T11:09:05-03:00",
+ "atualizadoEm": "2026-07-14T17:08:31-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1217,6 +1217,18 @@
    "activityId": 23536189987,
    "minutos": 53,
    "nome": "QUI Pernas A"
+  },
+  {
+   "date": "2026-07-11",
+   "activityId": 23560397759,
+   "minutos": 26,
+   "nome": "SAB Pernas B preventivo"
+  },
+  {
+   "date": "2026-07-14",
+   "activityId": 23598751980,
+   "minutos": 49,
+   "nome": "TER Empurrar"
   }
  ],
  "tendencias": {
@@ -1306,10 +1318,10 @@
   "paceZ2Ha8Sem": "7:24",
   "vo2max": {
    "atual": 48.0,
-   "ha8Sem": 48.0
+   "ha8Sem": 47.0
   },
-  "cadencia4Sem": 157,
-  "kmPorSemana4Sem": 16.2,
+  "cadencia4Sem": 158,
+  "kmPorSemana4Sem": 13.7,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1441,12 +1453,8 @@
    }
   ],
   "efAtual": 0.977,
-  "efHa8Sem": 0.951,
+  "efHa8Sem": 0.956,
   "kmSemanas": [
-   {
-    "semana": "2026-04-20",
-    "km": 15.9
-   },
    {
     "semana": "2026-04-27",
     "km": 0
@@ -1490,6 +1498,10 @@
    {
     "semana": "2026-07-06",
     "km": 11.2
+   },
+   {
+    "semana": "2026-07-13",
+    "km": 0
    }
   ],
   "longaoMes": [
