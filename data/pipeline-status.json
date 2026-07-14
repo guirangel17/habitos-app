@@ -1,5 +1,5 @@
 {
- "ultimaExecucao": "2026-07-13T20:09:07-03:00",
+ "ultimaExecucao": "2026-07-13T21:03:06-03:00",
  "status": "erro",
  "mensagem": "Garmin bloqueou o acesso deste runner — NÃO é o token; próximo cron tenta de novo. Detalhe: oauth exchange 429 server=cloudflare cf-ray=sim: Rate limited",
  "ultimaAnalise": null,
