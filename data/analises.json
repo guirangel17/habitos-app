@@ -1,7 +1,116 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-10T15:18:00-03:00",
+ "atualizadoEm": "2026-07-15T10:01:54-03:00",
  "analises": [
+  {
+   "date": "2026-07-15",
+   "activityId": 23606765010,
+   "geradoEm": "2026-07-15T10:02:09-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Longao 10km Z2",
+    "inicio": "2026-07-15 08:43:27",
+    "distanciaKm": 10.03,
+    "duracaoMin": 69.0,
+    "paceMedio": "6:53",
+    "fcMedia": 146,
+    "fcMax": 154,
+    "cadencia": 154,
+    "elevacaoM": 25,
+    "trainingEffect": {
+     "aerobico": 3.5,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 47.0,
+    "temperaturaC": 27.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:39",
+      "fc": 134
+     },
+     {
+      "km": 2,
+      "pace": "6:41",
+      "fc": 146
+     },
+     {
+      "km": 3,
+      "pace": "6:35",
+      "fc": 144
+     },
+     {
+      "km": 4,
+      "pace": "6:41",
+      "fc": 149
+     },
+     {
+      "km": 5,
+      "pace": "6:59",
+      "fc": 150
+     },
+     {
+      "km": 6,
+      "pace": "7:22",
+      "fc": 144
+     },
+     {
+      "km": 7,
+      "pace": "7:11",
+      "fc": 144
+     },
+     {
+      "km": 8,
+      "pace": "7:01",
+      "fc": 147
+     },
+     {
+      "km": 9,
+      "pace": "6:42",
+      "fc": 148
+     },
+     {
+      "km": 10,
+      "pace": "6:59",
+      "fc": 151
+     }
+    ],
+    "zonasFc": {
+     "z1": 6,
+     "z2": 92,
+     "z3": 2,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": 6.5
+   },
+   "plano": {
+    "tipo": "tiros",
+    "nome": "Fartlek 6 × 400 m a 5:35–5:50 — rec. trote leve",
+    "paceAlvo": "400 m: 5:35–5:50 · 800 m–1 km: 5:45–6:00 · 1,5 km: 5:55–6:05",
+    "fcAlvo": "Mande pelo pace (FC atrasa no tiro); 9/10 no último",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:57",
+    "paceZ2Ha8Sem": "6:56"
+   },
+   "ia": {
+    "resumo": "A corrida executada foi um longão de 10 km em Zona 2, com pace médio de 6:53/km e FC média de 146 bpm. O percurso apresentou pouca elevação e a temperatura estava em 27°C.",
+    "comparacao_plano": "O treino planejado para o dia era um Fartlek de 6 x 400m com ritmo de tiro (5:35–5:50/km). A corrida executada foi um longão de 10 km em ritmo leve (Z2), representando um estímulo completamente diferente do planejado para esta data.",
+    "pontos_fortes": [
+     "Excelente controle da frequência cardíaca, mantendo-se predominantemente na Zona 2 (92% do tempo) com FC média de 146 bpm, mesmo com a temperatura de 27°C. Isso demonstra uma leitura madura do esforço.",
+     "A deriva cardíaca de 6.5% é um resultado esperado para a distância em condições de calor, indicando uma boa adaptação fisiológica e base aeróbica sólida para o volume."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 154 spm ficou abaixo do alvo de 165+ spm para corridas leves e longas. Manter uma cadência mais alta ajuda a proteger a canela direita e a coxa esquerda, reduzindo o impacto.",
+     "O estímulo da corrida executada (longão Z2) divergiu significativamente do treino planejado para o dia (Fartlek de tiros). É importante seguir o plano para garantir a progressão adequada em todas as valências."
+    ],
+    "proxima_dica": "Na Social Run de 5 km, concentre-se em aumentar a cadência para 165+ spm, dando passos mais curtos e frequentes, mesmo que o pace fique um pouco mais lento.",
+    "nota_execucao": 2
+   }
+  },
   {
    "date": "2026-07-09",
    "activityId": 23542118688,
