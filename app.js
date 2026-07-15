@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.12'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.13'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -1497,9 +1497,13 @@ function renderTreino(root) {
   // pulado de propósito (v7.12) — pra diferenciar "não fiz mas vou fazer noutro dia" (some da
   // lista de pendências) de "não fiz e não vou fazer" (fica registrado, sem culpa, sem nagging)
   if (!futuro) {
+    // "último vence": pega só o estado ATUAL de cada dia, não qualquer done:true que já existiu
+    // na história (ex.: checkbox tocado e desfeito na sequência não pode contar como usado)
     const usadas = (kind) => {
+      const ultimoPorData = new Map();
+      for (const e of st.events) if (e.type === 'workout' && e.kind === kind) ultimoPorData.set(e.date, e);
       const s = new Set();
-      for (const e of st.events) if (e.type === 'workout' && e.kind === kind && e.done) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
+      for (const e of ultimoPorData.values()) if (e.done) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
       return s;
     };
     const acaoPular = (kind, rotulo) => {

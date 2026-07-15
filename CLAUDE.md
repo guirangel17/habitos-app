@@ -269,11 +269,18 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   `D.origemAtividade` — nunca direto pela data do dia exibido. Treino extra (sem nenhum dia do
   plano) agora aparece em "Treino do dia" mesmo sem plano, contanto que tenha check ou análise —
   antes ficava invisível mesmo com o parecer da IA pronto.
-  **Pegadinha corrigida em 15/07/2026**: os gates de "vincular"/`usadas()`/`sugestaoRemanejamento`
-  inicialmente checavam `=== undefined`, tratando um `done:false` ACIDENTAL (checkbox tocado e
-  destocado) como "já decidido" — sumia da lista de candidatos pra vincular e nunca mais era
-  sugerido. Corrigido pra `!feito`/`!done` em todos os gates; só `pulado:true` (v7.12, explícito)
-  conta como decisão de verdade.
+  **Pegadinha corrigida em 15/07/2026 (duas rodadas)**: (1) os gates de "vincular"/
+  `sugestaoRemanejamento` inicialmente checavam `=== undefined`, tratando um `done:false`
+  ACIDENTAL (checkbox tocado e destocado) como "já decidido" — sumia da lista de candidatos pra
+  vincular e nunca mais era sugerido; corrigido pra `!feito`/`!done`. (2) `usadas()` (o "já foi
+  usada essa atividade do Garmin nalgum vínculo?" da lista de candidatos) tinha o MESMO problema
+  de raiz por outro ângulo: olhava se um `done:true` já existiu EM QUALQUER PONTO da história de
+  eventos daquela data, em vez do estado ATUAL (último vence) — um toque seguido de destoque no
+  checkbox (`done:true` → `done:false` na sequência) deixava a atividade "usada" pra sempre,
+  mesmo com o dia visivelmente sem check. Corrigido agrupando por data e pegando só o último
+  evento antes de checar `done`, igual todo o resto do arquivo já fazia (`workoutsDoDia`,
+  `origemAtividade`, `foiPulado`). Regra geral: QUALQUER leitura de `events` que decide algo por
+  data tem que reduzir ao último evento primeiro — nunca testar `some()`/filtrar direto no loop.
 - **v7.12 — pular treino de propósito**: 3ª ação (junto de "vincular") na aba Treino pro dia
   planejado sem check — "– Pular essa corrida/esse treino (não vou fazer)" grava
   `workout {date, kind, done:false, pulado:true}`. Diferente de simplesmente não marcar: sinaliza
