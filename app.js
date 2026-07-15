@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.13'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.14'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -1569,11 +1569,11 @@ function renderTreino(root) {
     const temAnalise = analisesDoDia(D.origemAtividade(st.events, data, 'corrida')).length > 0;
     const viagem = D.emViagem(data, viagensCfg()); // corrida em viagem sem check: neutra, nunca "perdida"
     const pulado = !ok && D.foiPulado(st.events, data, 'corrida'); // decisão consciente ≠ "perdida"
-    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise && !viagem && !pulado ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
+    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${pulado ? 'pulado' : ''} ${passada && !ok && !temAnalise && !viagem && !pulado ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
       <button class="cron-toggle">
-        <span class="caixa">${ok ? '✓' : ''}</span>
+        <span class="caixa">${ok ? '✓' : pulado ? '–' : ''}</span>
         <span class="cron-data num">${fmtData(data)}</span>
-        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}${viagem && !ok ? ' <span class="cron-badge">✈️</span>' : ''}${pulado ? ' <span class="cron-badge">– pulado</span>' : ''}</span>
+        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}${viagem && !ok ? ' <span class="cron-badge">✈️</span>' : ''}${pulado ? ' <span class="cron-badge">pulado</span>' : ''}</span>
       </button>
       <button class="tr-ver cron-ver" aria-label="ver guia da corrida">›</button>
     </div>`);
