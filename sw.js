@@ -1,8 +1,9 @@
 // Service worker — cache-first do app shell, com versionamento para updates.
-const VERSAO = 'rotina-v7.10';
+const VERSAO = 'rotina-v7.11';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './data.js', './derive.js',
   './store.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
+  './icons/badge-96.png',
 ];
 
 self.addEventListener('install', (e) => {
@@ -48,7 +49,7 @@ self.addEventListener('push', (e) => {
   let dados = { titulo: 'Rotina', corpo: 'Toque para abrir.' };
   try { if (e.data) dados = { ...dados, ...e.data.json() }; } catch { /* payload não-JSON, usa default */ }
   e.waitUntil(self.registration.showNotification(dados.titulo, {
-    body: dados.corpo, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { aba: 'hoje' },
+    body: dados.corpo, icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', data: { aba: 'hoje' },
   }));
 });
 

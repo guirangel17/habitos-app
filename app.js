@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.10'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.11'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -3012,7 +3012,7 @@ function agendarLembretes() {
     if (prox.checa() && !S.getState().settings[prox.guarda]) {
       S.setSetting(prox.guarda, true);
       const reg = await navigator.serviceWorker?.getRegistration();
-      if (reg) reg.showNotification(prox.titulo, { body: prox.corpo, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png' });
+      if (reg) reg.showNotification(prox.titulo, { body: prox.corpo, icon: 'icons/icon-192.png', badge: 'icons/badge-96.png' });
       else new Notification(prox.titulo, { body: prox.corpo, icon: 'icons/icon-192.png' });
     }
     agendarLembretes();
