@@ -324,6 +324,7 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .sem-nav-btn:disabled { opacity: 0.3; }
 .sem-dot.evid { border-style: solid; border-color: var(--serie-2); filter: none; opacity: 0.95; position: relative; }
 .sem-dot.evid::after { content: '✨'; position: absolute; top: -5px; right: -7px; font-size: 0.55rem; }
+.sem-dot.viagem { border-color: var(--border); filter: none; opacity: 0.85; } /* neutro: viagem não é falha */
 
 /* ---------- aba dieta ---------- */
 .dieta-contexto { font-size: 0.85rem; color: var(--ink-2); }
@@ -466,6 +467,8 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .for-sem .cel.feito { background: var(--seq-4); }
 .for-sem .cel.evidencia { box-shadow: inset 0 0 0 1.5px var(--serie-2); }
 .for-sem .cel.aberto { background: transparent; border: 1px dashed var(--grid); }
+/* dia de viagem: neutro nas duas grades (FORÇA e CONSTÂNCIA) — fora da cobrança */
+.cel.viagem { background: transparent !important; border: 1px solid var(--grid); display: grid; place-items: center; font-size: 0.6rem; opacity: 0.8; }
 
 /* ---------- treino: linha com detalhe + exercícios ---------- */
 .treino-row { display: grid; grid-template-columns: 1fr 44px; gap: 6px; align-items: stretch; }
@@ -687,6 +690,14 @@ nav.abas button.ativa { color: var(--serie-1); font-weight: 600; }
   padding: 14px; font-size: 0.9rem; line-height: 1.45;
 }
 .ressaca-banner b { display: block; margin-bottom: 2px; }
+/* modo viagem (v7.9): card ambiente do slot contextual — informativo, sem urgência */
+.card-viagem { font-size: 0.88rem; line-height: 1.45; }
+.card-viagem > b { color: var(--serie-1); }
+.input-data {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--card); color: var(--ink); font: inherit; font-size: 0.9rem; margin-bottom: 10px;
+  color-scheme: light dark;
+}
 .check-passo {
   display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left;
   border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px;

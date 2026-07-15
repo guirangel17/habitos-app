@@ -275,5 +275,73 @@ ok(gf[0].feitos === 5 && gf[0].completa, 'gradeForca: 5/5 = semana completa');
 gf = D.gradeForca([gEv('2026-07-08', true), gEv('2026-07-08', false)], '2026-07-15', 2);
 ok(gf[0].dias[1].estado === 'perdido' && gf[0].feitos === 0, 'gradeForca: desfazer check volta a perdido (último vence)');
 
+// ---- v7.9: viagens + doce planejado ----
+const VIAG = [{ ini: '2026-07-06', fim: '2026-07-10' }];
+
+// emViagem / viagemDoDia: pontas inclusivas
+ok(D.emViagem('2026-07-06', VIAG) && D.emViagem('2026-07-10', VIAG) && !D.emViagem('2026-07-11', VIAG) && !D.emViagem('2026-07-05', VIAG), 'emViagem: pontas inclusivas');
+let vg = D.viagemDoDia('2026-07-08', VIAG);
+ok(vg && vg.dia === 3 && vg.total === 5, `viagemDoDia: dia 3 de 5 (veio ${vg && vg.dia}/${vg && vg.total})`);
+ok(D.viagemDoDia('2026-07-11', VIAG) === null, 'viagemDoDia: fora do range = null');
+ok(D.emViagem('2026-08-02', [...VIAG, { ini: '2026-08-01', fim: '2026-08-03' }]), 'emViagem: 2 viagens (OR)');
+
+// slipDays: doce planejado não é deslize; deslize em viagem sai quando viagens é passado
+ok(!D.slipDays([mk('sweet', '2026-07-04', { planejado: true })], 'sweet').includes('2026-07-04'), 'slipDays: planejado não é deslize');
+ok(D.slipDays([mk('sweet', '2026-07-08')], 'sweet').includes('2026-07-08'), 'slipDays: sem viagens, deslize conta');
+ok(!D.slipDays([mk('sweet', '2026-07-08')], 'sweet', VIAG).includes('2026-07-08'), 'slipDays: deslize em viagem protegido');
+ok(D.slipDays([mk('sos', '2026-07-04', { kind: 'doce', outcome: 'gave_in' })], 'sweet').includes('2026-07-04'), 'slipDays: sos gave_in segue contando');
+
+// ultimoSlipTs: planejado e viagem não resetam o anel
+const tsDe = (d) => D.parseKey(d).getTime() + 12 * 3600e3;
+let uts = D.ultimoSlipTs([mk('sweet', '2026-07-02'), mk('sweet', '2026-07-08')], 'sweet', 0, VIAG);
+ok(uts === tsDe('2026-07-02'), 'ultimoSlipTs: slip em viagem não reseta (anel conta do anterior)');
+uts = D.ultimoSlipTs([mk('sweet', '2026-07-02'), mk('sweet', '2026-07-12', { planejado: true })], 'sweet', 0);
+ok(uts === tsDe('2026-07-02'), 'ultimoSlipTs: doce planejado não reseta');
+
+// contadorResiliente: 2 dias seguidos DENTRO da viagem não quebram streak
+let cr = D.contadorResiliente([mk('sweet', '2026-07-07'), mk('sweet', '2026-07-08')], 'sweet', '2026-07-14', '2026-06-27', VIAG);
+ok(cr.streak === 17 && !cr.amassado, `resiliente: par consecutivo em viagem não quebra (streak ${cr.streak})`);
+cr = D.contadorResiliente([mk('sweet', '2026-07-12', { planejado: true }), mk('sweet', '2026-07-13')], 'sweet', '2026-07-14', '2026-06-27');
+ok(cr.streak === 17 && cr.amassado, 'resiliente: planejado + deslize real no dia seguinte não vira par (só amassa)');
+
+// docePlanejadoDaSemana: semana seg–dom
+const dp = mk('sweet', '2026-07-15', { planejado: true });
+ok(D.docePlanejadoDaSemana([dp], '2026-07-13') === dp && D.docePlanejadoDaSemana([dp], '2026-07-19') === dp, 'docePlanejadoDaSemana: acha na semana');
+ok(D.docePlanejadoDaSemana([dp], '2026-07-12') === null && D.docePlanejadoDaSemana([dp], '2026-07-20') === null, 'docePlanejadoDaSemana: semana vizinha = null');
+
+// metricasSemana: planejado conta no consumo e aparece separado
+let ms = D.metricasSemana([mk('sweet', '2026-07-14'), mk('sweet', '2026-07-15', { planejado: true })], '2026-07-15');
+ok(ms.sweet === 2 && ms.sweetPlanejado === 1, `metricasSemana: consumo honesto 2 (1 planejado) — veio ${ms.sweet}/${ms.sweetPlanejado}`);
+
+// semanaTreino: viagem sai do plano; treino feito em viagem conta plano+feito
+let stv = D.semanaTreino([], '2026-07-08', VIAG); // semana 06–12/07 toda com Ter–Sex em viagem (gym Ter–Sáb)
+ok(stv.gymPlan === 1 && stv.dias[1].viagem, `semanaTreino: só sáb 11/07 cobra gym (plan ${stv.gymPlan})`);
+stv = D.semanaTreino([gEv('2026-07-07')], '2026-07-08', VIAG);
+ok(stv.gymPlan === 2 && stv.gymFeito === 1, 'semanaTreino: treino feito em viagem conta plano e feito');
+
+// gradeForca: célula viagem, feito vence, plan ajustado
+gf = D.gradeForca([], '2026-07-15', 2, new Set(), VIAG);
+ok(gf[0].dias[0].estado === 'viagem' && gf[0].plan === 1 && !gf[0].completa, `gradeForca: Ter–Sex viagem → plan 1 (veio ${gf[0].plan})`);
+gf = D.gradeForca([gEv('2026-07-07')], '2026-07-15', 2, new Set(), VIAG);
+ok(gf[0].dias[0].estado === 'feito' && gf[0].plan === 2 && gf[0].feitos === 1, 'gradeForca: feito vence viagem e volta ao plano');
+gf = D.gradeForca([], '2026-07-15', 2, new Set(), [{ ini: '2026-07-06', fim: '2026-07-12' }]);
+ok(gf[0].plan === 0 && !gf[0].completa, 'gradeForca: semana toda em viagem → plan 0, nunca completa');
+
+// heatmapConstancia: célula viagem só sem registro; meta ajustada
+const hmv = D.heatmapConstancia(meals5('2026-07-07', 3), '2026-07-12', 1, VIAG);
+ok(hmv[0].dias[0] === 'viagem' && hmv[0].dias[1] === 3, 'heatmap: viagem sem registro = célula viagem; com registro = número');
+ok(D.metaSemanaRefeicoes(7) === 28 && D.metaSemanaRefeicoes(5) === 20 && D.metaSemanaRefeicoes(0) === 0, 'metaSemanaRefeicoes: 28 cheia, 20 com 2 dias fora');
+
+// aberturaSemana: semana anterior verde com meta ajustada por viagem
+const semViagemVerde = [0, 1, 2, 3].flatMap((i) => meals5(D.addDays('2026-07-09', i), 5)); // qui–dom 5/5 = 20 refeições
+ab = D.aberturaSemana(semViagemVerde, '2026-07-13', [{ ini: '2026-07-06', fim: '2026-07-08' }]);
+ok(ab.verdeAnterior === true, 'aberturaSemana: 20/20 com 3 dias de viagem = verde');
+ab = D.aberturaSemana(semViagemVerde, '2026-07-13');
+ok(ab.verdeAnterior === false, 'aberturaSemana: mesmas 20 refeições sem viagem = não-verde (meta 28)');
+
+// resumoPeriodo: treinoPlan pula viagem (na semana 06–12/07 só o gym de sábado 11 fica cobrado)
+let rpv = D.resumoPeriodo([], '2026-07-06', '2026-07-12', VIAG);
+ok(rpv.treinoPlan === 1, `resumoPeriodo: viagem seg–sex deixa só o gym de sábado (plan ${rpv.treinoPlan})`);
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);

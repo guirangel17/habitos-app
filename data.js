@@ -335,3 +335,15 @@ export const CHECKPOINTS = [
     vespera: 'Hoje: jantar com carbo e sono em dia — o dado só vale se o corpo chegar inteiro.',
   },
 ];
+
+// ---- Guia de viagem (v7.9) — modo manutenção, evidência sem sermão ----
+// Cada item [título, texto]. A dica do slot da Hoje rotaciona pelo dia da viagem (determinístico).
+export const VIAGEM_GUIA = [
+  ['Meta de viagem = manutenção', 'Pausa planejada não é retrocesso: breaks de dieta programados não pioram o resultado final (estudo MATADOR). O ganho típico de uma viagem é 0,3–0,5 kg — e boa parte é água, não gordura.'],
+  ['Proteína primeiro no café', 'SE tiver buffet, ENTÃO prato único e proteína primeiro. Segura a fome até a tarde e protege o resto do dia sem precisar pensar.'],
+  ['Caminhar conta como treino', 'Turismo costuma passar de 10 mil passos — isso é um dia LEVE honesto. Não existe dívida de treino em viagem.'],
+  ['Álcool é o maior driver de ganho', 'O 1×1 do contrato vale em qualquer cidade: um copo de água por drink. É a única regra de bar que sobrevive a férias.'],
+  ['Treino é bônus, não dívida', 'Duas corridas curtas na semana seguram o aeróbico (menos de 2 semanas parado = perda mínima). Força aguenta 3–4 semanas sozinha. Se der, ótimo; se não der, o plano absorve.'],
+  ['Never miss twice — em qualquer fuso', 'Um dia ruim de viagem não vira a viagem inteira. A PRÓXIMA refeição volta ao razoável — a regra de casa viaja com você.'],
+  ['Planeje a volta antes de ir', 'Fresh start: mercado no 1º dia, corrida leve no 2º. Quem volta com a geladeira vazia decide com fome — e fome decide mal.'],
+];

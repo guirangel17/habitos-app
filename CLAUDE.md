@@ -55,7 +55,7 @@ Eventos são **append-only** com `id` e `ts` (timestamp real — usado pelos con
 pelo mapa gatilho×período). Tipos:
 
 - `meal {date, meal: cafe|lanche1|almoco|lanche2|jantar, status: ok|sub|skip|off|none}` — **último vence** (corrigir = novo evento)
-- `delivery {date, trigger?}` · `sweet {date, trigger?}` — deslizes; trigger ∈ GATILHOS (2C do protocolo)
+- `delivery {date, trigger?}` · `sweet {date, trigger?, planejado?}` — deslizes; trigger ∈ GATILHOS (2C do protocolo); `planejado: true` = doce pré-decidido (v7.9, NÃO é deslize)
 - `night_out {date, drinks}` — fecha contrato se houver
 - `sos {date, kind: ifood|doce, outcome: surfed|gave_in, trigger?}` — `gave_in` CONTA como deslize do tipo
 - `weight {date, valor}` · `waist {date, valor}` — último do dia vence
@@ -83,7 +83,20 @@ chaves `notifLanche_*`/`notifRevisao_*` (guarda de notificação disparada).
 - **Peso**: a média móvel de 7 dias é a protagonista; pontos crus são esmaecidos. Corredor
   saudável −0,3 a −0,5 kg/sem que ACHATA após 04/10. Ganho na semana da prova = glicogênio, não
   gordura (o gráfico anota isso).
-- **Semana verde de constância** = ≥28/35 refeições (80%) — nunca exigir 35/35.
+- **Semana verde de constância** = ≥28/35 refeições (80%) — nunca exigir 35/35. Com dias de
+  viagem sem registro, a meta ajusta: 80% × 5 × dias cobrados (`metaSemanaRefeicoes`).
+- **Doce PLANEJADO (v7.9)**: `sweet {planejado: true}`, declarado sempre ANTES (bifurcação no
+  sheet do doce — o registro retroativo nunca vira planejado). NÃO é deslize: não reseta
+  anéis/jardim nem conta no never-miss-twice/insights (`ehDeslize` em derive.js centraliza);
+  MAS conta no consumo do §4 (`metricasSemana.sweetPlanejado`). Teto 1/semana com guarda
+  SUAVE (informa, nunca bloqueia). Sem chip de gatilho (não é estressor).
+- **Modo viagem (v7.9)**: `settings.viagens = [{ini, fim}]` (Ajustes), pontas inclusivas.
+  Deslize em dia de viagem não reseta anéis/streak (filtrado em `slipDays`/`ultimoSlipTs`
+  quando `viagens` é passado) mas segue contando no Relatório/§4. Dias de viagem saem dos
+  planos de treino e da meta de refeições (a menos que o usuário treine/registre — aí conta).
+  Cuidado: cadastrar viagem retroativa muda streak/jardim retroativamente (determinístico).
+  UI: chip ✈️ no header, dica do dia no slot contextual (rotação determinística pelo dia da
+  viagem sobre `VIAGEM_GUIA` de data.js), Dieta em modo manutenção, slot de volta (fresh start).
 - **Contrato da noite**: vale da criação até 06h do dia seguinte; fecha com `night_out`.
 - **Dominó quebrado** (dia de ressaca vitorioso) = 3 passos do script + ≥4/5 refeições.
 
@@ -259,7 +272,8 @@ lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto 
 `?contrato=1`, `?detalhe=gym|corrida`, `?dia=YYYY-MM-DD` (dia selecionado na semana do Treino),
 `?posalmoco=1` (registra café/lanche1/almoço agora → escudo pós-almoço no hero; use `hoje` = data
 REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo),
-`?checkpoint=1` (abre o guia do próximo checkpoint — CHECKPOINTS em data.js).
+`?checkpoint=1` (abre o guia do próximo checkpoint — CHECKPOINTS em data.js),
+`?viagem=YYYY-MM-DD:YYYY-MM-DD` (cadastra viagem em settings — persiste, como o seed).
 
 **Screenshots headless** (o Chrome clampa janela em ~500px; o truque é scale factor 2):
 ```bash

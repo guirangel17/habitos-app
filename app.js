@@ -1,10 +1,10 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.8'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.9'; // manter em sincronia com VERSAO do sw.js
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
   FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
-  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_TREINOS, GYM_FASE_POR_MES, CORRIDA_GUIA, CHECKPOINTS,
+  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_TREINOS, GYM_FASE_POR_MES, CORRIDA_GUIA, CHECKPOINTS, VIAGEM_GUIA,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -43,6 +43,7 @@ function el(html) {
   return t.content.firstElementChild;
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const viagensCfg = () => S.getState().settings.viagens || []; // períodos de manutenção (v7.9)
 
 let abaAtiva = ['hoje', 'dieta', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
 let periodoRelatorio = 30; // 30 | 90 | 0 (tudo)
@@ -52,6 +53,10 @@ if (params.get('dia')) { // dev: ?aba=treino&dia=YYYY-MM-DD
   diaTreinoSel = params.get('dia');
   const w = D.inicioSemana(diaTreinoSel);
   if (w !== D.inicioSemana(hojeKey())) semTreinoIni = w; // dia de outra semana abre já naquela semana
+}
+if (params.get('viagem')) { // dev: ?viagem=YYYY-MM-DD:YYYY-MM-DD — cadastra a viagem (persiste, como o seed)
+  const [vIni, vFim] = params.get('viagem').split(':');
+  if (vIni && vFim && vFim >= vIni) S.setSetting('viagens', [...(S.getState().settings.viagens || []).filter((v) => v.ini !== vIni), { ini: vIni, fim: vFim }]);
 }
 
 // ---------- seed de demonstração (dev/testes: ?seed=1 com store vazio) ----------
@@ -158,7 +163,7 @@ function iniciarTickHoje() {
     let proxFlor = null;
     card.querySelectorAll('.tempo-anel').forEach((a) => {
       const type = a.dataset.tipo;
-      const t = D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), agoraTs);
+      const t = D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs, viagensCfg()), agoraTs);
       const m = D.proximoMarco(t.totalDias);
       a.querySelector('.ta-dias').textContent = t.dias;
       a.querySelector('.ta-hms').textContent =
@@ -221,7 +226,9 @@ function renderHoje(root) {
       <p class="cardapio">${esc(rv.principal)}</p>
       ${ouroDomingo ? '<span class="badge-ouro">★ Hoje o jantar é INTENSO — pré-carga do Longão. NÃO corta o carbo.</span>' : ''}
       ${ajuste && !ouroDomingo ? `<p class="ajuste-dia">Hoje (${tipo}): ${esc(ajuste)}</p>` : ''}
-      ${escudo ? `<button class="escudo-sos" id="hero-sos">🍫 Bateu a vontade agora? <b>SOS doce</b> — 10 min de onda, sem julgamento ›</button>` : ''}
+      ${escudo ? (D.docePlanejadoDaSemana(st.events, key)?.date === key
+    ? '<span class="badge-ouro">🍰 Doce planejado hoje — a vontade tem hora marcada. Guarda ela pra ele.</span>'
+    : `<button class="escudo-sos" id="hero-sos">🍫 Bateu a vontade agora? <b>SOS doce</b> — 10 min de onda, sem julgamento ›</button>`) : ''}
       <div class="hero-acoes">
         <button class="acao-primaria" id="hero-feita">✓ Feita</button>
         <button class="acao-secundaria" id="hero-opcoes">substituições / pulei ›</button>
@@ -237,7 +244,7 @@ function renderHoje(root) {
   } else {
     // colheita do dia: a memória do dia é dominada pelo fim — o fim mostra a evidência
     const amanha = (D.parseKey(key).getDay() + 1) % 7;
-    const limpoHoje = !D.slipDays(st.events, 'delivery').includes(key) && !D.slipDays(st.events, 'sweet').includes(key);
+    const limpoHoje = !D.slipDays(st.events, 'delivery', viagensCfg()).includes(key) && !D.slipDays(st.events, 'sweet', viagensCfg()).includes(key);
     const eh = md.escolhido;
     const partes = [];
     if (planoT.corrida) partes.push(`${TIPO_CORRIDA_ICONE[planoT.corrida.tipo]} ${planoT.corrida.nome}${feitoT.corrida ? ' ✓' : ''}`);
@@ -261,7 +268,7 @@ function renderHoje(root) {
 
   // ---- abertura de semana (fresh start): só segunda de manhã ----
   if (D.parseKey(key).getDay() === 1 && agora().getHours() < 12) {
-    const ab = D.aberturaSemana(st.events, key);
+    const ab = D.aberturaSemana(st.events, key, viagensCfg());
     const abre = planoT.corrida && planoT.corrida.tipo === 'longo' ? 'o Longão de hoje abre ela' : 'ela começa hoje';
     const txt = ab.verdesSeguidas >= 2 ? `${ab.verdesSeguidas} semanas verdes seguidas — ${abre}.`
       : ab.verdeAnterior ? `semana verde fechada ✓ — ${abre}.`
@@ -299,8 +306,8 @@ function renderHoje(root) {
   root.append(linhaT);
 
   // ---- aviso never-miss-twice (só quando acionável) ----
-  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
-  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
+  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey, viagensCfg());
+  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey, viagensCfg());
   for (const [nome, c] of [['iFood', cDeliv], ['doce', cDoce]]) {
     if (c.amassado) {
       root.append(el(`<div class="card aviso-nmt"><b>Contador de ${nome} amassado — não quebrado.</b>
@@ -476,7 +483,60 @@ function slotContextual(st, key) {
     return [c];
   }
 
+  // 6. volta de viagem (fresh start da reentrada) — ontem/anteontem foi o último dia
+  const voltaDe = viagensCfg().find((v) => v.fim === D.addDays(key, -1) || v.fim === D.addDays(key, -2));
+  if (voltaDe && !st.settings[`voltaDispensada_${voltaDe.fim}`]) {
+    const longa = D.diffDays(voltaDe.ini, voltaDe.fim) + 1 >= 10;
+    const c = el(`<div class="card ressaca-banner"><b>🔙 De volta.</b>
+      Fresh start: mercado hoje, corrida leve amanhã.${longa ? ' Primeira semana com volume reduzido — o corpo volta rápido; a pressa é que machuca.' : ''}
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="acao-primaria" style="margin:0;padding:11px" id="ok">✓ Bora</button>
+      </div></div>`);
+    c.querySelector('#ok').onclick = () => S.setSetting(`voltaDispensada_${voltaDe.fim}`, true);
+    return [c];
+  }
+
+  // 7. viagem ativa — modo manutenção com a dica do dia (rotação determinística pelo dia da viagem)
+  const vg = D.viagemDoDia(key, viagensCfg());
+  if (vg) {
+    const [dicaT, dicaD] = VIAGEM_GUIA[(vg.dia - 1) % VIAGEM_GUIA.length];
+    const c = el(`<div class="card card-viagem"><b>✈️ Viagem · dia ${vg.dia} de ${vg.total}</b>
+      <span style="display:block;margin-top:6px"><b style="font-weight:600">${esc(dicaT)}.</b> ${esc(dicaD)}</span>
+      <button class="acao-secundaria" style="margin-top:10px" id="guia">guia completo da viagem ›</button></div>`);
+    c.querySelector('#guia').onclick = () => sheetGuiaViagem();
+    return [c];
+  }
+
   return [];
+}
+
+// guia completo do modo viagem — evidência sem sermão, no tom do app
+function sheetGuiaViagem() {
+  const box = el('<div><h3>✈️ Guia de viagem</h3><p style="font-size:.78rem;color:var(--muted);margin:-4px 0 10px">Meta: voltar inteiro, não voltar melhor. O plano espera você.</p><div class="exercicios"></div></div>');
+  const lista = box.querySelector('.exercicios');
+  VIAGEM_GUIA.forEach(([t, d], i) => {
+    lista.append(el(`<div class="exercicio"><span class="ex-num">${i + 1}</span><span class="ex-nome">${esc(t)}<small>${esc(d)}</small></span></div>`));
+  });
+  abrirSheet(box);
+}
+
+// cadastrar viagem (Ajustes) — só o range de datas; o modo liga e desliga sozinho
+function sheetViagem(key) {
+  const box = el(`<div><h3>✈️ Nova viagem</h3>
+    <p style="font-size:.8rem;color:var(--muted)">Só as datas — o resto o app cuida quando o dia chegar.</p>
+    <p style="font-size:.75rem;color:var(--muted);margin:10px 0 4px">Primeiro dia</p>
+    <input type="date" id="ini" class="input-data" value="${key}">
+    <p style="font-size:.75rem;color:var(--muted);margin:10px 0 4px">Último dia</p>
+    <input type="date" id="fim" class="input-data" value="${key}">
+    <button class="acao-primaria" id="ok">Adicionar viagem ✓</button></div>`);
+  box.querySelector('#ok').onclick = () => {
+    const ini = box.querySelector('#ini').value, fim = box.querySelector('#fim').value;
+    if (!ini || !fim || fim < ini) { snackbar('Confere as datas: o último dia vem depois do primeiro.'); return; }
+    S.setSetting('viagens', [...viagensCfg(), { ini, fim }]);
+    fecharSheet();
+    snackbar(`Viagem ${fmtData(ini)} – ${fmtData(fim)} cadastrada. Boa viagem — o plano espera você. ✈️`);
+  };
+  abrirSheet(box);
 }
 
 function placarContrato(ct) {
@@ -558,13 +618,13 @@ function sheetRegistrar(key) {
     <div class="opcoes">
       <button class="opcao" id="r-peso">⚖️ Peso / cintura</button>
       <button class="opcao" id="r-delivery">🛵 Pedi delivery</button>
-      <button class="opcao" id="r-sweet">🍫 Doce fora do plano</button>
+      <button class="opcao" id="r-sweet">🍫 Doce<small>já aconteceu (registrar) — ou planejar um da semana</small></button>
       <button class="opcao" id="r-noite">🍻 Noite fora<small>vou sair (contrato) ou já saí (registrar)</small></button>
     </div>
     <button class="acao-secundaria" id="r-sos">Bateu a vontade AGORA e ainda não cedeu? → Abrir SOS</button></div>`);
   box.querySelector('#r-peso').onclick = () => sheetPeso(key);
   box.querySelector('#r-delivery').onclick = () => sheetEvento('delivery', key);
-  box.querySelector('#r-sweet').onclick = () => sheetEvento('sweet', key);
+  box.querySelector('#r-sweet').onclick = () => sheetDoce(key);
   box.querySelector('#r-noite').onclick = () => sheetNoiteFora(key);
   box.querySelector('#r-sos').onclick = () => { fecharSheet(); abrirSOS(); };
   abrirSheet(box);
@@ -579,6 +639,63 @@ function sheetNoiteFora(key) {
     </div></div>`);
   box.querySelector('#vou').onclick = () => sheetContrato(key);
   box.querySelector('#ja').onclick = () => sheetNoite(key);
+  abrirSheet(box);
+}
+
+// duas rotas, como a noite fora: pré-decisão (doce planejado, v7.9) ou registro após o fato.
+// A pré-decisão é a única porta do "planejado" — registrar depois nunca vira planejado
+// (sem racionalização retroativa; o valor do pré-compromisso é decidir ANTES da vontade).
+function sheetDoce(key) {
+  const box = el(`<div><h3>Doce</h3>
+    <div class="opcoes">
+      <button class="opcao" id="plano">📝 Planejar um doce — sem quebrar nada<small>Decida ANTES: doce planejado não é deslize — não reseta anel nem jardim.</small></button>
+      <button class="opcao" id="ja">🍫 Já aconteceu — registrar<small>Sem culpa — vira dado.</small></button>
+    </div></div>`);
+  box.querySelector('#plano').onclick = () => sheetDocePlanejado(key);
+  box.querySelector('#ja').onclick = () => sheetEvento('sweet', key);
+  abrirSheet(box);
+}
+
+function sheetDocePlanejado(key) {
+  const st = S.getState();
+  let dia = key;
+  const box = el(`<div><h3>🍰 Doce planejado</h3>
+    <p style="font-size:.8rem;color:var(--muted)">Planejado e saboreado — sem culpa, sem reset. Para quando?</p>
+    <div class="chips" id="dias"></div>
+    <input type="date" id="data" class="input-data" min="${key}" value="${key}">
+    <div id="guarda"></div>
+    <button class="acao-primaria" id="ok">Planejar doce ✓</button>
+    <div id="existentes"></div>
+    <p style="font-size:.72rem;color:var(--muted);margin-top:10px">1 por semana é o teto que protege a meta do §4 — restrição flexível funciona quando é limitada.</p></div>`);
+  // planejados de hoje em diante: mudar de ideia = remover (o evento é o próprio registro)
+  const futuros = st.events.filter((e) => e.type === 'sweet' && e.planejado && e.date >= key);
+  for (const f of futuros) {
+    const row = el(`<div class="ajuste-linha"><span>🍰 ${fmtData(f.date)} — planejado ✓</span><button class="acao-secundaria" style="width:auto;margin:0">remover</button></div>`);
+    row.querySelector('button').onclick = () => { S.removeEvent(f.id); fecharSheet(); snackbar('Doce planejado removido.'); };
+    box.querySelector('#existentes').append(row);
+  }
+  const chips = [['hoje', key], ['amanhã', D.addDays(key, 1)], ['sábado', D.addDays(D.inicioSemana(key), 5) >= key ? D.addDays(D.inicioSemana(key), 5) : D.addDays(D.inicioSemana(key), 12)]];
+  const dataEl = box.querySelector('#data');
+  const atualizarGuarda = () => {
+    const jaTem = D.docePlanejadoDaSemana(st.events, dia);
+    box.querySelector('#guarda').innerHTML = jaTem
+      ? `<p style="font-size:.78rem;color:var(--ink-2);margin:8px 0 0">O planejado dessa semana já foi (${fmtData(jaTem.date)}). Um segundo entra como doce normal — ou joga pra semana que vem.</p>`
+      : '';
+    box.querySelector('#ok').style.display = jaTem ? 'none' : '';
+  };
+  const diasEl = box.querySelector('#dias');
+  for (const [rotulo, d] of chips) {
+    const b = el(`<button class="${d === dia ? 'sel' : ''}">${rotulo}</button>`);
+    b.onclick = () => { dia = d; dataEl.value = d; diasEl.querySelectorAll('button').forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); atualizarGuarda(); };
+    diasEl.append(b);
+  }
+  dataEl.onchange = () => { if (dataEl.value >= key) { dia = dataEl.value; diasEl.querySelectorAll('button').forEach((x) => x.classList.remove('sel')); atualizarGuarda(); } };
+  box.querySelector('#ok').onclick = () => {
+    const e = S.addEvent({ type: 'sweet', date: dia, planejado: true });
+    fecharSheet();
+    snackbar(`Doce de ${fmtData(dia)} planejado. Anel e jardim seguem intactos — aproveita de verdade.`, () => S.removeEvent(e.id));
+  };
+  atualizarGuarda();
   abrirSheet(box);
 }
 
@@ -1152,13 +1269,28 @@ function renderDieta(root) {
   const meals = D.mealsOfDay(st.events, key);
   const rv = refeicaoDaVez(meals);
 
-  // contexto do dia: o "porquê" do tipo de hoje
-  const faseTxt = { deficit: 'déficit', manutencao: 'manutenção', carga: '★ carga de carbo', prova: '🏁 prova' }[faseAtual];
-  root.append(el(`<div class="card dieta-contexto">
-    <h2>Dia ${tipo} · fase ${esc(faseTxt)}</h2>
-    <p><b class="num">${esc(metas.kcal)} kcal</b> · P ${esc(metas.p)} · C ${esc(metas.c)} · G ${esc(metas.g)}</p>
-    <p class="dieta-porque">Por quê: ${esc(TREINO_POR_DIA[D.parseKey(key).getDay()])}</p>
-  </div>`));
+  // contexto do dia: o "porquê" do tipo de hoje — em viagem, vira o modo manutenção
+  const vgDieta = D.viagemDoDia(key, viagensCfg());
+  if (vgDieta) {
+    const regras = [VIAGEM_GUIA[1], VIAGEM_GUIA[3], VIAGEM_GUIA[5]]; // proteína, álcool 1×1, never miss twice
+    const cardVg = el(`<div class="card dieta-contexto">
+      <h2>✈️ Viagem · dia ${vgDieta.dia} de ${vgDieta.total}</h2>
+      <p class="dieta-porque">Modo manutenção — o plano volta em ${fmtData(D.addDays(vgDieta.fim, 1))}. Registrar refeição é opcional; nada aqui cobra.</p>
+      <div class="exercicios" style="margin-top:8px">${regras.map(([t, d]) => `<div class="exercicio"><span class="ex-num">›</span><span class="ex-nome">${esc(t)}<small>${esc(d)}</small></span></div>`).join('')}</div>
+      <button class="acao-secundaria" id="guia-vg" style="margin-top:10px">guia completo da viagem ›</button>
+    </div>`);
+    cardVg.querySelector('#guia-vg').onclick = () => sheetGuiaViagem();
+    root.append(cardVg);
+  } else {
+    const faseTxt = { deficit: 'déficit', manutencao: 'manutenção', carga: '★ carga de carbo', prova: '🏁 prova' }[faseAtual];
+    const docePlan = D.docePlanejadoDaSemana(st.events, key);
+    root.append(el(`<div class="card dieta-contexto">
+      <h2>Dia ${tipo} · fase ${esc(faseTxt)}</h2>
+      <p><b class="num">${esc(metas.kcal)} kcal</b> · P ${esc(metas.p)} · C ${esc(metas.c)} · G ${esc(metas.g)}</p>
+      <p class="dieta-porque">Por quê: ${esc(TREINO_POR_DIA[D.parseKey(key).getDay()])}</p>
+      ${docePlan && docePlan.date >= key ? `<p class="dieta-porque">🍰 Doce planejado ${docePlan.date === key ? 'hoje' : fmtData(docePlan.date)} — guarda a vontade pra ele.</p>` : ''}
+    </div>`));
+  }
 
   // trilha das 5 refeições (toque abre opções de registro)
   const trilha = el('<div class="card trilha-card"><div class="trilha"></div></div>');
@@ -1177,7 +1309,9 @@ function renderDieta(root) {
   }
   root.append(trilha);
 
-  // cardápio do dia inteiro (principal + ajuste do tipo, sem abrir sheet por sheet)
+  // cardápio do dia inteiro (principal + ajuste do tipo, sem abrir sheet por sheet).
+  // Em viagem não faz sentido — o card de contexto já traz as regras de sobrevivência.
+  if (vgDieta) { root.append(semanaEmNumeros(st, key)); return; }
   const cardCardapio = el('<div class="card"><h2>Cardápio de hoje <small>· toque para registrar / ver substituições</small></h2><div class="cardapio-dia"></div></div>');
   const cw = cardCardapio.querySelector('.cardapio-dia');
   for (const r of REFEICOES) {
@@ -1198,19 +1332,32 @@ function renderDieta(root) {
   root.append(cardCardapio);
 
   // semana em números (§4) — movido da Evolução
+  root.append(semanaEmNumeros(st, key));
+}
+
+// card "Semana" da Dieta (§4) — meta de refeições ajustada por dias de viagem sem registro
+function semanaEmNumeros(st, key) {
   const m = D.metricasSemana(st.events, key);
   const b = st.settings.baseline;
-  let refSemana = 0;
-  for (let i = 0; i < 7; i++) refSemana += D.mealsDone(D.mealsOfDay(st.events, D.addDays(m.ini, i)));
-  root.append(el(`<div class="card"><h2>Semana <small>· metas de 30 dias do protocolo</small></h2>
+  let refSemana = 0, cobrados = 7;
+  for (let i = 0; i < 7; i++) {
+    const d = D.addDays(m.ini, i);
+    const n = D.mealsDone(D.mealsOfDay(st.events, d));
+    refSemana += n;
+    if (n === 0 && D.emViagem(d, viagensCfg())) cobrados--;
+  }
+  const metaRef = D.metaSemanaRefeicoes(cobrados);
+  const alvoRef = cobrados * 5;
+  return el(`<div class="card"><h2>Semana <small>· metas de 30 dias do protocolo</small></h2>
     <div class="tiles">
       ${tileMetrica('Delivery por impulso', m.delivery, b.delivery, 'delivery')}
       ${tileMetrica('Doces fora do plano', m.sweet, b.sweet, 'sweet')}
       ${tileMetrica('Drinks por saída', m.drinks, b.drinks, 'drinks')}
     </div>
-    <p class="const-linha">Refeições no plano: <b class="num">${refSemana}/35</b> ${refSemana >= 28 ? '<span style="color:var(--good-text)">✓ semana verde</span>' : '<small style="color:var(--muted)">· verde a partir de 28 (80%)</small>'}</p>
+    ${m.sweetPlanejado ? `<p style="font-size:.72rem;color:var(--muted);margin-top:6px">🍰 ${m.sweetPlanejado} dos doces foi planejado — conta no consumo, não como deslize.</p>` : ''}
+    <p class="const-linha">Refeições no plano: <b class="num">${refSemana}/${alvoRef}</b> ${cobrados < 7 ? '<small style="color:var(--muted)">· ✈️ semana com viagem</small> ' : ''}${cobrados > 0 && refSemana >= metaRef ? '<span style="color:var(--good-text)">✓ semana verde</span>' : `<small style="color:var(--muted)">· verde a partir de ${metaRef} (80%)</small>`}</p>
     ${b.delivery == null ? '<p style="font-size:.72rem;color:var(--muted);margin-top:8px">Defina seu baseline em Ajustes (⚙️ no topo) para ativar as metas de −50%.</p>' : ''}
-  </div>`));
+  </div>`);
 }
 
 // ================================================================
@@ -1228,7 +1375,7 @@ function renderTreino(root) {
   const futuro = alvo > key;
 
   // semana — cada dia é um botão que troca o card de treino abaixo; ‹ › navegam semanas passadas
-  const sem = D.semanaTreino(st.events, semTreinoIni || key);
+  const sem = D.semanaTreino(st.events, semTreinoIni || key, viagensCfg());
   const semanaAtualIni = D.inicioSemana(key);
   const limite = limiteSemanaTreino(key);
   const cardSem = el(`<div class="card"><div class="treino-cab">
@@ -1256,11 +1403,14 @@ function renderTreino(root) {
   const letras = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
   const forcasGarmin = forcasPorData();
   sem.dias.forEach((d, i) => {
+    // dia de viagem sem nenhum check = um único dot neutro ✈️ (nunca "perdido")
+    const soViagem = d.viagem && !d.feito.corrida && !d.feito.gym;
     const col = el(`<button class="sem-dia ${d.date === key ? 'hoje' : ''} ${d.date === alvo ? 'sel' : ''}" aria-pressed="${d.date === alvo}" aria-label="ver treino de ${fmtData(d.date)}">
       <span class="sem-letra">${letras[i]}</span>
-      ${d.plano.corrida ? `<span class="sem-dot ${d.feito.corrida ? 'ok' : d.date < key ? 'perdido' : ''}">${TIPO_CORRIDA_ICONE[d.plano.corrida.tipo]}</span>` : ''}
-      ${d.plano.gym ? `<span class="sem-dot ${d.feito.gym ? 'ok' : forcasGarmin.has(d.date) && d.date < key ? 'evid' : d.date < key ? 'perdido' : ''}">🏋️</span>` : ''}
-      ${!d.plano.corrida && !d.plano.gym ? '<span class="sem-dot descanso">–</span>' : ''}
+      ${soViagem ? '<span class="sem-dot viagem">✈️</span>' : `
+      ${d.plano.corrida ? `<span class="sem-dot ${d.feito.corrida ? 'ok' : d.viagem ? 'viagem' : d.date < key ? 'perdido' : ''}">${TIPO_CORRIDA_ICONE[d.plano.corrida.tipo]}</span>` : ''}
+      ${d.plano.gym ? `<span class="sem-dot ${d.feito.gym ? 'ok' : d.viagem ? 'viagem' : forcasGarmin.has(d.date) && d.date < key ? 'evid' : d.date < key ? 'perdido' : ''}">🏋️</span>` : ''}
+      ${!d.plano.corrida && !d.plano.gym ? '<span class="sem-dot descanso">–</span>' : ''}`}
     </button>`);
     col.onclick = () => { diaTreinoSel = d.date === key ? null : d.date; render(); };
     semWrap.append(col);
@@ -1328,11 +1478,12 @@ function renderTreino(root) {
     const passada = data < key;
     const hoje = data === key;
     const temAnalise = analisesDoDia(data).length > 0;
-    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
+    const viagem = D.emViagem(data, viagensCfg()); // corrida em viagem sem check: neutra, nunca "perdida"
+    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise && !viagem ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
       <button class="cron-toggle">
         <span class="caixa">${ok ? '✓' : ''}</span>
         <span class="cron-data num">${fmtData(data)}</span>
-        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}</span>
+        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}${viagem && !ok ? ' <span class="cron-badge">✈️</span>' : ''}</span>
       </button>
       <button class="tr-ver cron-ver" aria-label="ver guia da corrida">›</button>
     </div>`);
@@ -1504,7 +1655,7 @@ function legendaJardim(st, key) {
   const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
   const prox = ['delivery', 'sweet'].map((type) => {
     const icone = type === 'delivery' ? '🛵' : '🍫';
-    const t = D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), Date.now());
+    const t = D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs, viagensCfg()), Date.now());
     const flor = MARCOS_FLOR.find((f) => f > t.totalDias);
     if (!flor) return `${icone} todas as flores de marco até 120d já são suas`;
     return `${icone} próxima flor: marco de ${flor} dias — faltam ${Math.max(1, Math.ceil(flor - t.totalDias))}d`;
@@ -1521,7 +1672,7 @@ function legendaJardim(st, key) {
 
 function dadosJardim(st, key) {
   const inicioTs = D.parseKey(st.settings.startKey || key).getTime();
-  const dias = (type) => Math.floor(D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs), Date.now()).totalDias);
+  const dias = (type) => Math.floor(D.tempoLimpo(D.ultimoSlipTs(st.events, type, inicioTs, viagensCfg()), Date.now()).totalDias);
   return {
     plantas: [
       { icone: '🛵', dias: dias('delivery') },
@@ -1562,7 +1713,7 @@ function contadoresOverlay() {
     { type: 'sweet', icone: '🍫', nome: 'Sem doce fora do plano' },
   ];
   const anelEls = defs.map((d, i) => {
-    const c = D.contadorResiliente(st.events, d.type, key, st.settings.startKey);
+    const c = D.contadorResiliente(st.events, d.type, key, st.settings.startKey, viagensCfg());
     const box = el(`<div class="anel-card">
       <svg viewBox="0 0 200 200" class="anel-svg">
         <defs><linearGradient id="grad${i}" x1="0" y1="0" x2="1" y2="1">
@@ -1592,7 +1743,7 @@ function contadoresOverlay() {
     const eventos = S.getState().events;
     const agoraTs = Date.now();
     for (const a of anelEls) {
-      const desde = D.ultimoSlipTs(eventos, a.type, inicioTs);
+      const desde = D.ultimoSlipTs(eventos, a.type, inicioTs, viagensCfg());
       const t = D.tempoLimpo(desde, agoraTs);
       const marco = D.proximoMarco(t.totalDias);
       a.box.querySelector('.anel-dias').textContent = t.dias;
@@ -1671,7 +1822,9 @@ function wizardRevisao(semanaIni, passoInicial = 0) {
 
   const passos = [
     () => {
+      const diasViagem = Array.from({ length: 7 }, (_, i) => D.addDays(semanaIni, i)).filter((d) => D.emViagem(d, viagensCfg())).length;
       corpo.innerHTML = `<div class="num-passo">PASSO 1 DE 6 · OS TRÊS NÚMEROS</div>
+        ${diasViagem ? `<p style="color:var(--ink-2);font-size:.85rem">✈️ ${diasViagem} dia${diasViagem > 1 ? 's' : ''} de viagem nesta semana — modo manutenção, leia os números com esse desconto.</p>` : ''}
         ${linhaMetrica('🛵 Delivery por impulso', m.delivery, mAnt.delivery, b.delivery != null ? `≤ ${String(b.delivery * 0.5).replace('.', ',')}` : '−50% do baseline', (v) => b.delivery != null && v <= b.delivery * 0.5)}
         ${linhaMetrica('🍫 Doces fora do plano', m.sweet, mAnt.sweet, b.sweet != null ? `≤ ${String(b.sweet * 0.5).replace('.', ',')}` : '−50% do baseline', (v) => b.sweet != null && v <= b.sweet * 0.5)}
         ${linhaMetrica('🍻 Drinks por saída', m.drinks, mAnt.drinks, '≤ 3', (v) => v <= 3)}
@@ -1802,8 +1955,8 @@ function renderEvolucao(root) {
 
   // identidade
   const ident = D.identidadeAssinada(st.events, key);
-  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey);
-  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey);
+  const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey, viagensCfg());
+  const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey, viagensCfg());
   root.append(el('<div class="secao">IDENTIDADE</div>'));
   root.append(el(`<div class="card ${ident.assinada ? 'card-assinado' : ''}">
     <p class="frase-identidade ${ident.assinada ? 'assinada' : ''}">“${FRASE_IDENTIDADE}”</p>
@@ -1844,6 +1997,12 @@ function renderEvolucao(root) {
       if (ritmo < -0.55) { r.className = 'ritmo alerta'; r.textContent = `Ritmo: ${ritmo.toFixed(2).replace('.', ',')} kg/sem — caindo rápido demais. O plano manda subir ~150 kcal.`; }
       else if (ritmo <= -0.25) { r.className = 'ritmo ok'; r.textContent = `Ritmo: ${ritmo.toFixed(2).replace('.', ',')} kg/sem — dentro do corredor. É exatamente isso.`; }
       else { r.className = 'ritmo'; r.textContent = `Ritmo: ${ritmo.toFixed(2).replace('.', ',')} kg/sem — acima do corredor. Tendência manda mais que o dia; segura o plano.`; }
+    }
+    // pós-viagem: mesmo racional da nota de glicogênio da semana da prova — subida ≠ gordura
+    const posViagem = viagensCfg().some((v) => key >= v.ini && key <= D.addDays(v.fim, 7));
+    if (posViagem) {
+      cardPeso.querySelector('#rit').insertAdjacentHTML('afterend',
+        '<p style="font-size:.75rem;color:var(--muted);margin-top:6px">✈️ Viagem recente: os primeiros dias de subida são água/glicogênio/sódio — espera a média de 7d assentar antes de ler tendência.</p>');
     }
   } else {
     cardPeso.querySelector('#g').innerHTML = '<p style="font-size:.85rem;color:var(--muted)">Registre o peso 2+ vezes para ver a tendência. O valor do dia é ruído; a média de 7 dias é o sinal.</p>';
@@ -1955,7 +2114,7 @@ function renderEvolucao(root) {
   if (st.events.some((e) => e.type === 'workout' && e.kind === 'gym') || forcasGarmin.size) {
     root.append(el('<div class="secao">FORÇA</div>'));
     const nSem = Math.min(16, Math.floor(D.diffDays(limiteSemanaTreino(key), D.inicioSemana(key)) / 7) + 1);
-    const gf = D.gradeForca(st.events, key, nSem, forcasGarmin);
+    const gf = D.gradeForca(st.events, key, nSem, forcasGarmin, viagensCfg());
     const cardFor = el(`<div class="card"><h2>Musculação por semana <small>· Ter–Sáb · toque numa semana para abrir na aba Treino</small></h2>
       <div class="for-cab"><span></span>${['T', 'Q', 'Q', 'S', 'S'].map((l) => `<span>${l}</span>`).join('')}<span></span></div>
       <div class="for-linhas"></div></div>`);
@@ -1963,8 +2122,8 @@ function renderEvolucao(root) {
     for (const s of gf) {
       const row = el(`<button class="for-sem" aria-label="abrir a semana de ${fmtData(s.ini)} na aba Treino">
         <span class="const-label num">${fmtData(s.ini)}</span>
-        ${s.dias.map((d) => `<span class="cel ${d.estado}">${d.estado === 'evidencia' ? '✨' : ''}</span>`).join('')}
-        <span class="const-total num ${s.completa ? 'verde' : ''}">${s.feitos}/5${s.completa ? ' ✓' : ''}</span>
+        ${s.dias.map((d) => `<span class="cel ${d.estado}">${d.estado === 'evidencia' ? '✨' : d.estado === 'viagem' ? '✈️' : ''}</span>`).join('')}
+        <span class="const-total num ${s.completa ? 'verde' : ''}">${s.plan === 0 ? '✈️' : `${s.feitos}/${s.plan}${s.completa ? ' ✓' : ''}`}</span>
       </button>`);
       row.onclick = () => { // mesma mecânica dos botões da nav — render() re-arma o protegerVoltar
         semTreinoIni = s.ini === D.inicioSemana(key) ? null : s.ini;
@@ -1979,16 +2138,18 @@ function renderEvolucao(root) {
 
   // constância: uma linha legível por semana, meta = 80% (28/35), não perfeição
   root.append(el('<div class="secao">CONSTÂNCIA</div>'));
-  const hm = D.heatmapConstancia(st.events, key, 8);
+  const hm = D.heatmapConstancia(st.events, key, 8, viagensCfg());
   const cardHm = el(`<div class="card"><h2>Constância <small>· refeições no plano · meta da semana: 28/35 (80%)</small></h2>
     <div class="const-cab"><span></span>${['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((l) => `<span>${l}</span>`).join('')}<span></span></div>
     ${hm.map((sem) => {
-      const total = sem.dias.reduce((s, n) => s + (n || 0), 0);
+      const nums = sem.dias.filter((n) => typeof n === 'number');
+      const total = nums.reduce((s, n) => s + n, 0);
       const fechada = sem.dias.every((n) => n !== null);
-      const verde = fechada && total >= 28;
+      const meta = D.metaSemanaRefeicoes(nums.length); // dias de viagem sem registro saem da meta
+      const verde = fechada && nums.length > 0 && total >= meta;
       return `<div class="const-sem">
         <span class="const-label num">${fmtData(sem.ini)}</span>
-        ${sem.dias.map((n) => n === null ? '<span class="cel vazio"></span>' : `<span class="cel n${n}" title="${n}/5"></span>`).join('')}
+        ${sem.dias.map((n) => n === null ? '<span class="cel vazio"></span>' : n === 'viagem' ? '<span class="cel viagem" title="viagem">✈️</span>' : `<span class="cel n${n}" title="${n}/5"></span>`).join('')}
         <span class="const-total num ${verde ? 'verde' : ''}">${total}${verde ? ' ✓' : ''}</span>
       </div>`;
     }).join('')}
@@ -2262,7 +2423,7 @@ function graficoVolume(kmSemanas) {
 function textoResumoMensal(st, key) {
   const ini = key.slice(0, 8) + '01';
   const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-  const r = D.resumoPeriodo(st.events, ini, key);
+  const r = D.resumoPeriodo(st.events, ini, key, viagensCfg());
   const bl = st.settings.baseline || {};
   const v = (x, casas = 1) => x.toFixed(casas).replace('.', ',');
   const linhas = [`📊 Rotina — ${MESES[+key.slice(5, 7) - 1]} (até ${fmtData(key)})`];
@@ -2300,8 +2461,8 @@ function renderRelatorio(root) {
 
   const dias = periodoRelatorio || Math.max(1, D.diffDays(inicio, key) + 1);
   const ini = periodoRelatorio ? D.addDays(key, -dias + 1) : inicio;
-  const agora_ = D.resumoPeriodo(st.events, ini, key);
-  const antes = periodoRelatorio ? D.resumoPeriodo(st.events, D.addDays(ini, -dias), D.addDays(ini, -1)) : null;
+  const agora_ = D.resumoPeriodo(st.events, ini, key, viagensCfg());
+  const antes = periodoRelatorio ? D.resumoPeriodo(st.events, D.addDays(ini, -dias), D.addDays(ini, -1), viagensCfg()) : null;
 
   // placar do período — delta vs período anterior (verde quando na direção certa)
   const delta = (v, vAnt, bomQuandoCai, fmt = (x) => x) => {
@@ -2408,7 +2569,7 @@ function renderRelatorio(root) {
   root.append(share);
 
   // totais desde o início
-  const tudo = D.resumoPeriodo(st.events, inicio, key);
+  const tudo = D.resumoPeriodo(st.events, inicio, key, viagensCfg());
   const cs = D.corridasStats(st.events, key);
   root.append(el('<div class="secao">DESDE O INÍCIO · ' + fmtData(inicio) + '</div>'));
   root.append(el(`<div class="card"><div class="tiles" style="grid-template-columns:1fr 1fr 1fr">
@@ -2552,6 +2713,27 @@ function renderAjustes(root) {
     tipos.append(b);
   }
   root.append(cardTipo);
+
+  // viagens (v7.9): modo manutenção com datas — liga e desliga sozinho
+  const cardVg = el(`<div class="card"><h2>✈️ Viagens <small>· modo manutenção — liga e desliga sozinho nas datas</small></h2>
+    <p style="font-size:.75rem;color:var(--muted);margin-bottom:8px">Durante a viagem: treinos e refeições saem da cobrança, anéis e jardim ficam protegidos, e a Hoje mostra a dica do dia.</p>
+    <div id="vg-lista"></div>
+    <button class="acao-secundaria" id="vg-add">＋ Adicionar viagem</button></div>`);
+  const vgLista = cardVg.querySelector('#vg-lista');
+  const listaVgs = [...viagensCfg()].sort((a, b2) => (a.ini < b2.ini ? -1 : 1));
+  if (!listaVgs.length) vgLista.append(el('<p style="font-size:.78rem;color:var(--muted)">Nenhuma viagem cadastrada.</p>'));
+  for (const v of listaVgs) {
+    const nDias = D.diffDays(v.ini, v.fim) + 1;
+    const passada = v.fim < key;
+    const row = el(`<div class="ajuste-linha" ${passada ? 'style="opacity:.55"' : ''}><span>${passada ? '' : '✈️ '}${fmtData(v.ini)} – ${fmtData(v.fim)} · ${nDias} dia${nDias > 1 ? 's' : ''}${D.emViagem(key, [v]) ? ' <b style="color:var(--serie-1)">· agora</b>' : ''}</span><button class="acao-secundaria" style="width:auto;margin:0" aria-label="remover viagem">✕</button></div>`);
+    row.querySelector('button').onclick = () => {
+      S.setSetting('viagens', viagensCfg().filter((x) => !(x.ini === v.ini && x.fim === v.fim)));
+      snackbar('Viagem removida.', () => S.setSetting('viagens', [...viagensCfg(), v]));
+    };
+    vgLista.append(row);
+  }
+  cardVg.querySelector('#vg-add').onclick = () => sheetViagem(key);
+  root.append(cardVg);
 
   // backup
   const dias = diasDesdeBackup(st);
@@ -2697,7 +2879,10 @@ function render() {
   const tipo = D.tipoDoDia(key, st.settings.dayTypeOverrides);
   const faseAtual = D.fase(key);
   const metas = (faseAtual === 'deficit' ? METAS_DIA.deficit : METAS_DIA.manutencao)[tipo];
-  $('#chip-dia').innerHTML = `<span class="tipo">${tipo}</span><span class="metas num">${metas.kcal} · P ${metas.p}</span>`;
+  const vgChip = D.viagemDoDia(key, viagensCfg());
+  $('#chip-dia').innerHTML = vgChip
+    ? `<span class="tipo">✈️ VIAGEM</span><span class="metas num">dia ${vgChip.dia}/${vgChip.total}</span>`
+    : `<span class="tipo">${tipo}</span><span class="metas num">${metas.kcal} · P ${metas.p}</span>`;
 
   const root = $('#conteudo');
   root.innerHTML = '';

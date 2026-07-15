@@ -50,13 +50,39 @@ export function mealsDone(mealMap) {
   return MEAL_IDS.filter((m) => mealMap[m] === 'ok' || mealMap[m] === 'sub').length;
 }
 
-export function slipDays(events, type) {
-  // dias (dateKey) que tiveram pelo menos um deslize do tipo
+// o evento conta como deslize do tipo? Doce PLANEJADO (pré-decidido, v7.9) não é
+// deslize — restrição flexível ≠ falha (Westenhoefer; evita o efeito violação da abstinência)
+function ehDeslize(e, type) {
+  if (e.planejado) return false;
+  return e.type === type
+    || (type === 'delivery' && e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in')
+    || (type === 'sweet' && e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in');
+}
+
+// ---- Viagens (v7.9): períodos de manutenção — settings.viagens = [{ini, fim}] ----
+export function emViagem(key, viagens = []) {
+  return viagens.some((v) => key >= v.ini && key <= v.fim);
+}
+
+export function viagemDoDia(key, viagens = []) {
+  const v = viagens.find((x) => key >= x.ini && key <= x.fim);
+  return v ? { ini: v.ini, fim: v.fim, dia: diffDays(v.ini, key) + 1, total: diffDays(v.ini, v.fim) + 1 } : null;
+}
+
+// doce planejado da semana de key (seg–dom), ou null — guarda suave de 1/semana
+export function docePlanejadoDaSemana(events, key) {
+  const ini = inicioSemana(key), fim = addDays(ini, 6);
+  return events.find((e) => e.type === 'sweet' && e.planejado && e.date >= ini && e.date <= fim) || null;
+}
+
+export function slipDays(events, type, viagens = []) {
+  // dias (dateKey) que tiveram pelo menos um deslize do tipo.
+  // Deslize em dia de viagem fica de fora: viagem protege streak/anéis/jardim (vira só dado de Relatório)
   const s = new Set();
   for (const e of events) {
-    if (e.type === type) s.add(e.date || dateKey(new Date(e.ts)));
-    if (type === 'delivery' && e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in') s.add(e.date || dateKey(new Date(e.ts)));
-    if (type === 'sweet' && e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in') s.add(e.date || dateKey(new Date(e.ts)));
+    if (!ehDeslize(e, type)) continue;
+    const d = e.date || dateKey(new Date(e.ts));
+    if (!emViagem(d, viagens)) s.add(d);
   }
   return [...s].sort();
 }
@@ -64,8 +90,8 @@ export function slipDays(events, type) {
 // ---- Contador resiliente (never miss twice, Protocolo 3B.6) ----
 // A streak só quebra com deslizes em DOIS dias consecutivos. Um deslize isolado
 // deixa o contador "amassado" por 24h mas não zera a contagem resiliente.
-export function contadorResiliente(events, type, hojeKey, startKey) {
-  const slips = slipDays(events, type).filter((d) => d <= hojeKey);
+export function contadorResiliente(events, type, hojeKey, startKey, viagens = []) {
+  const slips = slipDays(events, type, viagens).filter((d) => d <= hojeKey);
   const inicio = startKey || (slips.length ? slips[0] : hojeKey);
 
   // segmentos de streak: quebra acontece no 2º dia de um par consecutivo
@@ -121,11 +147,14 @@ export function inicioSemana(key) {
 export function metricasSemana(events, key) {
   const ini = inicioSemana(key), fim = addDays(ini, 6);
   const dentro = (e) => { const d = e.date || dateKey(new Date(e.ts)); return d >= ini && d <= fim; };
+  // consumo HONESTO do §4: doce planejado e deslize em viagem CONTAM aqui (a proteção
+  // de viagem/planejado vale para streak/anéis/jardim, não para a métrica de consumo)
   const delivery = events.filter((e) => dentro(e) && (e.type === 'delivery' || (e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in'))).length;
   const sweet = events.filter((e) => dentro(e) && (e.type === 'sweet' || (e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in'))).length;
+  const sweetPlanejado = events.filter((e) => dentro(e) && e.type === 'sweet' && e.planejado).length;
   const saidas = events.filter((e) => dentro(e) && e.type === 'night_out');
   const drinks = saidas.length ? saidas.reduce((s, e) => s + (e.drinks || 0), 0) / saidas.length : null;
-  return { ini, fim, delivery, sweet, drinks, saidas: saidas.length };
+  return { ini, fim, delivery, sweet, sweetPlanejado, drinks, saidas: saidas.length };
 }
 
 export function metaAtingida(metrica, valor, baseline) {
@@ -176,19 +205,26 @@ export function ritmoSemanal(pontosMM) {
 }
 
 // ---- Heatmap de constância ----
-export function heatmapConstancia(events, hojeKey, semanas = 16) {
-  // matriz [semana][diaDaSemana] com nº de refeições feitas (ok|sub); null = futuro/sem uso
+export function heatmapConstancia(events, hojeKey, semanas = 16, viagens = []) {
+  // matriz [semana][diaDaSemana] com nº de refeições feitas (ok|sub); null = futuro/sem uso;
+  // 'viagem' = dia de viagem sem registro (fora da cobrança — se registrou, conta normal)
   const out = [];
   for (let w = semanas - 1; w >= 0; w--) {
     const linha = [];
     for (let d = 0; d < 7; d++) {
       const key = addDays(addDays(inicioSemana(hojeKey), -7 * w), d);
       if (key > hojeKey) { linha.push(null); continue; }
-      linha.push(mealsDone(mealsOfDay(events, key)));
+      const n = mealsDone(mealsOfDay(events, key));
+      linha.push(n === 0 && emViagem(key, viagens) ? 'viagem' : n);
     }
     out.push({ ini: addDays(inicioSemana(hojeKey), -7 * w), dias: linha });
   }
   return out;
+}
+
+// meta de refeições da semana ajustada por viagem: 80% de 5 refeições × dias cobrados (7 dias → 28)
+export function metaSemanaRefeicoes(diasCobrados) {
+  return Math.ceil(0.8 * 5 * diasCobrados);
 }
 
 // ---- Ressaca ----
@@ -306,7 +342,7 @@ export function workoutsDoDia(events, key) {
   return out; // {corrida: true|false, gym: true|false}
 }
 
-export function semanaTreino(events, key) {
+export function semanaTreino(events, key, viagens = []) {
   const ini = inicioSemana(key);
   let gymPlan = 0, gymFeito = 0, corridaPlan = 0, corridaFeita = 0;
   const dias = [];
@@ -314,9 +350,11 @@ export function semanaTreino(events, key) {
     const d = addDays(ini, i);
     const plano = treinoDoDia(d);
     const feito = workoutsDoDia(events, d);
-    if (plano.gym) { gymPlan++; if (feito.gym) gymFeito++; }
-    if (plano.corrida) { corridaPlan++; if (feito.corrida) corridaFeita++; }
-    dias.push({ date: d, plano, feito });
+    const viagem = emViagem(d, viagens);
+    // dia de viagem sai do plano — a menos que tenha treinado mesmo assim (aí conta plano E feito)
+    if (plano.gym && (!viagem || feito.gym)) { gymPlan++; if (feito.gym) gymFeito++; }
+    if (plano.corrida && (!viagem || feito.corrida)) { corridaPlan++; if (feito.corrida) corridaFeita++; }
+    dias.push({ date: d, plano, feito, viagem });
   }
   return { ini, dias, gymPlan, gymFeito, corridaPlan, corridaFeita };
 }
@@ -325,24 +363,26 @@ export function semanaTreino(events, key) {
 // Uma linha por semana (antiga→atual), colunas Ter–Sáb (os 5 dias com gym no plano).
 // forcasDates: Set de dateKeys com sessão de força registrada no Garmin — vira estado
 // 'evidencia' visual e NÃO soma em `feitos` (confirmação de treino é sempre manual).
-export function gradeForca(events, hojeKey, semanas = 16, forcasDates = new Set()) {
+export function gradeForca(events, hojeKey, semanas = 16, forcasDates = new Set(), viagens = []) {
   const iniAtual = inicioSemana(hojeKey);
   const out = [];
   for (let w = semanas - 1; w >= 0; w--) {
     const ini = addDays(iniAtual, -7 * w);
     const dias = [];
-    let feitos = 0;
+    let feitos = 0, plan = 5;
     for (let i = 1; i <= 5; i++) { // segunda+1 = Ter … segunda+5 = Sáb
       const date = addDays(ini, i);
       const feito = workoutsDoDia(events, date).gym === true;
       if (feito) feitos++;
-      const estado = feito ? 'feito'
-        : forcasDates.has(date) && date <= hojeKey ? 'evidencia'
-          : date < hojeKey ? 'perdido'
-            : 'aberto'; // hoje ainda em aberto + futuro — nunca "perdido" antes do dia acabar
+      const estado = feito ? 'feito' // treinou em viagem = conta normal
+        : emViagem(date, viagens) ? 'viagem'
+          : forcasDates.has(date) && date <= hojeKey ? 'evidencia'
+            : date < hojeKey ? 'perdido'
+              : 'aberto'; // hoje ainda em aberto + futuro — nunca "perdido" antes do dia acabar
+      if (estado === 'viagem') plan--;
       dias.push({ date, estado });
     }
-    out.push({ ini, dias, feitos, plan: 5, completa: feitos === 5 });
+    out.push({ ini, dias, feitos, plan, completa: plan > 0 && feitos === plan });
   }
   return out;
 }
@@ -358,13 +398,14 @@ export function corridasStats(events, hojeKey) {
 }
 
 // ---- Contador com precisão de tempo (estilo SugarCut) ----
-export function ultimoSlipTs(events, type, fallbackTs) {
+export function ultimoSlipTs(events, type, fallbackTs, viagens = []) {
+  // doce planejado e deslize em viagem NÃO resetam o anel: ele segue contando
+  // contíguo desde o deslize real anterior (determinístico, sem "pausa")
   let max = null;
   for (const e of events) {
-    const conta = e.type === type
-      || (type === 'delivery' && e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in')
-      || (type === 'sweet' && e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in');
-    if (conta && (max === null || e.ts > max)) max = e.ts;
+    if (!ehDeslize(e, type)) continue;
+    if (emViagem(e.date || dateKey(new Date(e.ts)), viagens)) continue;
+    if (max === null || e.ts > max) max = e.ts;
   }
   return max ?? fallbackTs;
 }
@@ -393,8 +434,9 @@ export function proximoMarco(totalDias) {
 // prioridade para celebrar em vez de mostrar o anel novo quase vazio.
 export function marcoDashboard(events, settings, key, agoraTs) {
   const inicioTs = parseKey(settings.startKey || key).getTime();
+  const viagens = settings.viagens || [];
   const ambos = ['delivery', 'sweet'].map((tipo) => {
-    const t = tempoLimpo(ultimoSlipTs(events, tipo, inicioTs), agoraTs);
+    const t = tempoLimpo(ultimoSlipTs(events, tipo, inicioTs, viagens), agoraTs);
     const m = proximoMarco(t.totalDias);
     return {
       tipo, dias: t.dias, totalDias: t.totalDias,
@@ -410,21 +452,27 @@ export function marcoDashboard(events, settings, key, agoraTs) {
 // ---- Abertura de semana (fresh start de segunda) ----
 // Semana "verde" = ≥28/35 refeições no plano (80%, nunca exigir 35/35).
 // O gate de "é segunda de manhã" fica na UI; aqui só os dados.
-export function aberturaSemana(events, key) {
+export function aberturaSemana(events, key, viagens = []) {
   const ini = inicioSemana(key);
-  const refSemana = (s) => {
-    let n = 0;
-    for (let i = 0; i < 7; i++) n += mealsDone(mealsOfDay(events, addDays(s, i)));
-    return n;
+  const semana = (s) => { // {ref, meta} — meta ajustada por dias de viagem sem registro
+    let ref = 0, cobrados = 7;
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(s, i);
+      const n = mealsDone(mealsOfDay(events, d));
+      ref += n;
+      if (n === 0 && emViagem(d, viagens)) cobrados--;
+    }
+    return { ref, meta: metaSemanaRefeicoes(cobrados), cobrados };
   };
-  const refAnterior = refSemana(addDays(ini, -7));
+  const ant = semana(addDays(ini, -7));
+  const verde = (s) => { const x = semana(s); return x.cobrados > 0 && x.ref >= x.meta; };
   let verdesSeguidas = 0;
-  for (let s = addDays(ini, -7); refSemana(s) >= 28 && verdesSeguidas < 52; s = addDays(s, -7)) verdesSeguidas++;
+  for (let s = addDays(ini, -7); verde(s) && verdesSeguidas < 52; s = addDays(s, -7)) verdesSeguidas++;
   return {
     ini,
     restantes: semanasAteProva(key),
-    temDados: refAnterior > 0,
-    verdeAnterior: refAnterior >= 28,
+    temDados: ant.ref > 0,
+    verdeAnterior: ant.cobrados > 0 && ant.ref >= ant.meta,
     verdesSeguidas,
   };
 }
@@ -434,12 +482,10 @@ export function aberturaSemana(events, key) {
 // ================================================================
 
 export function slipsNoPeriodo(events, ini, fim, type) {
+  // deslizes REAIS (planejado fica de fora); deslize em viagem conta — Relatório é dado
   return events.filter((e) => {
     const d = e.date || dateKey(new Date(e.ts));
-    if (d < ini || d > fim) return false;
-    return e.type === type
-      || (type === 'delivery' && e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in')
-      || (type === 'sweet' && e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in');
+    return d >= ini && d <= fim && ehDeslize(e, type);
   }).length;
 }
 
@@ -450,7 +496,7 @@ export function diasObservados(events, ini, fim) {
   return [...s].sort();
 }
 
-export function resumoPeriodo(events, ini, fim) {
+export function resumoPeriodo(events, ini, fim, viagens = []) {
   const obs = diasObservados(events, ini, fim);
   let refFeitas = 0;
   for (const d of obs) refFeitas += mealsDone(mealsOfDay(events, d));
@@ -459,8 +505,9 @@ export function resumoPeriodo(events, ini, fim) {
   for (let d = ini; d <= fim; d = addDays(d, 1)) {
     const plano = treinoDoDia(d);
     const feito = workoutsDoDia(events, d);
-    if (plano.corrida) { treinoPlan++; if (feito.corrida) treinoFeito++; }
-    if (plano.gym) { treinoPlan++; if (feito.gym) treinoFeito++; }
+    const viagem = emViagem(d, viagens); // viagem sai do plano (a menos que tenha treinado)
+    if (plano.corrida && (!viagem || feito.corrida)) { treinoPlan++; if (feito.corrida) treinoFeito++; }
+    if (plano.gym && (!viagem || feito.gym)) { treinoPlan++; if (feito.gym) treinoFeito++; }
   }
   const mm = mediaMovel7(serie(events, 'weight').filter((p) => p.date <= fim));
   const mmIni = [...mm].reverse().find((p) => p.date <= ini);
@@ -481,7 +528,7 @@ export function resumoPeriodo(events, ini, fim) {
 export function insightLancheDoce(events, hojeKey, dias = 90) {
   const ini = addDays(hojeKey, -dias + 1);
   const obs = diasObservados(events, ini, hojeKey);
-  const doceEm = new Set(events.filter((e) => e.type === 'sweet' || (e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in')).map((e) => e.date || dateKey(new Date(e.ts))));
+  const doceEm = new Set(events.filter((e) => ehDeslize(e, 'sweet')).map((e) => e.date || dateKey(new Date(e.ts))));
   const grupo = { com: { dias: 0, doces: 0 }, sem: { dias: 0, doces: 0 } };
   for (const d of obs) {
     const lanche = mealsOfDay(events, d).lanche2;
@@ -520,8 +567,7 @@ export function deslizesPorDiaSemana(events, hojeKey, dias = 90) {
   for (const e of events) {
     const d = e.date || dateKey(new Date(e.ts));
     if (d < ini || d > hojeKey) continue;
-    const tipo = e.type === 'delivery' || (e.type === 'sos' && e.kind === 'ifood' && e.outcome === 'gave_in') ? 'delivery'
-      : e.type === 'sweet' || (e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in') ? 'sweet' : null;
+    const tipo = ehDeslize(e, 'delivery') ? 'delivery' : ehDeslize(e, 'sweet') ? 'sweet' : null;
     if (!tipo) continue;
     out[(parseKey(d).getDay() + 6) % 7][tipo]++;
     total++;
