@@ -1496,7 +1496,7 @@ function renderTreino(root) {
   if (!futuro) {
     const usadas = (kind) => {
       const s = new Set();
-      for (const e of st.events) if (e.type === 'workout' && e.kind === kind) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
+      for (const e of st.events) if (e.type === 'workout' && e.kind === kind && e.done) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
       return s;
     };
     if (plano.corrida && !feito.corrida) {
