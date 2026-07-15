@@ -1,5 +1,7 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.9'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.10'; // manter em sincronia com VERSAO do sw.js
+// chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
+const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
@@ -44,6 +46,12 @@ function el(html) {
 }
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const viagensCfg = () => S.getState().settings.viagens || []; // períodos de manutenção (v7.9)
+const DIA_NOME = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+// applicationServerKey da Push API espera Uint8Array, não a string base64url
+function urlBase64ToUint8Array(base64String) {
+  const base64 = (base64String + '='.repeat((4 - base64String.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from([...atob(base64)].map((c) => c.charCodeAt(0)));
+}
 
 let abaAtiva = ['hoje', 'dieta', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
 let periodoRelatorio = 30; // 30 | 90 | 0 (tudo)
@@ -452,35 +460,21 @@ function slotContextual(st, key) {
   const pend = analisePendenteConfirmacao(st, key);
   if (pend) {
     const g = pend.analise.garmin;
-    const c = el(`<div class="card ressaca-banner"><b>🛰️ O Garmin registrou sua corrida de ${fmtData(pend.date)}</b>
-      ${String(g.distanciaKm).replace('.', ',')} km em pace ${g.paceMedio || '–'}/km — a análise está na aba Treino. Marcar o treino como feito?
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="acao-primaria" style="margin:0;padding:11px" id="sim">✓ Marcar feito</button>
-        <button class="acao-secundaria" style="margin:0;width:auto" id="nao">agora não</button>
-      </div></div>`);
-    c.querySelector('#sim').onclick = () => {
-      S.addEvent({ type: 'workout', date: pend.date, kind: 'corrida', done: true });
-      snackbar('Treino no papel. 👊');
-    };
-    c.querySelector('#nao').onclick = () => S.setSetting(`garminDispensado_${pend.date}`, true);
-    return [c];
+    return [cardGarminPendente({
+      kind: 'corrida', dataReal: pend.date, sugestaoData: pend.sugestaoData,
+      resumo: `${String(g.distanciaKm).replace('.', ',')} km em pace ${g.paceMedio || '–'}/km — a análise está na aba Treino.`,
+      dispensarChave: `garminDispensado_${pend.date}`,
+    })];
   }
 
   // 5. treino de força registrado no Garmin sem check no app → 1 toque (nunca automático)
   const forca = forcaPendenteConfirmacao(st, key);
   if (forca) {
-    const c = el(`<div class="card ressaca-banner"><b>🛰️ O Garmin registrou seu treino de força de ${fmtData(forca.date)}</b>
-      ${forca.minutos ? `${forca.minutos} min de sessão. ` : ''}Marcar o treino como feito?
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="acao-primaria" style="margin:0;padding:11px" id="sim">✓ Marcar feito</button>
-        <button class="acao-secundaria" style="margin:0;width:auto" id="nao">agora não</button>
-      </div></div>`);
-    c.querySelector('#sim').onclick = () => {
-      S.addEvent({ type: 'workout', date: forca.date, kind: 'gym', done: true });
-      snackbar('Treino no papel. 👊');
-    };
-    c.querySelector('#nao').onclick = () => S.setSetting(`garminDispensadoGym_${forca.date}`, true);
-    return [c];
+    return [cardGarminPendente({
+      kind: 'gym', dataReal: forca.date, sugestaoData: forca.sugestaoData,
+      resumo: forca.minutos ? `${forca.minutos} min de sessão. ` : '',
+      dispensarChave: `garminDispensadoGym_${forca.date}`,
+    })];
   }
 
   // 6. volta de viagem (fresh start da reentrada) — ontem/anteontem foi o último dia
@@ -1128,15 +1122,55 @@ function autoDispararAnalise() {
   dispararAnalise('auto');
 }
 
+// card de confirmação do card Hoje (slots 4/5): direto quando a atividade caiu no dia certo do
+// plano, ou com a sugestão de remanejamento quando caiu noutro dia (ex.: longão feito atrasado)
+function cardGarminPendente({ kind, dataReal, sugestaoData, resumo, dispensarChave }) {
+  const nomeDia = (d) => `${DIA_NOME[D.parseKey(d).getDay()]} (${fmtData(d)})`;
+  if (sugestaoData) {
+    const planoAlvo = kind === 'corrida' ? D.treinoDoDia(sugestaoData).corrida?.nome : D.treinoDoDia(sugestaoData).gym;
+    const c = el(`<div class="card ressaca-banner"><b>🛰️ O Garmin registrou ${kind === 'corrida' ? 'uma corrida' : 'um treino de força'} de ${nomeDia(dataReal)} fora do plano</b>
+      ${resumo} Foi o treino de ${nomeDia(sugestaoData)}${planoAlvo ? ` — ${esc(planoAlvo)}` : ''} que faltou?
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+        <button class="acao-primaria" style="margin:0;padding:11px" id="sim">✓ Sim, foi esse</button>
+        <button class="acao-secundaria" style="margin:0;width:auto" id="extra">treino extra</button>
+        <button class="acao-secundaria" style="margin:0;width:auto" id="nao">agora não</button>
+      </div></div>`);
+    c.querySelector('#sim').onclick = () => {
+      S.addEvent({ type: 'workout', date: sugestaoData, kind, done: true, origemData: dataReal });
+      snackbar('Treino no papel. 👊');
+    };
+    c.querySelector('#extra').onclick = () => {
+      S.addEvent({ type: 'workout', date: dataReal, kind, done: true });
+      snackbar('Registrado como treino extra. 👊');
+    };
+    c.querySelector('#nao').onclick = () => S.setSetting(dispensarChave, true);
+    return c;
+  }
+  const c = el(`<div class="card ressaca-banner"><b>🛰️ O Garmin registrou ${kind === 'corrida' ? 'sua corrida' : 'seu treino de força'} de ${fmtData(dataReal)}</b>
+    ${resumo} Marcar o treino como feito?
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="acao-primaria" style="margin:0;padding:11px" id="sim">✓ Marcar feito</button>
+      <button class="acao-secundaria" style="margin:0;width:auto" id="nao">agora não</button>
+    </div></div>`);
+  c.querySelector('#sim').onclick = () => {
+    S.addEvent({ type: 'workout', date: dataReal, kind, done: true });
+    snackbar('Treino no papel. 👊');
+  };
+  c.querySelector('#nao').onclick = () => S.setSetting(dispensarChave, true);
+  return c;
+}
+
 // confirmação de 1 toque: Garmin registrou corrida planejada sem check no app (últimos 3 dias)
 function analisePendenteConfirmacao(st, key) {
   if (!dadosAnalises) return null;
   for (const [date, lista] of Object.entries(dadosAnalises.porData)) {
     if (date > key || date < D.addDays(key, -3)) continue;
-    if (!D.treinoDoDia(date).corrida) continue;
-    if (D.workoutsDoDia(st.events, date).corrida !== undefined) continue;
     if (st.settings[`garminDispensado_${date}`]) continue;
-    return { date, analise: lista[0] };
+    if (D.workoutsDoDia(st.events, date).corrida !== undefined) continue;
+    if (D.treinoDoDia(date).corrida) return { date, analise: lista[0] };
+    // fora do plano — sugere remanejar pro dia certo (ex.: longão perdido, feito noutro dia)
+    const sugestaoData = D.sugestaoRemanejamento(st.events, date, 'corrida');
+    if (sugestaoData) return { date, analise: lista[0], sugestaoData };
   }
   return null;
 }
@@ -1146,10 +1180,11 @@ function forcaPendenteConfirmacao(st, key) {
   if (!dadosHistorico?.forcas) return null;
   for (const f of [...dadosHistorico.forcas].reverse()) {
     if (f.date > key || f.date < D.addDays(key, -3)) continue;
-    if (!D.treinoDoDia(f.date).gym) continue;
-    if (D.workoutsDoDia(st.events, f.date).gym !== undefined) continue;
     if (st.settings[`garminDispensadoGym_${f.date}`]) continue;
-    return f;
+    if (D.workoutsDoDia(st.events, f.date).gym !== undefined) continue;
+    if (D.treinoDoDia(f.date).gym) return f;
+    const sugestaoData = D.sugestaoRemanejamento(st.events, f.date, 'gym');
+    if (sugestaoData) return { ...f, sugestaoData };
   }
   return null;
 }
@@ -1418,7 +1453,6 @@ function renderTreino(root) {
   root.append(cardSem);
 
   // treino do dia exibido (hoje por padrão; outro dia se selecionado na semana)
-  const DIA_NOME = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
   const titulo = diaTreinoSel
     ? `Treino de ${DIA_NOME[D.parseKey(alvo).getDay()]} <small>· ${fmtData(alvo)}</small>`
     : 'Treino de hoje';
@@ -1446,10 +1480,48 @@ function renderTreino(root) {
     row.querySelector('.tr-ver').onclick = () => sheetTreinoDetalhe(kind, plano, alvo);
     return row;
   };
+  // treino extra: sem plano nesse dia, mas com check ou análise do Garmin (ex.: "registrar como
+  // treino extra" no card de Hoje, ou dia visitado antes de confirmar) — sem isso ficava invisível
+  const extraCorrida = !plano.corrida && (feito.corrida !== undefined || analisesDoDia(alvo).length > 0);
+  const extraGym = !plano.gym && (feito.gym !== undefined || forcaAnalisesDoDia(alvo).length > 0);
   if (plano.corrida) tr.append(linhaTreino('corrida', TIPO_CORRIDA_ICONE[plano.corrida.tipo], plano.corrida.nome));
-  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym + (forcaAnalisesDoDia(alvo).length ? ' ✨' : '')));
-  if (!plano.corrida && !plano.gym) tr.append(el(`<p style="font-size:.85rem;color:var(--muted)">Descanso — ${futuro ? 'o treino é' : 'hoje o treino é'} dormir 7–8h. Metade da recuperação acontece dormindo.</p>`));
+  if (plano.gym) tr.append(linhaTreino('gym', '🏋️', plano.gym + (forcaAnalisesDoDia(D.origemAtividade(st.events, alvo, 'gym')).length ? ' ✨' : '')));
+  if (extraCorrida) tr.append(linhaTreino('corrida', '🏃', 'Corrida extra' + (analisesDoDia(alvo).length ? ' ✨' : '')));
+  if (extraGym) tr.append(linhaTreino('gym', '🏋️', 'Treino de força extra' + (forcaAnalisesDoDia(alvo).length ? ' ✨' : '')));
+  if (!plano.corrida && !plano.gym && !extraCorrida && !extraGym) tr.append(el(`<p style="font-size:.85rem;color:var(--muted)">Descanso — ${futuro ? 'o treino é' : 'hoje o treino é'} dormir 7–8h. Metade da recuperação acontece dormindo.</p>`));
   root.append(cardHoje);
+
+  // vincular manualmente: dia planejado ainda sem check + atividades do Garmin por perto sem
+  // vínculo nenhum (a sugestão automática em Hoje foi dispensada, ou passou da janela de 4 dias)
+  if (!futuro) {
+    const usadas = (kind) => {
+      const s = new Set();
+      for (const e of st.events) if (e.type === 'workout' && e.kind === kind) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
+      return s;
+    };
+    if (plano.corrida && feito.corrida === undefined) {
+      const usadasC = usadas('corrida');
+      const candidatos = (dadosHistorico?.corridas || [])
+        .filter((c) => c.date >= D.addDays(alvo, -13) && c.date <= key && !usadasC.has(c.date))
+        .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
+      if (candidatos.length) {
+        const l = el('<button class="linha-streaks">🔗 <span>Vincular a uma corrida do Garmin</span><span class="seta">→</span></button>');
+        l.onclick = () => sheetVincularGarmin('corrida', alvo, candidatos);
+        root.append(l);
+      }
+    }
+    if (plano.gym && feito.gym === undefined) {
+      const usadasG = usadas('gym');
+      const candidatos = (dadosHistorico?.forcas || [])
+        .filter((f) => f.date >= D.addDays(alvo, -13) && f.date <= key && !usadasG.has(f.date))
+        .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 10);
+      if (candidatos.length) {
+        const l = el('<button class="linha-streaks">🔗 <span>Vincular a um treino de força do Garmin</span><span class="seta">→</span></button>');
+        l.onclick = () => sheetVincularGarmin('gym', alvo, candidatos);
+        root.append(l);
+      }
+    }
+  }
 
   // disparo rápido da análise (só com PAT configurado em Ajustes)
   if (patGarmin()) {
@@ -1477,7 +1549,7 @@ function renderTreino(root) {
     const ok = !!feitasCorrida.get(data);
     const passada = data < key;
     const hoje = data === key;
-    const temAnalise = analisesDoDia(data).length > 0;
+    const temAnalise = analisesDoDia(D.origemAtividade(st.events, data, 'corrida')).length > 0;
     const viagem = D.emViagem(data, viagensCfg()); // corrida em viagem sem check: neutra, nunca "perdida"
     const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise && !viagem ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
       <button class="cron-toggle">
@@ -1499,11 +1571,14 @@ function renderTreino(root) {
 
 // sheet: o treino completo do dia (exercícios da academia / guia de pace da corrida)
 function sheetTreinoDetalhe(kind, plano, key) {
+  // dia remanejado: a análise do Garmin mora na data REAL da atividade, não na data do plano
+  const dataAnalise = D.origemAtividade(S.getState().events, key, kind);
   let box;
   if (kind === 'gym') {
-    const exercicios = GYM_TREINOS[D.parseKey(key).getDay()] || [];
-    const fase = GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1];
-    box = el(`<div><h3>🏋️ ${esc(plano.gym)}</h3>
+    const exercicios = plano.gym ? (GYM_TREINOS[D.parseKey(key).getDay()] || []) : [];
+    const fase = plano.gym ? GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1] : null;
+    box = el(`<div><h3>🏋️ ${esc(plano.gym || 'Treino de força extra')}</h3>
+      ${!plano.gym ? '<p class="detalhe-fase">Fora do plano — não substitui nenhum treino planejado.</p>' : ''}
       ${fase ? `<p class="detalhe-fase">${esc(fase)}</p>` : ''}
       <div class="exercicios">${exercicios.map(([ex, sr, obs], i) => `
         <div class="exercicio">
@@ -1511,23 +1586,24 @@ function sheetTreinoDetalhe(kind, plano, key) {
           <span class="ex-nome">${esc(ex)}${obs ? `<small>${esc(obs)}</small>` : ''}</span>
           <span class="ex-series num">${esc(sr)}</span>
         </div>`).join('')}</div></div>`);
-    for (const a of forcaAnalisesDoDia(key)) box.append(blocoAnaliseForca(a));
+    for (const a of forcaAnalisesDoDia(dataAnalise)) box.append(blocoAnaliseForca(a));
     // dia passado sem parecer detalhado, mas com sessão registrada no relógio (historico.json)
-    const sess = (dadosHistorico?.forcas || []).find((f) => f.date === key);
-    if (!forcaAnalisesDoDia(key).length && sess) {
+    const sess = (dadosHistorico?.forcas || []).find((f) => f.date === dataAnalise);
+    if (!forcaAnalisesDoDia(dataAnalise).length && sess) {
       box.append(el(`<div class="analise"><div class="ana-cab">SUA SESSÃO · GARMIN</div>
         <p style="font-size:.82rem;color:var(--ink-2)">🛰️ ${esc(sess.nome || 'Treino de força')} · ${sess.minutos} min — registrado no relógio, sem parecer detalhado.</p></div>`));
     }
   } else {
     const c = plano.corrida;
-    const g = CORRIDA_GUIA[c.tipo] || {};
-    box = el(`<div><h3>${TIPO_CORRIDA_ICONE[c.tipo]} ${esc(c.nome)}</h3>
+    const g = c ? (CORRIDA_GUIA[c.tipo] || {}) : {};
+    box = el(`<div><h3>${c ? `${TIPO_CORRIDA_ICONE[c.tipo]} ${esc(c.nome)}` : '🏃 Corrida extra'}</h3>
+      ${!c ? '<p class="detalhe-fase">Fora do plano — não substitui nenhum treino planejado.</p>' : `
       <div class="exercicios">
         <div class="exercicio"><span class="ex-num">⏱</span><span class="ex-nome">Pace alvo<small>${esc(g.pace || '—')}</small></span></div>
         <div class="exercicio"><span class="ex-num">❤️</span><span class="ex-nome">Frequência cardíaca<small>${esc(g.fc || '—')}</small></span></div>
         <div class="exercicio"><span class="ex-num">🗣</span><span class="ex-nome">Sensação<small>${esc(g.sensacao || '—')}</small></span></div>
         ${g.extra ? `<div class="exercicio"><span class="ex-num">☝️</span><span class="ex-nome">Execução<small>${esc(g.extra)}</small></span></div>` : ''}
-      </div></div>`);
+      </div>`}</div>`);
     // checkpoint do plano: o sheet do dia ganha o guia de execução completo
     const cp = CHECKPOINTS.find((x) => x.date === key);
     if (cp) {
@@ -1536,7 +1612,32 @@ function sheetTreinoDetalhe(kind, plano, key) {
       box.append(b);
     }
     // análise da corrida executada (pipeline Garmin → IA), quando existir para o dia
-    for (const a of analisesDoDia(key)) box.append(blocoAnalise(a));
+    for (const a of analisesDoDia(dataAnalise)) box.append(blocoAnalise(a));
+  }
+  abrirSheet(box);
+}
+
+// sheet: lista curta de atividades do Garmin sem vínculo, pra religar manualmente a um dia do
+// plano (fallback de "vincular a uma corrida do Garmin" — sem digitar nada, só toque)
+function sheetVincularGarmin(kind, alvo, candidatos) {
+  const box = el(`<div><h3>Vincular a ${kind === 'corrida' ? 'uma corrida' : 'um treino de força'} do Garmin</h3>
+    <p class="detalhe-fase">Qual atividade foi o treino de ${DIA_NOME[D.parseKey(alvo).getDay()]} (${fmtData(alvo)})?</p>
+    <div class="exercicios" id="lista"></div></div>`);
+  const lista = box.querySelector('#lista');
+  for (const c of candidatos) {
+    const resumo = kind === 'corrida'
+      ? `${String(c.distanciaKm).replace('.', ',')} km${c.paceMedio ? ` · ${c.paceMedio}/km` : ''}`
+      : `${c.minutos ? `${c.minutos} min` : 'sessão'}${c.nome ? ` · ${esc(c.nome)}` : ''}`;
+    const item = el(`<button class="exercicio" style="width:100%;text-align:left;cursor:pointer">
+      <span class="ex-num">🛰️</span>
+      <span class="ex-nome">${DIA_NOME[D.parseKey(c.date).getDay()]} (${fmtData(c.date)})<small>${resumo}</small></span>
+    </button>`);
+    item.onclick = () => {
+      S.addEvent({ type: 'workout', date: alvo, kind, done: true, origemData: c.date });
+      fecharSheet();
+      snackbar('Treino no papel. 👊');
+    };
+    lista.append(item);
   }
   abrirSheet(box);
 }
@@ -2780,6 +2881,57 @@ function renderAjustes(root) {
   cardLem.querySelector('#t-lanche').onclick = (e) => liga('lanche', e.currentTarget);
   cardLem.querySelector('#t-revisao').onclick = (e) => liga('revisao', e.currentTarget);
   root.append(cardLem);
+
+  // notificação push real (v7.10) — GitHub Actions avisa quando o pipeline identifica uma
+  // corrida/força nova, mesmo com o app fechado. Setup: colar a inscrição 1x num Secret do repo.
+  const cardPush = el(`<div class="card"><h2>Notificação de atividade <small>· funciona com o app fechado</small></h2>
+    <div class="ajuste-linha"><span>Avisar quando o Garmin identificar corrida/força<div class="d">a IA já analisou — só falta confirmar em Hoje</div></span>
+      <button class="toggle ${st.settings.pushAtivo ? 'on' : ''}" id="t-push"><span></span></button></div>
+    <div id="push-setup" style="display:none"></div>
+  </div>`);
+  const setupPush = cardPush.querySelector('#push-setup');
+  const mostrarSetupPush = (sub) => {
+    setupPush.style.display = '';
+    setupPush.innerHTML = `<p style="font-size:.72rem;color:var(--muted);margin:10px 0 6px">Cole isto no Secret <b>PUSH_SUBSCRIPTION</b> do repo — Settings → Secrets and variables → Actions → New repository secret. Só precisa fazer 1 vez (refaça só se desinstalar o app).</p>
+      <textarea readonly style="width:100%;min-height:64px;font-size:.65rem;font-family:monospace;padding:8px;border-radius:8px;border:1px solid var(--grid);background:transparent;color:inherit" id="sub-json"></textarea>
+      <button class="acao-secundaria" style="margin-top:6px" id="sub-copiar">Copiar inscrição</button>`;
+    setupPush.querySelector('#sub-json').value = JSON.stringify(sub);
+    setupPush.querySelector('#sub-copiar').onclick = async () => {
+      try { await navigator.clipboard.writeText(JSON.stringify(sub)); snackbar('Copiado ✓'); } catch { snackbar('Não consegui copiar — selecione o texto acima manualmente.'); }
+    };
+  };
+  if (st.settings.pushAtivo && st.settings.pushSubscription) mostrarSetupPush(st.settings.pushSubscription);
+  cardPush.querySelector('#t-push').onclick = async (e) => {
+    const btn = e.currentTarget;
+    if (S.getState().settings.pushAtivo) {
+      S.setSetting('pushAtivo', false);
+      btn.classList.remove('on');
+      setupPush.style.display = 'none';
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration();
+        const sub = await reg?.pushManager.getSubscription();
+        await sub?.unsubscribe();
+      } catch { /* desliga no app mesmo se a unsubscribe do navegador falhar */ }
+      return;
+    }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) { snackbar('Este navegador não suporta notificação push.'); return; }
+    if (Notification.permission !== 'granted') {
+      const p = await Notification.requestPermission();
+      if (p !== 'granted') { snackbar('Sem permissão de notificação — não foi possível ativar.'); return; }
+    }
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) })).toJSON();
+      S.setSetting('pushAtivo', true);
+      S.setSetting('pushSubscription', sub);
+      btn.classList.add('on');
+      mostrarSetupPush(sub);
+      snackbar('Inscrição criada ✓ — falta colar no Secret do GitHub.');
+    } catch {
+      snackbar('Não consegui criar a inscrição de push neste aparelho.');
+    }
+  };
+  root.append(cardPush);
 
   // integração Garmin — análises automáticas de corrida (pipeline v7)
   const temPat = !!st.settings.garminPat;

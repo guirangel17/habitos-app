@@ -335,11 +335,29 @@ export function treinoDoDia(key) {
   };
 }
 
-// workout events: {type:'workout', date, kind:'corrida'|'gym', done} — último vence
+// workout events: {type:'workout', date, kind:'corrida'|'gym', done, origemData?} — último vence
 export function workoutsDoDia(events, key) {
   const out = {};
   for (const e of events) if (e.type === 'workout' && e.date === key) out[e.kind] = e.done;
   return out; // {corrida: true|false, gym: true|false}
+}
+
+// data real da atividade Garmin por trás do dia `date` (remanejamento) — sem remanejar, é a própria data
+export function origemAtividade(events, date, kind) {
+  let ultimo = null;
+  for (const e of events) if (e.type === 'workout' && e.date === date && e.kind === kind) ultimo = e;
+  return ultimo?.origemData || date;
+}
+
+// dia planejado mais recente (até `janelaDias` atrás) ainda sem check — sugestão de remanejamento
+// quando uma atividade do Garmin cai num dia sem plano (ex.: Longão de segunda feito na quarta)
+export function sugestaoRemanejamento(events, dataAtividade, kind, janelaDias = 4) {
+  for (let i = 1; i <= janelaDias; i++) {
+    const d = addDays(dataAtividade, -i);
+    const planejado = kind === 'corrida' ? treinoDoDia(d).corrida : treinoDoDia(d).gym;
+    if (planejado && workoutsDoDia(events, d)[kind] === undefined) return d;
+  }
+  return null;
 }
 
 export function semanaTreino(events, key, viagens = []) {

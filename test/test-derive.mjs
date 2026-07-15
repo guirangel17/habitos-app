@@ -176,6 +176,19 @@ ok(semT.corridaPlan === 3 && semT.corridaFeita === 1, `semana treino: corrida 1/
 const cs = D.corridasStats(wEvs, '2026-07-16');
 ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 67, `corridas: 1/6 até 16/07, 67 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
 
+// ---- v7.10: remanejamento de treino pro dia certo do plano ----
+// terça 14/07 não tem corrida planejada; o longão de segunda 13/07 ficou sem check
+ok(D.sugestaoRemanejamento([], '2026-07-14', 'corrida') === '2026-07-13', 'sugere o longão de segunda pra atividade de terça sem plano');
+// se segunda já foi confirmada, não sugere de novo
+const jaFeito = [{ id: 'jf', ts: 1, type: 'workout', date: '2026-07-13', kind: 'corrida', done: true }];
+ok(D.sugestaoRemanejamento(jaFeito, '2026-07-14', 'corrida') === null, 'não sugere dia já confirmado');
+// janela curta sem dia planejado dentro dela: não sugere nada
+ok(D.sugestaoRemanejamento([], '2026-07-18', 'corrida', 1) === null, 'nada a sugerir dentro da janela');
+
+const remEvs = [{ id: 'r1', ts: 1, type: 'workout', date: '2026-07-13', kind: 'corrida', done: true, origemData: '2026-07-14' }];
+ok(D.origemAtividade(remEvs, '2026-07-13', 'corrida') === '2026-07-14', 'origemAtividade acha a data real remanejada');
+ok(D.origemAtividade(remEvs, '2026-07-16', 'corrida') === '2026-07-16', 'sem remanejamento: origem é a própria data');
+
 // ---- v3: tempo limpo ----
 const t0 = D.parseKey('2026-07-01').getTime();
 const tl = D.tempoLimpo(t0, t0 + (2 * 86400 + 5 * 3600 + 30 * 60 + 10) * 1000);

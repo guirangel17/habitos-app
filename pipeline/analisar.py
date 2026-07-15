@@ -555,6 +555,28 @@ def escrever_json(arq, doc):
     arq.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n")
 
 
+def notificar_push(titulo, corpo):
+    """Avisa o app (Web Push, v7.10) que uma análise nova chegou — com o app fechado inclusive.
+    Opt-in (Ajustes → Notificação de atividade) e best-effort: sem os Secrets configurados, ou se
+    o envio falhar (inscrição expirada etc.), só loga e segue — o card de confirmação em Hoje
+    continua funcionando normalmente na próxima vez que o app abrir. Nunca é uma dependência."""
+    sub_raw = os.environ.get("PUSH_SUBSCRIPTION")
+    vapid_priv = os.environ.get("VAPID_PRIVATE_KEY")
+    if not sub_raw or not vapid_priv:
+        return
+    try:
+        from pywebpush import webpush
+        webpush(
+            subscription_info=json.loads(sub_raw),
+            data=json.dumps({"titulo": titulo, "corpo": corpo}),
+            vapid_private_key=vapid_priv,
+            vapid_claims={"sub": "mailto:guirangel17@users.noreply.github.com"},
+        )
+        print(f"[ok] push enviado: {titulo}")
+    except Exception as e:
+        print(f"[aviso] push não enviado: {e}", file=sys.stderr)
+
+
 def main():
     agora = datetime.now(BRT)
     hoje = agora.strftime("%Y-%m-%d")
@@ -657,6 +679,7 @@ def main():
             codigo_saida = 1
 
         # ---- análise de musculação (v7.7) — NUNCA derruba a análise de corrida ----
+        push_forca_geradas = 0
         try:
             import forca as F
             doc_forca = carregar_json(ARQ_FORCA, {"schema": 1, "atualizadoEm": None, "analises": []})
@@ -724,13 +747,29 @@ def main():
                     print(f"[ok] parecer de força: {date} · {a.get('activityName')} ({aid})")
                 except Exception as e:
                     print(f"[aviso] sessão de força {aid}: {e}", file=sys.stderr)
-            if len(doc_forca["analises"]) > antes_forca:
+            push_forca_geradas = len(doc_forca["analises"]) - antes_forca
+            if push_forca_geradas > 0:
                 doc_forca["analises"].sort(key=lambda x: (x["date"], x.get("geradoEm") or ""), reverse=True)
                 doc_forca["analises"] = doc_forca["analises"][:60]  # baseline cabe folgado; JSON não cresce sem limite
                 doc_forca["atualizadoEm"] = status["ultimaExecucao"]
                 escrever_json(ARQ_FORCA, doc_forca)
         except Exception as e:
             print(f"[aviso] análise de musculação indisponível nesta execução: {e}", file=sys.stderr)
+
+        # ---- notificação push (v7.10) — avisa que a IA terminou, mesmo com o app fechado ----
+        if geradas or push_forca_geradas:
+            partes = []
+            if geradas == 1:
+                ultima = next((x for x in doc["analises"] if x.get("activityId") not in processados), doc["analises"][0])
+                g = ultima.get("garmin", {})
+                partes.append(f"corrida de {ultima['date']} · {g.get('distanciaKm', '–')} km")
+            elif geradas > 1:
+                partes.append(f"{geradas} corridas novas")
+            if push_forca_geradas == 1:
+                partes.append("1 treino de força")
+            elif push_forca_geradas > 1:
+                partes.append(f"{push_forca_geradas} treinos de força")
+            notificar_push("🛰️ Atividade identificada", " + ".join(partes) + " — toque para confirmar.")
     except KeyError as e:
         status.update(status="erro", mensagem=f"variável/campo ausente: {e}")
         codigo_saida = 1

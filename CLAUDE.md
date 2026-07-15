@@ -62,11 +62,18 @@ pelo mapa gatilho×período). Tipos:
 - `hangover_on/off/step/dismiss {date, step?: agua|cafe|caminhada}`
 - `contract {date, maxDrinks, horaSaida, lancheAntes}` · `contract_tick {date, kind: drink|agua}` · `contract_cancel`
 - `review {week: dateKey da segunda, nota?, ajuste?}` — revisão de domingo
-- `workout {date, kind: corrida|gym, done}` — último vence
+- `workout {date, kind: corrida|gym, done, origemData?}` — último vence. `date` é o dia do PLANO
+  que foi cumprido (o que conta pro cronograma/streak/meta semanal); `origemData` só existe em
+  remanejamento (v7.10) — a data REAL da atividade no Garmin, quando diferente de `date` (ex.:
+  longão de segunda feito na quarta). `D.origemAtividade(events, date, kind)` resolve pra onde
+  buscar a análise da IA (`analisesDoDia`/`forcaAnalisesDoDia`); sem remanejamento, é a própria
+  `date`. `D.sugestaoRemanejamento` acha o dia planejado mais recente (até 4 dias) ainda sem
+  check, pra sugerir o remanejamento com 1 toque quando a atividade cai num dia sem plano.
 
 `settings`: `baseline {delivery, sweet, drinks}`, `dayTypeOverrides {date: TIPO}`, `startKey`
 (primeira data de uso — âncora dos contadores), `lastBackupTs`, `lembretes {lanche, revisao}`,
-chaves `notifLanche_*`/`notifRevisao_*` (guarda de notificação disparada).
+chaves `notifLanche_*`/`notifRevisao_*` (guarda de notificação disparada), `pushAtivo` +
+`pushSubscription` (inscrição de Web Push deste aparelho, v7.10 — ver seção de notificação).
 
 ## Regras de negócio críticas (implementadas em `derive.js`, cobertas por testes)
 
@@ -222,7 +229,10 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   (3) redisparar e conferir `data/pipeline-status.json` no remoto. Cuidado de higiene: o dump
   é credencial — nunca imprimir no chat; gravar em arquivo e o usuário copia do terminal dele.
   Secret `GEMINI_API_KEY` = chave do AI Studio. O guia de problemas em Ajustes (app) resume
-  isso em linguagem de usuário.
+  isso em linguagem de usuário. Secrets `PUSH_SUBSCRIPTION`/`VAPID_PRIVATE_KEY` (v7.10,
+  opcionais) = notificação push — setup fica em Ajustes → Notificação de atividade no app
+  (o toggle mostra o JSON pra colar em `PUSH_SUBSCRIPTION`); comentário no topo do
+  `analisar-corridas.yml` lista os quatro secrets.
 - **Zonas de FC CANÔNICAS** (nunca usar as do Garmin/Connect — variam com a config do relógio):
   FCmax 190 → Z1 <133 · Z2 133–152 · Z3 153–165 · Z4 166–177 · Z5 178+ (const `ZONAS_FC` no
   analisar.py, espelha plano-hibrido-pampulha.md). Calculadas da série temporal de FC
@@ -242,6 +252,18 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   e, desde a v7.6, para FORÇA: o pipeline também busca `strength_training` e grava o campo
   `forcas` no historico.json (só date/activityId/minutos/nome); dispensa em
   `settings.garminDispensadoGym_{date}`.
+- **v7.10 — remanejamento de treino pro dia certo do plano**: o pipeline analisa QUALQUER corrida
+  do Garmin, não só as dos dias planejados — mas antes disso o app só reconhecia a atividade se a
+  data real batesse exatamente com um dia de plano. Se o longão de segunda foi feito na quarta,
+  o card de Hoje agora detecta isso (`D.sugestaoRemanejamento`) e oferece "Sim, foi esse" (grava
+  `workout {date: segunda, origemData: quarta}`), "treino extra" (grava no próprio dia, sem vínculo
+  com o plano) ou "agora não". Se a sugestão for dispensada ou passar da janela de 4 dias, a aba
+  Treino ganha um link "🔗 vincular a uma corrida/treino de força do Garmin" no dia planejado sem
+  check, com uma lista curta das atividades recentes sem vínculo (sem digitar nada). Cronograma,
+  ✨ e o bloco "SUA CORRIDA/SESSÃO" em `sheetTreinoDetalhe` sempre resolvem a análise via
+  `D.origemAtividade` — nunca direto pela data do dia exibido. Treino extra (sem nenhum dia do
+  plano) agora aparece em "Treino do dia" mesmo sem plano, contanto que tenha check ou análise —
+  antes ficava invisível mesmo com o parecer da IA pronto.
 - **v7.7 — análise de MUSCULAÇÃO** (`pipeline/forca.py`, funções puras testadas + prompt):
   para cada sessão de força nova o pipeline busca `/activity-service/activity/{id}/exerciseSets`,
   normaliza (kg vem em GRAMAS; sets REST descartados), compara com a sessão anterior do MESMO
@@ -255,6 +277,18 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   derruba a de corrida (try/except no orquestrador). No app: sheet do treino de gym ganha
   "SUA SESSÃO · GARMIN" (volume/séries/tempo + tabela com badges + parecer) e ✨ na linha do
   treino; sessão livre sem sets estruturados vira entrada compacta sem parecer (render tolera).
+- **v7.10 — notificação push real** (opt-in, Ajustes → "Notificação de atividade"): até aqui o
+  único lembrete local (`agendarLembretes`) era best-effort e só funcionava com o app aberto ou
+  recente — não resolvia "preciso abrir o app pra saber se a análise chegou". Web Push de verdade
+  não precisa de backend: o par de chaves VAPID é gerado uma vez (pública embutida em `app.js`
+  como `VAPID_PUBLIC_KEY`; privada SÓ no Secret `VAPID_PRIVATE_KEY`), o toggle em Ajustes assina
+  o navegador (`pushManager.subscribe`) e mostra a inscrição resultante pro usuário colar 1x no
+  Secret `PUSH_SUBSCRIPTION` (mesmo padrão manual de `GARMIN_TOKEN`/`GEMINI_API_KEY` — sem lib de
+  criptografia nova no app). Ao final do `main()` do pipeline, se saiu análise de corrida ou força
+  nova, `notificar_push()` (usa `pywebpush`) envia um push curto; `sw.js` mostra a notificação
+  (`push`) e ao tocar foca/abre o app em `?aba=hoje` (`notificationclick`) — cai direto no mesmo
+  card de confirmação de sempre. Sem os Secrets configurados, ou se o envio falhar, `notificar_push`
+  só loga e segue — **nunca é uma dependência**: o card de Hoje funciona igual na próxima abertura.
 
 ## Fluxo de desenvolvimento e verificação
 
@@ -329,7 +363,9 @@ os dois temas se a mudança mexe em CSS.
   quebrado ou parado >48h acende bolinha âmbar no ⚙️ via `atualizarBadgeSaude()`) + guia de
   problemas (sheet com runbooks em linguagem de usuário), aparência (tema auto/claro/escuro em
   `settings.tema`), baseline, override do tipo de dia, backup export/import, lembretes opt-in
-  (best-effort, sem push server — dependem do app aberto), versão + buscar atualização.
+  (best-effort, sem push server — dependem do app aberto), notificação de atividade (v7.10, push
+  real via VAPID — funciona com o app fechado, setup de 1 vez colando a inscrição no Secret do
+  repo), versão + buscar atualização.
 - **Wizard de revisão** (domingo ≥18h até terça): 6 passos — métricas prontas → O ATLETA
   (v7.4: corridas×plano + km + longão + EF da semana, via historico.json) → gatilhos →
   1 pergunta → 1 ajuste de AMBIENTE (lista do protocolo) → frase de identidade + lembrete de

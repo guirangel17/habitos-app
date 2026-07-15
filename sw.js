@@ -1,5 +1,5 @@
 // Service worker — cache-first do app shell, com versionamento para updates.
-const VERSAO = 'rotina-v7.9';
+const VERSAO = 'rotina-v7.10';
 const SHELL = [
   './', './index.html', './styles.css', './app.js', './data.js', './derive.js',
   './store.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
@@ -39,4 +39,27 @@ self.addEventListener('fetch', (e) => {
         return resp;
       }))
   );
+});
+
+// push do pipeline (GitHub Actions → Web Push) — atividade identificada com o app fechado.
+// Best-effort/opt-in (Ajustes → Lembretes): nunca é dependência, o card de confirmação em Hoje
+// funciona igual sem isso na próxima vez que o app abrir.
+self.addEventListener('push', (e) => {
+  let dados = { titulo: 'Rotina', corpo: 'Toque para abrir.' };
+  try { if (e.data) dados = { ...dados, ...e.data.json() }; } catch { /* payload não-JSON, usa default */ }
+  e.waitUntil(self.registration.showNotification(dados.titulo, {
+    body: dados.corpo, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { aba: 'hoje' },
+  }));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const aba = e.notification.data?.aba || 'hoje';
+  e.waitUntil((async () => {
+    const clientes = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of clientes) {
+      if (new URL(c.url).pathname === new URL('./', self.registration.scope).pathname) return c.focus();
+    }
+    return self.clients.openWindow(`./?aba=${aba}`);
+  })());
 });
