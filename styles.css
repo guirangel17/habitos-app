@@ -707,6 +707,7 @@ nav.abas button.ativa { color: var(--serie-1); font-weight: 600; }
   flex-shrink: 0; display: grid; place-items: center; color: var(--surface); font-size: 0.8rem; margin-top: 1px;
 }
 .check-passo.feito .caixa { background: var(--good); border-color: var(--good); }
+.check-passo.pulado .caixa { border-color: var(--muted); color: var(--muted); }
 .check-passo.feito .t { text-decoration: line-through; color: var(--muted); }
 .check-passo .t { font-weight: 600; font-size: 0.9rem; }
 .check-passo .d { font-size: 0.78rem; color: var(--ink-2); margin-top: 2px; line-height: 1.4; }

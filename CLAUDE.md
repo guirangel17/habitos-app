@@ -62,13 +62,18 @@ pelo mapa gatilho×período). Tipos:
 - `hangover_on/off/step/dismiss {date, step?: agua|cafe|caminhada}`
 - `contract {date, maxDrinks, horaSaida, lancheAntes}` · `contract_tick {date, kind: drink|agua}` · `contract_cancel`
 - `review {week: dateKey da segunda, nota?, ajuste?}` — revisão de domingo
-- `workout {date, kind: corrida|gym, done, origemData?}` — último vence. `date` é o dia do PLANO
-  que foi cumprido (o que conta pro cronograma/streak/meta semanal); `origemData` só existe em
-  remanejamento (v7.10) — a data REAL da atividade no Garmin, quando diferente de `date` (ex.:
-  longão de segunda feito na quarta). `D.origemAtividade(events, date, kind)` resolve pra onde
-  buscar a análise da IA (`analisesDoDia`/`forcaAnalisesDoDia`); sem remanejamento, é a própria
-  `date`. `D.sugestaoRemanejamento` acha o dia planejado mais recente (até 4 dias) ainda sem
-  check, pra sugerir o remanejamento com 1 toque quando a atividade cai num dia sem plano.
+- `workout {date, kind: corrida|gym, done, origemData?, pulado?}` — último vence. `date` é o dia
+  do PLANO que foi cumprido (o que conta pro cronograma/streak/meta semanal); `origemData` só
+  existe em remanejamento (v7.10) — a data REAL da atividade no Garmin, quando diferente de
+  `date` (ex.: longão de segunda feito na quarta). `D.origemAtividade(events, date, kind)`
+  resolve pra onde buscar a análise da IA (`analisesDoDia`/`forcaAnalisesDoDia`); sem
+  remanejamento, é a própria `date`. `D.sugestaoRemanejamento` acha o dia planejado mais recente
+  (até 4 dias) ainda SEM DECISÃO (nem feito nem pulado — `D.foiPulado`) pra sugerir o
+  remanejamento com 1 toque quando a atividade cai num dia sem plano. `pulado: true` (v7.12,
+  sempre com `done: false`) = treino pulado DE PROPÓSITO ("não fiz e não vou fazer", distinto de
+  "não fiz ainda mas vou fazer noutro dia") — só o botão explícito grava isso; um `done: false`
+  comum (checkbox tocado e destocado por engano) não é pulado e continua contando como "sem
+  decisão" pra não sumir de listas de sugestão/vínculo.
 
 `settings`: `baseline {delivery, sweet, drinks}`, `dayTypeOverrides {date: TIPO}`, `startKey`
 (primeira data de uso — âncora dos contadores), `lastBackupTs`, `lembretes {lanche, revisao}`,
@@ -264,6 +269,19 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   `D.origemAtividade` — nunca direto pela data do dia exibido. Treino extra (sem nenhum dia do
   plano) agora aparece em "Treino do dia" mesmo sem plano, contanto que tenha check ou análise —
   antes ficava invisível mesmo com o parecer da IA pronto.
+  **Pegadinha corrigida em 15/07/2026**: os gates de "vincular"/`usadas()`/`sugestaoRemanejamento`
+  inicialmente checavam `=== undefined`, tratando um `done:false` ACIDENTAL (checkbox tocado e
+  destocado) como "já decidido" — sumia da lista de candidatos pra vincular e nunca mais era
+  sugerido. Corrigido pra `!feito`/`!done` em todos os gates; só `pulado:true` (v7.12, explícito)
+  conta como decisão de verdade.
+- **v7.12 — pular treino de propósito**: 3ª ação (junto de "vincular") na aba Treino pro dia
+  planejado sem check — "– Pular essa corrida/esse treino (não vou fazer)" grava
+  `workout {date, kind, done:false, pulado:true}`. Diferente de simplesmente não marcar: sinaliza
+  decisão consciente ("não fiz e não vou fazer", ex.: trocou o treino do dia por outro — ver
+  v7.10 remanejamento pra "não fiz ainda mas vou fazer noutro dia"). `D.foiPulado` esconde
+  "vincular"/"pular" pro mesmo dia depois de marcado, tira o dia do `sugestaoRemanejamento` e o
+  cronograma troca a classe `perdida` (opacidade, nunca vermelho) por um badge "– pulado" — seguindo
+  o princípio 1 (zero linguagem punitiva): não é uma corrida perdida, foi uma escolha.
 - **v7.7 — análise de MUSCULAÇÃO** (`pipeline/forca.py`, funções puras testadas + prompt):
   para cada sessão de força nova o pipeline busca `/activity-service/activity/{id}/exerciseSets`,
   normaliza (kg vem em GRAMAS; sets REST descartados), compara com a sessão anterior do MESMO

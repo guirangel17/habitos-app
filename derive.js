@@ -349,13 +349,24 @@ export function origemAtividade(events, date, kind) {
   return ultimo?.origemData || date;
 }
 
-// dia planejado mais recente (até `janelaDias` atrás) ainda sem check — sugestão de remanejamento
-// quando uma atividade do Garmin cai num dia sem plano (ex.: Longão de segunda feito na quarta)
+// treino pulado DE PROPÓSITO (v7.12): {done:false, pulado:true} — distinto de um done:false
+// acidental (ex.: checkbox tocado e destocado, que deve seguir contando como "sem decisão").
+// Só o botão explícito "pular esse treino" grava pulado:true.
+export function foiPulado(events, date, kind) {
+  let ultimo = null;
+  for (const e of events) if (e.type === 'workout' && e.date === date && e.kind === kind) ultimo = e;
+  return !!ultimo?.pulado;
+}
+
+// dia planejado mais recente (até `janelaDias` atrás) ainda sem decisão — sugestão de remanejamento
+// quando uma atividade do Garmin cai num dia sem plano (ex.: Longão de segunda feito na quarta).
+// "sem decisão" = nunca marcado feito E nunca pulado de propósito (done:false acidental conta
+// como sem decisão, senão um toque perdido no checkbox tiraria o dia da lista pra sempre).
 export function sugestaoRemanejamento(events, dataAtividade, kind, janelaDias = 4) {
   for (let i = 1; i <= janelaDias; i++) {
     const d = addDays(dataAtividade, -i);
     const planejado = kind === 'corrida' ? treinoDoDia(d).corrida : treinoDoDia(d).gym;
-    if (planejado && workoutsDoDia(events, d)[kind] === undefined) return d;
+    if (planejado && !workoutsDoDia(events, d)[kind] && !foiPulado(events, d, kind)) return d;
   }
   return null;
 }

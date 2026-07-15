@@ -189,6 +189,14 @@ const remEvs = [{ id: 'r1', ts: 1, type: 'workout', date: '2026-07-13', kind: 'c
 ok(D.origemAtividade(remEvs, '2026-07-13', 'corrida') === '2026-07-14', 'origemAtividade acha a data real remanejada');
 ok(D.origemAtividade(remEvs, '2026-07-16', 'corrida') === '2026-07-16', 'sem remanejamento: origem é a própria data');
 
+// ---- v7.12: treino pulado de propósito ----
+const semDecisao = [{ id: 'a1', ts: 1, type: 'workout', date: '2026-07-13', kind: 'corrida', done: false }];
+ok(D.foiPulado(semDecisao, '2026-07-13', 'corrida') === false, 'done:false acidental não é pulado');
+ok(D.sugestaoRemanejamento(semDecisao, '2026-07-14', 'corrida') === '2026-07-13', 'done:false acidental não bloqueia a sugestão de remanejamento');
+const pulado = [{ id: 'p1', ts: 1, type: 'workout', date: '2026-07-13', kind: 'corrida', done: false, pulado: true }];
+ok(D.foiPulado(pulado, '2026-07-13', 'corrida') === true, 'pulado:true é reconhecido');
+ok(D.sugestaoRemanejamento(pulado, '2026-07-14', 'corrida') === null, 'dia pulado de propósito não entra na sugestão de remanejamento');
+
 // ---- v3: tempo limpo ----
 const t0 = D.parseKey('2026-07-01').getTime();
 const tl = D.tempoLimpo(t0, t0 + (2 * 86400 + 5 * 3600 + 30 * 60 + 10) * 1000);

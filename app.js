@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.11'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.12'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -1462,11 +1462,12 @@ function renderTreino(root) {
   const tr = cardHoje.querySelector('#tr');
   const linhaTreino = (kind, icone, nome) => {
     const ok = !!feito[kind];
+    const pulado = !ok && D.foiPulado(st.events, alvo, kind);
     const row = el(`<div class="treino-row ${ok ? 'feito' : ''}">
       ${futuro
     ? `<div class="check-passo tr-plano"><span><span class="t">${icone} ${esc(nome)}</span></span></div>`
-    : `<button class="check-passo tr-check ${ok ? 'feito' : ''}">
-        <span class="caixa">${ok ? '✓' : ''}</span>
+    : `<button class="check-passo tr-check ${ok ? 'feito' : pulado ? 'pulado' : ''}">
+        <span class="caixa">${ok ? '✓' : pulado ? '–' : ''}</span>
         <span><span class="t">${icone} ${esc(nome)}</span></span>
       </button>`}
       <button class="tr-ver" aria-label="ver treino completo">›</button>
@@ -1491,15 +1492,25 @@ function renderTreino(root) {
   if (!plano.corrida && !plano.gym && !extraCorrida && !extraGym) tr.append(el(`<p style="font-size:.85rem;color:var(--muted)">Descanso — ${futuro ? 'o treino é' : 'hoje o treino é'} dormir 7–8h. Metade da recuperação acontece dormindo.</p>`));
   root.append(cardHoje);
 
-  // vincular manualmente: dia planejado ainda sem check + atividades do Garmin por perto sem
-  // vínculo nenhum (a sugestão automática em Hoje foi dispensada, ou passou da janela de 4 dias)
+  // ações pro dia sem check: vincular manualmente a uma atividade do Garmin por perto (a
+  // sugestão automática em Hoje foi dispensada, ou passou da janela de 4 dias) OU marcar como
+  // pulado de propósito (v7.12) — pra diferenciar "não fiz mas vou fazer noutro dia" (some da
+  // lista de pendências) de "não fiz e não vou fazer" (fica registrado, sem culpa, sem nagging)
   if (!futuro) {
     const usadas = (kind) => {
       const s = new Set();
       for (const e of st.events) if (e.type === 'workout' && e.kind === kind && e.done) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
       return s;
     };
-    if (plano.corrida && !feito.corrida) {
+    const acaoPular = (kind, rotulo) => {
+      const l = el(`<button class="linha-streaks">– <span>Pular ${rotulo} (não vou fazer)</span><span class="seta">→</span></button>`);
+      l.onclick = () => {
+        const e = S.addEvent({ type: 'workout', date: alvo, kind, done: false, pulado: true });
+        snackbar('Sem culpa — registrado. 🌊', () => S.removeEvent(e.id));
+      };
+      return l;
+    };
+    if (plano.corrida && !feito.corrida && !D.foiPulado(st.events, alvo, 'corrida')) {
       const usadasC = usadas('corrida');
       const candidatos = (dadosHistorico?.corridas || [])
         .filter((c) => c.date >= D.addDays(alvo, -13) && c.date <= key && !usadasC.has(c.date))
@@ -1509,8 +1520,9 @@ function renderTreino(root) {
         l.onclick = () => sheetVincularGarmin('corrida', alvo, candidatos);
         root.append(l);
       }
+      root.append(acaoPular('corrida', 'essa corrida'));
     }
-    if (plano.gym && !feito.gym) {
+    if (plano.gym && !feito.gym && !D.foiPulado(st.events, alvo, 'gym')) {
       const usadasG = usadas('gym');
       const candidatos = (dadosHistorico?.forcas || [])
         .filter((f) => f.date >= D.addDays(alvo, -13) && f.date <= key && !usadasG.has(f.date))
@@ -1520,6 +1532,7 @@ function renderTreino(root) {
         l.onclick = () => sheetVincularGarmin('gym', alvo, candidatos);
         root.append(l);
       }
+      root.append(acaoPular('gym', 'esse treino'));
     }
   }
 
@@ -1551,11 +1564,12 @@ function renderTreino(root) {
     const hoje = data === key;
     const temAnalise = analisesDoDia(D.origemAtividade(st.events, data, 'corrida')).length > 0;
     const viagem = D.emViagem(data, viagensCfg()); // corrida em viagem sem check: neutra, nunca "perdida"
-    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise && !viagem ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
+    const pulado = !ok && D.foiPulado(st.events, data, 'corrida'); // decisão consciente ≠ "perdida"
+    const item = el(`<div class="cron-item ${ok ? 'feita' : ''} ${passada && !ok && !temAnalise && !viagem && !pulado ? 'perdida' : ''} ${hoje ? 'hoje' : ''}">
       <button class="cron-toggle">
         <span class="caixa">${ok ? '✓' : ''}</span>
         <span class="cron-data num">${fmtData(data)}</span>
-        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}${viagem && !ok ? ' <span class="cron-badge">✈️</span>' : ''}</span>
+        <span class="cron-nome">${TIPO_CORRIDA_ICONE[tipo]} ${esc(nome)}${temAnalise ? ' <span class="cron-badge">✨</span>' : ''}${viagem && !ok ? ' <span class="cron-badge">✈️</span>' : ''}${pulado ? ' <span class="cron-badge">– pulado</span>' : ''}</span>
       </button>
       <button class="tr-ver cron-ver" aria-label="ver guia da corrida">›</button>
     </div>`);
