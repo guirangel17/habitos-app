@@ -1499,7 +1499,7 @@ function renderTreino(root) {
       for (const e of st.events) if (e.type === 'workout' && e.kind === kind) { s.add(e.date); if (e.origemData) s.add(e.origemData); }
       return s;
     };
-    if (plano.corrida && feito.corrida === undefined) {
+    if (plano.corrida && !feito.corrida) {
       const usadasC = usadas('corrida');
       const candidatos = (dadosHistorico?.corridas || [])
         .filter((c) => c.date >= D.addDays(alvo, -13) && c.date <= key && !usadasC.has(c.date))
@@ -1510,7 +1510,7 @@ function renderTreino(root) {
         root.append(l);
       }
     }
-    if (plano.gym && feito.gym === undefined) {
+    if (plano.gym && !feito.gym) {
       const usadasG = usadas('gym');
       const candidatos = (dadosHistorico?.forcas || [])
         .filter((f) => f.date >= D.addDays(alvo, -13) && f.date <= key && !usadasG.has(f.date))
