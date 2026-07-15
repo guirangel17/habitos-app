@@ -17,6 +17,11 @@
 name: Analisar corridas
 on:
   workflow_dispatch:
+    inputs:
+      push_teste:
+        description: 'Enviar push de teste (ignora se há análise nova — só valida o setup)'
+        type: boolean
+        default: false
   schedule:
     - cron: '15,45 10-12 * * *'   # 07:15–09:45 BRT — pós-treino da manhã
     - cron: '15,45 22,23 * * *'   # 19:15–20:45 BRT — pós-treino da noite
@@ -48,6 +53,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_TESTE: ${{ inputs.push_teste }}
       - name: Previsão do tempo das janelas de treino
         if: always()
         run: python pipeline/clima.py || echo "clima indisponível — segue sem"

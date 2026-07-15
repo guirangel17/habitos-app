@@ -582,6 +582,10 @@ def main():
     hoje = agora.strftime("%Y-%m-%d")
     status = {"ultimaExecucao": agora.isoformat(timespec="seconds"), "status": "ok", "mensagem": "", "ultimaAnalise": None, "pendentes": 0}
     codigo_saida = 0
+    # gatilho manual pra validar o setup do push sem esperar uma análise nova de verdade
+    # (workflow_dispatch → input push_teste; ver analisar-corridas.yml)
+    if os.environ.get("PUSH_TESTE") == "true":
+        notificar_push("🔔 Teste de notificação", "Se você está vendo isso, o push chegou! Pode desligar o input de teste agora.")
     try:
         plano_doc = json.loads(ARQ_PLANO.read_text())
         corridas_plano = plano_doc["CORRIDAS"]
