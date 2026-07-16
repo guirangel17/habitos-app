@@ -1,7 +1,208 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-14T17:08:31-03:00",
+ "atualizadoEm": "2026-07-16T18:03:25-03:00",
  "analises": [
+  {
+   "date": "2026-07-16",
+   "activityId": 23622133520,
+   "geradoEm": "2026-07-16T18:03:26-03:00",
+   "sessao": {
+    "minutos": 52,
+    "series": 22,
+    "volumeKg": 6339,
+    "exercicios": [
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 55
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 45
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 44
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 45
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 31
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 36
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 39
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_BULGARIAN_SPLIT_SQUAT",
+      "categoria": "LUNGE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": null,
+        "s": 89
+       },
+       {
+        "reps": 9,
+        "kg": null,
+        "s": 60
+       },
+       {
+        "reps": 9,
+        "kg": null,
+        "s": 58
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": null,
+      "deltaReps": 0
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 45.0,
+        "s": 16
+       },
+       {
+        "reps": 11,
+        "kg": 52.5,
+        "s": 36
+       },
+       {
+        "reps": 9,
+        "kg": 52.5,
+        "s": 41
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "BARBELL_STRAIGHT_LEG_DEADLIFT",
+      "categoria": "DEADLIFT",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 10.0,
+        "s": 52
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 41
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "STANDING_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 59.0,
+        "s": 10
+       },
+       {
+        "reps": 12,
+        "kg": 59.0,
+        "s": 33
+       },
+       {
+        "reps": 12,
+        "kg": 59.0,
+        "s": 30
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 7.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SEATED_DUMBBELL_TOE_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 18,
+        "kg": 15.0,
+        "s": 189
+       },
+       {
+        "reps": 15,
+        "kg": 15.0,
+        "s": 81
+       },
+       {
+        "reps": 15,
+        "kg": 15.0,
+        "s": 76
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": 0
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de Pernas A foi bem executada, com um volume total de 22 séries e 6339kg em 52 minutos, alinhada com o plano de um dia pesado único. Houve um bom progresso de carga em vários exercícios e a introdução de novos movimentos.",
+    "comparacao_plano": "O treino de Pernas A foi realizado com 22 séries, ligeiramente acima das ~21 séries planejadas, e dentro do tempo esperado. Houve excelente aderência à estrutura e aos objetivos de hipertrofia (8-12 reps). O Leg Press e a Panturrilha em Pé atingiram o topo da faixa de repetições, indicando prontidão para aumento de carga. A Elevação Pélvica e o Tibial Anterior (Seated Dumbbell Toe Raise) também viram progressão de carga. O Stiff foi introduzido como um novo exercício, com uma série pulada propositalmente.",
+    "pontos_fortes": [
+     "Consistente aplicação da sobrecarga progressiva, com aumento de carga no Barbell Hip Thrust, Standing Calf Raise e Seated Dumbbell Toe Raise.",
+     "Excelente aderência ao volume planejado para a sessão (22 séries vs. ~21 planejadas), otimizando o estímulo de hipertrofia.",
+     "Atingiu o topo da faixa de repetições no Leg Press (11 reps) e Standing Calf Raise (12 reps), demonstrando força e controle crescentes."
+    ],
+    "pontos_atencao": [
+     "No Leg Press, você consistentemente alcançou 11 repetições nas últimas séries, o que significa que o método de progressão dupla sugere um aumento de carga para a próxima sessão, voltando ao piso da faixa de repetições.",
+     "No Dumbbell Bulgarian Split Squat, as repetições variaram (11, 9, 9). Para otimizar o estímulo, busque manter a consistência nas repetições ou até mesmo tentar mais 1 repetição nas últimas séries se a técnica permitir.",
+     "Uma série do Barbell Straight Leg Deadlift foi pulada. Lembre-se que este é um exercício novo e importante para a cadeia posterior, essencial para a estabilidade na corrida."
+    ],
+    "proxima_dica": "Para o Leg Press, como você atingiu 11 repetições em múltiplas séries, na próxima sessão de Pernas A, aumente a carga em 5kg (2,5kg por lado) e foque em realizar 8-10 repetições com boa forma.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-07-14",
    "activityId": 23598751980,
