@@ -281,6 +281,13 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   evento antes de checar `done`, igual todo o resto do arquivo já fazia (`workoutsDoDia`,
   `origemAtividade`, `foiPulado`). Regra geral: QUALQUER leitura de `events` que decide algo por
   data tem que reduzir ao último evento primeiro — nunca testar `some()`/filtrar direto no loop.
+  **Terceira rodada (v7.17, 17/07/2026)**: os gates dos CARDS DE CONFIRMAÇÃO
+  (`analisePendenteConfirmacao`/`forcaPendenteConfirmacao`) e do checkpoint tinham ficado de
+  fora das duas primeiras — testavam `!== undefined`, então um `done:false` acidental
+  suprimia o card de confirmar o treino do Garmin PRA SEMPRE naquele dia (foi por isso que a
+  Social Run de 16/07 nunca ganhou card). Semântica certa: suprimir só com `done:true` OU
+  `foiPulado`. Ao mexer em qualquer gate novo de treino, correr atrás dos QUATRO lugares:
+  vincular, sugestão de remanejamento, cards de confirmação, checkpoint.
 - **v7.12 — pular treino de propósito**: 3ª ação (junto de "vincular") na aba Treino pro dia
   planejado sem check — "– Pular essa corrida/esse treino (não vou fazer)" grava
   `workout {date, kind, done:false, pulado:true}`. Diferente de simplesmente não marcar: sinaliza

@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.16'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.17'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -429,7 +429,7 @@ function slotContextual(st, key) {
   // Vem antes da revisão de propósito: a véspera cai sempre em terça, mesmo dia em que a
   // revisão pendente ainda mora no slot — e o checkpoint tem hora marcada.
   const cpHoje = CHECKPOINTS.find((c) => c.date === key);
-  if (cpHoje && D.workoutsDoDia(st.events, key).corrida === undefined) {
+  if (cpHoje && !D.workoutsDoDia(st.events, key).corrida) {
     const c = el(`<button class="card card-revisao card-checkpoint">
       <span><b>🎯 Hoje: ${esc(cpHoje.titulo)}</b><br><small>O dia que define ${esc(cpHoje.define)}. Como executar — 2 min de leitura</small></span>
       <span class="seta">→</span></button>`);
@@ -1173,7 +1173,9 @@ function analisePendenteConfirmacao(st, key) {
   for (const [date, lista] of Object.entries(dadosAnalises.porData)) {
     if (date > key || date < D.addDays(key, -3)) continue;
     if (st.settings[`garminDispensado_${date}`]) continue;
-    if (D.workoutsDoDia(st.events, date).corrida !== undefined) continue;
+    // done:true ou pulado de propósito = decidido; done:false acidental (checkbox tocado e
+    // destocado) segue "sem decisão" e o card continua sendo oferecido — mesma regra da v7.13
+    if (D.workoutsDoDia(st.events, date).corrida || D.foiPulado(st.events, date, 'corrida')) continue;
     if (D.treinoDoDia(date).corrida) return { date, analise: lista[0] };
     // fora do plano — sugere remanejar pro dia certo (ex.: longão perdido, feito noutro dia)
     const sugestaoData = D.sugestaoRemanejamento(st.events, date, 'corrida');
@@ -1188,7 +1190,7 @@ function forcaPendenteConfirmacao(st, key) {
   for (const f of [...dadosHistorico.forcas].reverse()) {
     if (f.date > key || f.date < D.addDays(key, -3)) continue;
     if (st.settings[`garminDispensadoGym_${f.date}`]) continue;
-    if (D.workoutsDoDia(st.events, f.date).gym !== undefined) continue;
+    if (D.workoutsDoDia(st.events, f.date).gym || D.foiPulado(st.events, f.date, 'gym')) continue;
     if (D.treinoDoDia(f.date).gym) return f;
     const sugestaoData = D.sugestaoRemanejamento(st.events, f.date, 'gym');
     if (sugestaoData) return { ...f, sugestaoData };
