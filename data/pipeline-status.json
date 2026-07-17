@@ -1,7 +1,7 @@
 {
- "ultimaExecucao": "2026-07-16T21:10:09-03:00",
- "status": "ok",
- "mensagem": "",
+ "ultimaExecucao": "2026-07-16T22:03:38-03:00",
+ "status": "gemini_quota",
+ "mensagem": "1 análise(s) falharam — o próximo cron tenta de novo",
  "ultimaAnalise": "2026-07-15",
  "pendentes": 0
 }
