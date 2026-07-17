@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.15'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.16'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -2727,6 +2727,8 @@ function checarSaude(st, sp) {
     if (sp.status !== 'ok') itens.push({ n: 'warn', txt: `Pipeline: ${ROTULO_PIPE[sp.status] || sp.status}` });
     else if (h > 26) itens.push({ n: 'warn', txt: `Pipeline não roda há ${Math.round(h / 24)} dia(s) — métricas de corrida podem estar velhas` });
     else itens.push({ n: 'ok', txt: `Pipeline Garmin · rodou há ${h < 1 ? 'menos de 1h' : `${h}h`}` });
+    // push que falha é silencioso por design — aqui é o único lugar que conta pro usuário
+    if (sp.pushErro) itens.push({ n: 'warn', txt: 'Notificação push falhou no último envio (inscrição expirada?) — desligue e ligue o toggle em Notificação de atividade e recole o Secret PUSH_SUBSCRIPTION' });
   }
   const seteD = D.addDays(hojeKey(), -7);
   const semAnalise = (dadosHistorico?.corridas || []).filter((c) => c.date >= seteD && c.date <= hojeKey()
@@ -2753,7 +2755,7 @@ function checarSaude(st, sp) {
 async function atualizarBadgeSaude() {
   const sp = await fetchDados('pipeline-status.json');
   const h = sp?.ultimaExecucao ? (Date.now() - new Date(sp.ultimaExecucao).getTime()) / 36e5 : Infinity;
-  $('#btn-ajustes')?.classList.toggle('alerta', !sp || sp.status !== 'ok' || h > 48);
+  $('#btn-ajustes')?.classList.toggle('alerta', !sp || sp.status !== 'ok' || h > 48 || !!sp.pushErro);
 }
 
 function sheetGuiaProblemas() {
@@ -2764,6 +2766,7 @@ function sheetGuiaProblemas() {
       ${item('🛰️', 'Conexão com a Garmin expirou (garmin_auth)', 'Abra uma sessão do Claude no servidor e peça "renova o token do Garmin" — o passo a passo (túnel + login + Secret) está no CLAUDE.md do repo, leva ~5 min. Nenhuma corrida se perde: tudo fica na Garmin e é analisado quando voltar.')}
       ${item('⏳', 'IA sem quota (gemini_quota)', 'Resolve sozinho no próximo horário automático. Se passar de 1 dia, conferir a chave GEMINI_API_KEY nos Secrets do repo (GitHub → Settings → Actions).')}
       ${item('✨', 'Análise não apareceu', 'Com token: 2–4 min depois do 🛰️. Sem token: espera os horários automáticos (manhã, noite e 14h). Corrida com +1 dia sem análise = ver o status na saúde.')}
+      ${item('🔔', 'Notificação de atividade parou de chegar', 'A inscrição de push pode expirar ou ser cancelada pelo navegador sem aviso — a saúde acusa quando o último envio falhou. Refazer: desligue e ligue o toggle em Notificação de atividade, copie o JSON novo e atualize o Secret PUSH_SUBSCRIPTION no GitHub. Valide rodando o workflow Analisar corridas com "Enviar push de teste" marcado.')}
       ${item('📵', 'App preso em versão antiga', 'Saia do app e volte (ele checa sozinho ao voltar). Persistiu: Buscar atualização aqui em Ajustes e espere na Hoje. Teimou: guia anônima na URL do app pra ver o que o servidor entrega; último recurso: chrome://serviceworker-internals → Unregister do escopo do app — é seguro, NÃO apaga dados. O que NUNCA fazer: "Limpar dados do site" — isso apaga seus registros.')}
       ${item('📊', 'Métricas de corrida desatualizadas', 'Quase sempre é o pipeline parado — a saúde diz há quanto tempo e o motivo. O ⚙️ do header ganha uma bolinha âmbar quando isso acontece, pra você não passar semanas sem ver.')}
       ${item('💾', 'Troquei ou perdi o celular', 'Instale o app de novo pelo Chrome (guirangel17.github.io/habitos-app) e use Ajustes → Importar backup com o último export. É por isso que o lembrete mensal de backup existe.')}
@@ -2925,7 +2928,25 @@ function renderAjustes(root) {
       try { await navigator.clipboard.writeText(JSON.stringify(sub)); snackbar('Copiado ✓'); } catch { snackbar('Não consegui copiar — selecione o texto acima manualmente.'); }
     };
   };
-  if (st.settings.pushAtivo && st.settings.pushSubscription) mostrarSetupPush(st.settings.pushSubscription);
+  if (st.settings.pushAtivo && st.settings.pushSubscription) {
+    mostrarSetupPush(st.settings.pushSubscription);
+    // deriva de inscrição: o navegador pode cancelar/trocar a inscrição por baixo (410 Gone no
+    // pipeline) — sem esta checagem o Secret aponta pra uma inscrição morta e ninguém fica sabendo
+    (async () => {
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration();
+        const sub = (await reg?.pushManager.getSubscription())?.toJSON();
+        const salvo = st.settings.pushSubscription;
+        const aviso = (txt) => setupPush.insertAdjacentHTML('afterbegin', `<p style="font-size:.75rem;color:var(--warning);margin:10px 0 0">⚠️ ${txt}</p>`);
+        if (!sub) aviso('A inscrição deste aparelho não existe mais (o navegador cancelou). Desligue e ligue o toggle e cole a inscrição NOVA no Secret.');
+        else if (sub.endpoint !== salvo.endpoint) {
+          S.setSetting('pushSubscription', sub);
+          mostrarSetupPush(sub);
+          aviso('A inscrição mudou desde a última cópia — recole o JSON abaixo no Secret PUSH_SUBSCRIPTION.');
+        }
+      } catch { /* checagem best-effort — sem suporte a push, nada a avisar */ }
+    })();
+  }
   cardPush.querySelector('#t-push').onclick = async (e) => {
     const btn = e.currentTarget;
     if (S.getState().settings.pushAtivo) {

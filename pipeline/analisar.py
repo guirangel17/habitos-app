@@ -559,11 +559,15 @@ def notificar_push(titulo, corpo):
     """Avisa o app (Web Push, v7.10) que uma análise nova chegou — com o app fechado inclusive.
     Opt-in (Ajustes → Notificação de atividade) e best-effort: sem os Secrets configurados, ou se
     o envio falhar (inscrição expirada etc.), só loga e segue — o card de confirmação em Hoje
-    continua funcionando normalmente na próxima vez que o app abrir. Nunca é uma dependência."""
+    continua funcionando normalmente na próxima vez que o app abrir. Nunca é uma dependência.
+
+    Retorna None quando enviou (ou nem tentou); string de erro quando a tentativa falhou —
+    o main() grava em status["pushErro"] pra saúde do app acusar inscrição morta (falha
+    silenciosa de 410 Gone foi exatamente o que escondeu o push quebrado em 16/07/2026)."""
     sub_raw = os.environ.get("PUSH_SUBSCRIPTION")
     vapid_priv = os.environ.get("VAPID_PRIVATE_KEY")
     if not sub_raw or not vapid_priv:
-        return
+        return None
     try:
         from pywebpush import webpush
         webpush(
@@ -573,8 +577,10 @@ def notificar_push(titulo, corpo):
             vapid_claims={"sub": "mailto:guirangel17@users.noreply.github.com"},
         )
         print(f"[ok] push enviado: {titulo}")
+        return None
     except Exception as e:
         print(f"[aviso] push não enviado: {e}", file=sys.stderr)
+        return str(e).replace("\n", " ")[:160]
 
 
 def main():
@@ -585,7 +591,9 @@ def main():
     # gatilho manual pra validar o setup do push sem esperar uma análise nova de verdade
     # (workflow_dispatch → input push_teste; ver analisar-corridas.yml)
     if os.environ.get("PUSH_TESTE") == "true":
-        notificar_push("🔔 Teste de notificação", "Se você está vendo isso, o push chegou! Pode desligar o input de teste agora.")
+        erro_push = notificar_push("🔔 Teste de notificação", "Se você está vendo isso, o push chegou! Pode desligar o input de teste agora.")
+        if erro_push:
+            status["pushErro"] = erro_push
     try:
         plano_doc = json.loads(ARQ_PLANO.read_text())
         corridas_plano = plano_doc["CORRIDAS"]
@@ -773,7 +781,9 @@ def main():
                 partes.append("1 treino de força")
             elif push_forca_geradas > 1:
                 partes.append(f"{push_forca_geradas} treinos de força")
-            notificar_push("🛰️ Atividade identificada", " + ".join(partes) + " — toque para confirmar.")
+            erro_push = notificar_push("🛰️ Atividade identificada", " + ".join(partes) + " — toque para confirmar.")
+            if erro_push:
+                status["pushErro"] = erro_push
     except KeyError as e:
         status.update(status="erro", mensagem=f"variável/campo ausente: {e}")
         codigo_saida = 1

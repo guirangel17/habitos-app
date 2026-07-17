@@ -314,6 +314,14 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   (`push`) e ao tocar foca/abre o app em `?aba=hoje` (`notificationclick`) — cai direto no mesmo
   card de confirmação de sempre. Sem os Secrets configurados, ou se o envio falhar, `notificar_push`
   só loga e segue — **nunca é uma dependência**: o card de Hoje funciona igual na próxima abertura.
+  **Pegadinha aprendida em 16-17/07/2026 (v7.16)**: a inscrição de push morre sem aviso (o
+  toggle OFF chama `unsubscribe()`, e o navegador também pode cancelar sozinho) — o Secret fica
+  apontando pra uma inscrição morta, o push falha com `410 Gone` a cada run e NINGUÉM fica
+  sabendo, porque a falha era só um log. Desde a v7.16 a falha de envio vira `pushErro` no
+  `pipeline-status.json` (a saúde em Ajustes acusa e o ⚙️ acende âmbar) e o card de Ajustes
+  compara `pushManager.getSubscription()` com `settings.pushSubscription` ao renderizar —
+  inscrição sumida ou trocada ganha aviso pra recolar o Secret. Runbook: desligar/ligar o
+  toggle, colar o JSON novo no Secret e validar com o input `push_teste` do workflow.
 
 ## Fluxo de desenvolvimento e verificação
 
