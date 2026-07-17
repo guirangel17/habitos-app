@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.14'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.15'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -1076,7 +1076,15 @@ async function dispararAnalise(origem) {
   const pat = patGarmin();
   if (!pat) return false;
   const ultimo = Number(S.getState().settings.garminUltimoDisparo || 0);
-  if (origem === 'auto' && Date.now() - ultimo < 20 * 60e3) return false;
+  // cooldown vale pros dois: 'auto' evita disparo repetido em foco; 'manual' evita cliques em
+  // sequência (ou reabrir o app) empilharem runs concorrentes que estouram a quota do Gemini
+  // no mesmo treino (persistido em settings — sobrevive a reload, ao contrário de analiseAguardando)
+  const cooldown = origem === 'auto' ? 20 * 60e3 : 3 * 60e3;
+  if (Date.now() - ultimo < cooldown) {
+    if (origem !== 'auto') snackbar('Análise já disparada há pouco — aguarde alguns minutos antes de tentar de novo.');
+    return false;
+  }
+  S.setSetting('garminUltimoDisparo', Date.now());
   try {
     const r = await fetch(`${REPO_API}/actions/workflows/analisar-corridas.yml/dispatches`, {
       method: 'POST',
@@ -1084,7 +1092,6 @@ async function dispararAnalise(origem) {
       body: JSON.stringify({ ref: 'main' }),
     });
     if (r.status !== 204) throw new Error(`HTTP ${r.status}`);
-    S.setSetting('garminUltimoDisparo', Date.now());
     iniciarPollingAnalise();
     if (origem !== 'auto') snackbar('Análise disparada — chega em ~2-4 min 🛰️');
     return true;
