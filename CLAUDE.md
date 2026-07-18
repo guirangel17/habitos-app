@@ -217,11 +217,16 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   Solução definitiva: **`garmin/renovar-token.py` agendado no notebook do usuário** (IP
   residencial) renova o OAuth2 diariamente e atualiza o Secret via API do GitHub (PAT com
   Secrets RW em `~/.habitos-pat`) — setup no `garmin/README.md`. `garmin_auth` = só 401
-  real (renovar de verdade); bloqueio 429/403 vira status `erro` transiente com o detalhe
-  da resposta (server/cf-ray/corpo) na mensagem.
-  **Se TODOS os runs do dia falham com `oauth exchange 429`** (aprendido em 14/07/2026):
-  não é transiente — significa que o OAuth2 do Secret venceu e o runner está tentando o
-  exchange bloqueado; a causa raiz mora no NOTEBOOK: `schtasks /Query /TN RenovarGarmin /V`
+  real (renovar de verdade); bloqueio 429/403 vira status `garmin_bloqueio` (v7.18) com o
+  detalhe da resposta (server/cf-ray/corpo) na mensagem — o pipeline sai com **exit 0 de
+  propósito** (run verde no Actions: condição transiente que nenhuma ação resolve; decisão
+  de 18/07/2026 depois de 4 runs "falhados" num único dia só por bloqueio diurno) e o
+  exchange tenta com backoff progressivo (pausas de 42s e 90s) antes de desistir. No app,
+  `garmin_bloqueio` é item INFO na saúde e NÃO acende o âmbar do ⚙️ (senão passaria o dia
+  aceso); análise atrasada de verdade é pega pelo check "corrida(s) da semana sem análise".
+  **Se TODOS os runs do dia terminam com `garmin_bloqueio`** (aprendido em 14/07/2026, na
+  época como falha de run): não é transiente — significa que o OAuth2 do Secret venceu e o
+  runner está tentando o exchange bloqueado; a causa raiz mora no NOTEBOOK: `schtasks /Query /TN RenovarGarmin /V`
   e olhe o Last Result (0x80070002 = tarefa apontava para o alias `py` da Store, que o
   Agendador não executa — usar o python.exe real; ver garmin/README.md). Rodar
   `renovar-token.py` na mão destrava na hora.

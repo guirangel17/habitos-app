@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.17'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.18'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -2720,13 +2720,18 @@ const ROTULO_PIPE = {
   erro: 'erro na última execução — ver guia',
 };
 
+// bloqueio transiente do Cloudflare da Garmin (v7.18): nenhuma ação resolve e o próximo
+// cron tenta sozinho — vira item informativo, nunca âmbar (senão o ⚙️ passaria o dia aceso)
+const PIPE_TRANSIENTE = 'garmin_bloqueio';
+
 function checarSaude(st, sp) {
   const horasDesde = (iso) => (iso ? Math.round((Date.now() - new Date(iso).getTime()) / 36e5) : null);
   const itens = [];
   if (!sp?.ultimaExecucao) itens.push({ n: 'warn', txt: 'Pipeline Garmin sem execuções — configurar Secrets no repo' });
   else {
     const h = horasDesde(sp.ultimaExecucao);
-    if (sp.status !== 'ok') itens.push({ n: 'warn', txt: `Pipeline: ${ROTULO_PIPE[sp.status] || sp.status}` });
+    if (sp.status === PIPE_TRANSIENTE) itens.push({ n: 'info', txt: 'Pipeline: Garmin bloqueou o runner no último ciclo — passa sozinho, nada a fazer' });
+    else if (sp.status !== 'ok') itens.push({ n: 'warn', txt: `Pipeline: ${ROTULO_PIPE[sp.status] || sp.status}` });
     else if (h > 26) itens.push({ n: 'warn', txt: `Pipeline não roda há ${Math.round(h / 24)} dia(s) — métricas de corrida podem estar velhas` });
     else itens.push({ n: 'ok', txt: `Pipeline Garmin · rodou há ${h < 1 ? 'menos de 1h' : `${h}h`}` });
     // push que falha é silencioso por design — aqui é o único lugar que conta pro usuário
@@ -2757,7 +2762,7 @@ function checarSaude(st, sp) {
 async function atualizarBadgeSaude() {
   const sp = await fetchDados('pipeline-status.json');
   const h = sp?.ultimaExecucao ? (Date.now() - new Date(sp.ultimaExecucao).getTime()) / 36e5 : Infinity;
-  $('#btn-ajustes')?.classList.toggle('alerta', !sp || sp.status !== 'ok' || h > 48 || !!sp.pushErro);
+  $('#btn-ajustes')?.classList.toggle('alerta', !sp || (sp.status !== 'ok' && sp.status !== PIPE_TRANSIENTE) || h > 48 || !!sp.pushErro);
 }
 
 function sheetGuiaProblemas() {
@@ -3009,6 +3014,7 @@ function renderAjustes(root) {
     const rot = {
       ok: '✓ ok', garmin_auth: '⚠ conexão com a Garmin expirou — renovar o token (runbook no CLAUDE.md)',
       gemini_quota: '⏳ quota da IA — o próximo ciclo tenta de novo', erro: '⚠ erro na última execução',
+      garmin_bloqueio: '⏳ Garmin bloqueou o runner — o próximo ciclo tenta de novo',
     }[s.status] || s.status;
     alvo.textContent = `${rot} · executou ${s.ultimaExecucao.slice(0, 16).replace('T', ' ')}${s.ultimaAnalise ? ` · última análise ${fmtData(s.ultimaAnalise)}` : ''}`;
   });

@@ -430,12 +430,16 @@ def _exchange_navegador(oauth1, client, *, login=False):
         urllib.parse.urlencode(data),
         {"User-Agent": UA_NAVEGADOR, "Content-Type": "application/x-www-form-urlencoded"},
     )
-    for tentativa in (1, 2):
+    # backoff progressivo: a regra de velocidade do WAF às vezes libera após pausa de
+    # 30-45s (relato da comunidade); a segunda pausa maior cobre janelas de bloqueio
+    # curtas sem estourar o timeout-minutes do workflow
+    pausas = (42, 90)
+    for tentativa in range(len(pausas) + 1):
         resp = crequests.post(url, headers=dict(headers), data=corpo, impersonate="chrome", timeout=15)
         if resp.status_code == 200:
             return OAuth2Token(**sso.set_expirations(resp.json()))
-        if resp.status_code in (429, 403) and tentativa == 1:
-            time.sleep(42)  # regra de velocidade do WAF — a comunidade relata que pausa de 30-45s passa
+        if resp.status_code in (429, 403) and tentativa < len(pausas):
+            time.sleep(pausas[tentativa])
             continue
         break
     # "oauth" + código no texto: a classificação de erro do main() depende disso;
@@ -791,16 +795,18 @@ def main():
         s = str(e)
         # 401 = token de fato inválido (renovar). 429/403 na URL do oauth = Cloudflare
         # bloqueou o runner — o token está OK e renovar não resolve; o próximo cron tenta.
+        # Bloqueio sai com código 0 (skip): falhar o run só sujava o histórico do Actions
+        # com uma condição transiente que nenhuma ação resolve (decisão de 18/07/2026).
         auth = "401" in s or "Unauthorized" in s
         bloqueio = not auth and ("429" in s or "403" in s) and "oauth" in s.lower()
         status.update(
-            status="garmin_auth" if auth else "erro",
+            status="garmin_auth" if auth else "garmin_bloqueio" if bloqueio else "erro",
             mensagem="Conexão com a Garmin expirou — rodar login-garmin.py local e atualizar o Secret GARMIN_TOKEN (runbook no CLAUDE.md)" if auth
             else f"Garmin bloqueou o acesso deste runner — NÃO é o token; próximo cron tenta de novo. Detalhe: {s[:220]}" if bloqueio
             else s[:300],
         )
-        print(f"[fatal] {e}", file=sys.stderr)
-        codigo_saida = 1
+        print(f"[{'aviso' if bloqueio else 'fatal'}] {e}", file=sys.stderr)
+        codigo_saida = 0 if bloqueio else 1
     escrever_json(ARQ_STATUS, status)
     print(f"status: {status['status']} · {status['mensagem'] or 'ok'}")
     sys.exit(codigo_saida)

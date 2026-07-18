@@ -11,7 +11,8 @@
 #   VAPID_PRIVATE_KEY   opcional — chave privada VAPID pareada com a pública embutida no app.js
 #
 # RUNBOOK — status "garmin_auth" no pipeline-status.json (~1x/ano, token OAuth1 expirou
-# de verdade — 401; bloqueio 429/403 do Cloudflare vira status "erro" e passa sozinho):
+# de verdade — 401; bloqueio 429/403 do Cloudflare vira status "garmin_bloqueio", o run
+# fica VERDE de propósito — exit 0 — e passa sozinho no próximo cron):
 # seguir garmin/README.md — login-garmin.py em máquina com internet aberta, colar o dump
 # no Secret GARMIN_TOKEN e rodar este workflow manualmente.
 name: Analisar corridas
