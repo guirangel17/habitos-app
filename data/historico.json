@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-18T21:05:29-03:00",
+ "atualizadoEm": "2026-07-19T00:56:25-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1497,7 +1497,7 @@
    }
   ],
   "efAtual": 0.982,
-  "efHa8Sem": 0.985,
+  "efHa8Sem": 0.997,
   "kmSemanas": [
    {
     "semana": "2026-04-27",
