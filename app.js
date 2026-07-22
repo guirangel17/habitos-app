@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.18'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.19'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -2730,7 +2730,8 @@ function checarSaude(st, sp) {
   if (!sp?.ultimaExecucao) itens.push({ n: 'warn', txt: 'Pipeline Garmin sem execuções — configurar Secrets no repo' });
   else {
     const h = horasDesde(sp.ultimaExecucao);
-    if (sp.status === PIPE_TRANSIENTE) itens.push({ n: 'info', txt: 'Pipeline: Garmin bloqueou o runner no último ciclo — passa sozinho, nada a fazer' });
+    if (sp.status === PIPE_TRANSIENTE && sp.sustentado) itens.push({ n: 'warn', txt: `Pipeline: Garmin bloqueado há ~${sp.horasSemSucesso || '24+'}h — a renovação do token no notebook parou. Abra e conecte o notebook na tomada (a tarefa RenovarGarmin renova sozinha ao acordar) e o pipeline volta no próximo ciclo.` });
+    else if (sp.status === PIPE_TRANSIENTE) itens.push({ n: 'info', txt: 'Pipeline: Garmin bloqueou o runner no último ciclo — passa sozinho, nada a fazer' });
     else if (sp.status !== 'ok') itens.push({ n: 'warn', txt: `Pipeline: ${ROTULO_PIPE[sp.status] || sp.status}` });
     else if (h > 26) itens.push({ n: 'warn', txt: `Pipeline não roda há ${Math.round(h / 24)} dia(s) — métricas de corrida podem estar velhas` });
     else itens.push({ n: 'ok', txt: `Pipeline Garmin · rodou há ${h < 1 ? 'menos de 1h' : `${h}h`}` });
@@ -2762,7 +2763,7 @@ function checarSaude(st, sp) {
 async function atualizarBadgeSaude() {
   const sp = await fetchDados('pipeline-status.json');
   const h = sp?.ultimaExecucao ? (Date.now() - new Date(sp.ultimaExecucao).getTime()) / 36e5 : Infinity;
-  $('#btn-ajustes')?.classList.toggle('alerta', !sp || (sp.status !== 'ok' && sp.status !== PIPE_TRANSIENTE) || h > 48 || !!sp.pushErro);
+  $('#btn-ajustes')?.classList.toggle('alerta', !sp || (sp.status !== 'ok' && sp.status !== PIPE_TRANSIENTE) || (sp.status === PIPE_TRANSIENTE && !!sp.sustentado) || h > 48 || !!sp.pushErro);
 }
 
 function sheetGuiaProblemas() {
@@ -2771,6 +2772,7 @@ function sheetGuiaProblemas() {
     <p class="detalhe-fase">O card de saúde em Ajustes diz O QUE parou; aqui está o que fazer em cada caso.</p>
     <div class="exercicios">
       ${item('🛰️', 'Conexão com a Garmin expirou (garmin_auth)', 'Abra uma sessão do Claude no servidor e peça "renova o token do Garmin" — o passo a passo (túnel + login + Secret) está no CLAUDE.md do repo, leva ~5 min. Nenhuma corrida se perde: tudo fica na Garmin e é analisado quando voltar.')}
+      ${item('🔌', 'Garmin bloqueado há muitas horas (renovação parou)', 'O token do Garmin é renovado pelo seu notebook — a Garmin bloqueia a nuvem. Se o note ficou desligado ou só na bateria por ~1 dia, a renovação para e o pipeline fica bloqueado o dia todo (nada é detectado). Solução: abra e conecte o notebook na tomada — a tarefa RenovarGarmin renova sozinha ao acordar e o pipeline volta no próximo ciclo. Suas atividades ficam salvas na Garmin e são analisadas quando voltar.')}
       ${item('⏳', 'IA sem quota (gemini_quota)', 'Resolve sozinho no próximo horário automático. Se passar de 1 dia, conferir a chave GEMINI_API_KEY nos Secrets do repo (GitHub → Settings → Actions).')}
       ${item('✨', 'Análise não apareceu', 'Com token: 2–4 min depois do 🛰️. Sem token: espera os horários automáticos (manhã, noite e 14h). Corrida com +1 dia sem análise = ver o status na saúde.')}
       ${item('🔔', 'Notificação de atividade parou de chegar', 'A inscrição de push pode expirar ou ser cancelada pelo navegador sem aviso — a saúde acusa quando o último envio falhou. Refazer: desligue e ligue o toggle em Notificação de atividade, copie o JSON novo e atualize o Secret PUSH_SUBSCRIPTION no GitHub. Valide rodando o workflow Analisar corridas com "Enviar push de teste" marcado.')}
@@ -3016,7 +3018,10 @@ function renderAjustes(root) {
       gemini_quota: '⏳ quota da IA — o próximo ciclo tenta de novo', erro: '⚠ erro na última execução',
       garmin_bloqueio: '⏳ Garmin bloqueou o runner — o próximo ciclo tenta de novo',
     }[s.status] || s.status;
-    alvo.textContent = `${rot} · executou ${s.ultimaExecucao.slice(0, 16).replace('T', ' ')}${s.ultimaAnalise ? ` · última análise ${fmtData(s.ultimaAnalise)}` : ''}`;
+    const rotFinal = (s.status === 'garmin_bloqueio' && s.sustentado)
+      ? `⚠ Garmin bloqueado há ~${s.horasSemSucesso || '24+'}h — abra/pluge o notebook pra renovar o token`
+      : rot;
+    alvo.textContent = `${rotFinal} · executou ${s.ultimaExecucao.slice(0, 16).replace('T', ' ')}${s.ultimaAnalise ? ` · última análise ${fmtData(s.ultimaAnalise)}` : ''}`;
   });
   root.append(cardGar);
 

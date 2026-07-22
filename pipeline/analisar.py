@@ -45,6 +45,13 @@ PARADO_MAX_PCT = 10    # corrida social (quintas) tem 15-40% de tempo parado e p
 MAX_POR_RUN = 3        # protege a quota do Gemini; o resto fica pro próximo cron
 JANELA_DIAS = 7        # só analisa corridas dos últimos N dias
 DIST_MINIMA_M = 1000   # ignora atividades-teste
+# bloqueio da Garmin é TRANSIENTE por natureza (o token vence, o notebook renova, volta ao ok).
+# Mas um run só toma bloqueio quando o OAuth2 JÁ venceu — então >Nh seguidas sem NENHUM run "ok"
+# significa que a renovação no notebook parou de verdade (note desligado/na bateria). Aí deixa de
+# ser transiente: vira âmbar no app + push de aviso (senão a falha fica invisível — foi o que
+# aconteceu em 20-21/07/2026, treino não detectado o dia todo sem ninguém saber).
+LIMIAR_SUSTENTADO_H = 20   # sem run "ok" por mais que isso = renovação parou (não é transiente)
+ALERTA_REPETE_H = 12       # no máximo 1 push de aviso a cada Nh enquanto o bloqueio persistir
 MODELO_GEMINI = "gemini-2.5-flash"
 BRT = timezone(timedelta(hours=-3))
 
@@ -554,6 +561,42 @@ def carregar_json(arq, padrao):
         return padrao
 
 
+def avaliar_bloqueio(status_prev, status_nome, ts_iso, agora, limiar_h, repete_h):
+    """Puro (sem I/O nem push). Rastreia o último run "ok" e decide se o bloqueio da Garmin
+    deixou de ser transiente. Retorna dict a mesclar no status:
+      - `ultimoSucesso`: sempre — timestamp do último run que alcançou a Garmin (carregado do
+        run anterior quando este falhou).
+      - quando o bloqueio/auth passou de `limiar_h` sem nenhum "ok": `sustentado=True`,
+        `horasSemSucesso`, `ultimoAlertaTs` (carregado do anterior) e `alertar=True` só quando já
+        passou `repete_h` do último aviso — o main usa `alertar` p/ disparar 1 push e regravar o ts.
+    """
+    if status_nome == "ok":
+        return {"ultimoSucesso": ts_iso}
+    prev = status_prev or {}
+    ultimo = prev.get("ultimoSucesso") or ts_iso
+    out = {"ultimoSucesso": ultimo}
+    if status_nome not in ("garmin_bloqueio", "garmin_auth"):
+        return out
+    try:
+        horas = (agora - datetime.fromisoformat(ultimo)).total_seconds() / 3600
+    except (ValueError, TypeError):
+        horas = 0
+    if horas < limiar_h:
+        return out
+    out["sustentado"] = True
+    out["horasSemSucesso"] = round(horas)
+    ultimo_alerta = prev.get("ultimoAlertaTs")
+    out["ultimoAlertaTs"] = ultimo_alerta  # carrega; o main sobrescreve p/ agora se enviar push
+    if not ultimo_alerta:
+        out["alertar"] = True
+    else:
+        try:
+            out["alertar"] = (agora - datetime.fromisoformat(ultimo_alerta)).total_seconds() / 3600 >= repete_h
+        except (ValueError, TypeError):
+            out["alertar"] = True
+    return out
+
+
 def escrever_json(arq, doc):
     arq.parent.mkdir(parents=True, exist_ok=True)
     arq.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n")
@@ -591,6 +634,7 @@ def main():
     agora = datetime.now(BRT)
     hoje = agora.strftime("%Y-%m-%d")
     status = {"ultimaExecucao": agora.isoformat(timespec="seconds"), "status": "ok", "mensagem": "", "ultimaAnalise": None, "pendentes": 0}
+    status_prev = carregar_json(ARQ_STATUS, {})  # p/ rastrear há quanto tempo o pipeline não fica "ok"
     codigo_saida = 0
     # gatilho manual pra validar o setup do push sem esperar uma análise nova de verdade
     # (workflow_dispatch → input push_teste; ver analisar-corridas.yml)
@@ -807,6 +851,20 @@ def main():
         )
         print(f"[{'aviso' if bloqueio else 'fatal'}] {e}", file=sys.stderr)
         codigo_saida = 0 if bloqueio else 1
+    # bloqueio sustentado (renovação do token parou) deixa de ser silencioso: âmbar no app + push
+    info_bloq = avaliar_bloqueio(status_prev, status["status"], status["ultimaExecucao"], agora,
+                                 LIMIAR_SUSTENTADO_H, ALERTA_REPETE_H)
+    for chave in ("ultimoSucesso", "sustentado", "horasSemSucesso", "ultimoAlertaTs"):
+        if chave in info_bloq:
+            status[chave] = info_bloq[chave]
+    if info_bloq.get("alertar"):
+        erro_alerta = notificar_push(
+            "⚠️ Renovação do Garmin parou",
+            f"O pipeline não conecta há ~{info_bloq['horasSemSucesso']}h — abra e conecte o "
+            f"notebook na tomada pra renovar o token. Suas atividades ficam salvas na Garmin.")
+        status["ultimoAlertaTs"] = status["ultimaExecucao"]
+        if erro_alerta:
+            status["pushErro"] = erro_alerta
     escrever_json(ARQ_STATUS, status)
     print(f"status: {status['status']} · {status['mensagem'] or 'ok'}")
     sys.exit(codigo_saida)

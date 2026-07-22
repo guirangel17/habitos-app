@@ -5,11 +5,15 @@ import unittest
 import forca
 
 from clima import extrair_janelas
+from datetime import datetime, timedelta, timezone
+
 from analisar import (
-    TIPOS_CORRIDA, ZONAS_FC, calcular_tendencias, compactar_atividade, compactar_forca,
-    corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace, pace_seg,
-    proxima_corrida, resumir_splits, tipo_atividade, validar_ia, zonas_de_pontos,
+    TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias, compactar_atividade,
+    compactar_forca, corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace,
+    pace_seg, proxima_corrida, resumir_splits, tipo_atividade, validar_ia, zonas_de_pontos,
 )
+
+BRT = timezone(timedelta(hours=-3))
 
 CORRIDAS = [
     ["2026-07-05", "prova", "PROVA 5 km"],
@@ -309,6 +313,55 @@ class TestForca(unittest.TestCase):
         b = forca.baseline_mesmo_dia("2026-07-09", 99, analises)
         self.assertEqual(b["activityId"], 2)                              # qui 09/07 > qui 02/07; qua 08/07 fora
         self.assertIsNone(forca.baseline_mesmo_dia("2026-07-11", 99, analises))
+
+
+class TestAvaliarBloqueio(unittest.TestCase):
+    def setUp(self):
+        self.agora = datetime(2026, 7, 22, 12, 0, tzinfo=BRT)
+        self.ts = self.agora.isoformat(timespec="seconds")
+
+    def test_run_ok_grava_ultimo_sucesso_e_nada_mais(self):
+        r = avaliar_bloqueio({"ultimoSucesso": "2026-07-20T09:00:00-03:00"}, "ok", self.ts, self.agora, 20, 12)
+        self.assertEqual(r, {"ultimoSucesso": self.ts})  # ok reseta o rastreio, sem sustentado/alerta
+
+    def test_bloqueio_transiente_nao_alerta(self):
+        # último ok há 3h → transiente, sem sustentado nem alerta
+        prev = {"ultimoSucesso": "2026-07-22T09:00:00-03:00"}
+        r = avaliar_bloqueio(prev, "garmin_bloqueio", self.ts, self.agora, 20, 12)
+        self.assertEqual(r["ultimoSucesso"], prev["ultimoSucesso"])
+        self.assertNotIn("sustentado", r)
+        self.assertNotIn("alertar", r)
+
+    def test_bloqueio_sustentado_alerta_primeira_vez(self):
+        # último ok há ~26h, nunca alertou → sustentado + alertar
+        prev = {"ultimoSucesso": "2026-07-21T10:00:00-03:00"}
+        r = avaliar_bloqueio(prev, "garmin_bloqueio", self.ts, self.agora, 20, 12)
+        self.assertTrue(r["sustentado"])
+        self.assertEqual(r["horasSemSucesso"], 26)
+        self.assertTrue(r["alertar"])
+
+    def test_sustentado_nao_repete_alerta_dentro_da_janela(self):
+        prev = {"ultimoSucesso": "2026-07-21T10:00:00-03:00", "ultimoAlertaTs": "2026-07-22T06:00:00-03:00"}
+        r = avaliar_bloqueio(prev, "garmin_bloqueio", self.ts, self.agora, 20, 12)  # alertou há 6h < 12h
+        self.assertTrue(r["sustentado"])
+        self.assertFalse(r["alertar"])
+        self.assertEqual(r["ultimoAlertaTs"], prev["ultimoAlertaTs"])  # carrega o ts p/ não perder
+
+    def test_sustentado_realerta_apos_janela(self):
+        prev = {"ultimoSucesso": "2026-07-20T10:00:00-03:00", "ultimoAlertaTs": "2026-07-21T20:00:00-03:00"}
+        r = avaliar_bloqueio(prev, "garmin_bloqueio", self.ts, self.agora, 20, 12)  # alertou há 16h > 12h
+        self.assertTrue(r["alertar"])
+
+    def test_garmin_auth_tambem_conta_como_sustentado(self):
+        prev = {"ultimoSucesso": "2026-07-21T10:00:00-03:00"}
+        r = avaliar_bloqueio(prev, "garmin_auth", self.ts, self.agora, 20, 12)
+        self.assertTrue(r["sustentado"])
+
+    def test_sem_ultimo_sucesso_previo_usa_agora(self):
+        # primeiro run já bloqueado, sem histórico → ancora em agora, não vira sustentado na hora
+        r = avaliar_bloqueio({}, "garmin_bloqueio", self.ts, self.agora, 20, 12)
+        self.assertEqual(r["ultimoSucesso"], self.ts)
+        self.assertNotIn("sustentado", r)
 
 
 if __name__ == "__main__":
