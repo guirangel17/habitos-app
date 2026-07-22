@@ -1,7 +1,122 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-17T00:39:24-03:00",
+ "atualizadoEm": "2026-07-22T18:40:05-03:00",
  "analises": [
+  {
+   "date": "2026-07-22",
+   "activityId": 23696171411,
+   "geradoEm": "2026-07-22T18:40:32-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Tiros 6x400m",
+    "inicio": "2026-07-22 17:48:29",
+    "distanciaKm": 5.6,
+    "duracaoMin": 39.7,
+    "paceMedio": "7:05",
+    "fcMedia": 138,
+    "fcMax": 161,
+    "cadencia": 144,
+    "elevacaoM": 11,
+    "trainingEffect": {
+     "aerobico": 3.1,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 49.0,
+    "temperaturaC": 31.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "8:01",
+      "fc": 121
+     },
+     {
+      "km": 2,
+      "pace": "7:54",
+      "fc": 135
+     },
+     {
+      "km": 3,
+      "pace": "5:27",
+      "fc": 143
+     },
+     {
+      "km": 5,
+      "pace": "5:26",
+      "fc": 145
+     },
+     {
+      "km": 7,
+      "pace": "5:33",
+      "fc": 146
+     },
+     {
+      "km": 8,
+      "pace": "8:11",
+      "fc": 143
+     },
+     {
+      "km": 9,
+      "pace": "5:34",
+      "fc": 147
+     },
+     {
+      "km": 10,
+      "pace": "8:11",
+      "fc": 143
+     },
+     {
+      "km": 11,
+      "pace": "5:36",
+      "fc": 151
+     },
+     {
+      "km": 13,
+      "pace": "5:24",
+      "fc": 151
+     },
+     {
+      "km": 15,
+      "pace": "7:54",
+      "fc": 138
+     }
+    ],
+    "zonasFc": {
+     "z1": 20,
+     "z2": 67,
+     "z3": 13,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "tiros",
+    "nome": "Fartlek 6 × 400 m a 5:35–5:50 — rec. trote leve",
+    "paceAlvo": "400 m: 5:35–5:50 · 800 m–1 km: 5:45–6:00 · 1,5 km: 5:55–6:05",
+    "fcAlvo": "Mande pelo pace (FC atrasa no tiro); 9/10 no último",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:55",
+    "paceZ2Ha8Sem": "6:50"
+   },
+   "ia": {
+    "resumo": "Guilherme executou um treino de tiros 6x400m em condições de calor intenso, demonstrando boa capacidade de recuperação cardíaca entre os esforços. Os paces dos tiros foram consistentes, embora ligeiramente mais rápidos que o planejado.",
+    "comparacao_plano": "O plano era realizar 6x400m com pace entre 5:35-5:50/km. Os splits indicam 6 esforços com paces variando de 5:24-5:36/km, o que está consistentemente mais rápido que o alvo, especialmente nos primeiros e últimos tiros. A FC de recuperação se manteve na Z2 (<152 bpm), conforme o esperado para um trote leve, mesmo com a temperatura de 31°C. A distância total de 5.6 km foi adequada para a estrutura do treino.",
+    "pontos_fortes": [
+     "Recuperação Cardíaca Eficaz: A FC de recuperação entre os tiros se manteve consistentemente na Zona 2 (FC < 152 bpm), indicando que o corpo estava se recuperando bem e pronto para o próximo estímulo de velocidade.",
+     "Adaptação ao Calor: A corrida foi realizada sob 31°C, uma temperatura elevada que naturalmente inflama a FC. Manter a FC média em Z2 e a FC de recuperação controlada é um sinal de boa adaptação fisiológica ao estresse térmico, mostrando que o corpo priorizou a manutenção da FC correta.",
+     "Evolução do VO2max: O VO2max atual de 49.0, comparado a 48.0 há 8 semanas, mostra uma melhora na capacidade aeróbica, o que é um excelente sinal de progresso."
+    ],
+    "pontos_atencao": [
+     "Pace Ligeiramente Rápido nos Tiros: Os paces dos tiros (5:24-5:36/km) foram consistentemente mais rápidos que a faixa alvo (5:35-5:50/km), especialmente o último tiro. Para otimizar o estímulo de velocidade e evitar um acúmulo desnecessário de fadiga, o ideal é buscar o meio da faixa planejada (5:40-5:45/km).",
+     "Cadência Geral: A cadência média de 144 spm está abaixo do alvo de 165+ spm para treinos leves e longos. Embora este seja um treino de tiros, focar em passos mais curtos e frequentes, mesmo nos trechos de recuperação e aquecimento, pode ajudar a proteger a tíbia e melhorar a eficiência biomecânica."
+    ],
+    "proxima_dica": "Na Social Run de amanhã, concentre-se em manter a cadência acima de 165 spm, especialmente nos trechos mais leves, para reforçar a proteção estrutural da tíbia.",
+    "nota_execucao": 7
+   }
+  },
   {
    "date": "2026-07-16",
    "activityId": 23625243336,
