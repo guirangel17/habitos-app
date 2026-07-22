@@ -28,26 +28,47 @@ Agendar (só faz efeito com o notebook ligado; o app acende o aviso âmbar em
 Ajustes se o pipeline ficar >24h parado):
 
 ```powershell
-# Windows (Agendador de Tarefas): diário às 08:30 + a cada logon.
-# ATENÇÃO (aprendido em 14/07/2026): NUNCA use "py"/"python" no /TR — se o Python
-# veio da Microsoft Store ou do instalador novo, esses comandos são App Execution
-# Aliases (reparse points em WindowsApps) que o Agendador NÃO consegue executar:
-# a tarefa falha todo dia com 0x80070002 ("arquivo não encontrado"), o Secret
-# nunca renova e o pipeline cai em "oauth exchange 429" no runner. Descubra o
-# executável REAL com:  python -c "import sys; print(sys.executable)"
-# Também libere bateria/StartWhenAvailable — é notebook: às 08:30 ele pode estar
-# na bateria ou dormindo, e o padrão do Agendador pula a execução nos dois casos.
-$py = (python -c "import sys; print(sys.executable)")
+# Windows (Agendador de Tarefas): diário 08:30 REPETINDO a cada 2h + ao acordar do
+# sleep + a cada logon. Bateria LIBERADA.
+# ATENÇÃO 1 (14/07/2026): NUNCA use "py"/"python" no Execute — se o Python veio da
+# Microsoft Store/instalador novo, são App Execution Aliases (reparse points em
+# WindowsApps) que o Agendador NÃO executa: a tarefa falha com 0x80070002, o Secret
+# nunca renova e o pipeline cai em "oauth exchange 429". Use o python.exe REAL.
+# ATENÇÃO 2 (22/07/2026 — causa do treino não detectado em 20-21/07): um gatilho ÚNICO
+# diário + bateria NÃO liberada é frágil demais num NOTEBOOK. -AllowStartIfOnBatteries
+# não estava de fato aplicado e o padrão do Agendador é "só na tomada" + "para se for pra
+# bateria": desplugado às 08:30 a tarefa NÃO roda, e sem repetição/wake ela só tenta no
+# dia seguinte. O OAuth2 (vida ~24-29h) venceu por ~48h e TODO run virou garmin_bloqueio
+# o dia inteiro, em silêncio. Fix: bateria liberada + repetição 2h + gatilho de acordar
+# (evento Kernel-Power 107). Confirme os campos REAIS (o cmdlet inverte o nome):
+#   (Get-ScheduledTask RenovarGarmin).Settings | fl DisallowStartIfOnBatteries,StopIfGoingOnBatteries
+#   -> os DOIS têm que ser False.
+$py = (python -c "import sys; print(sys.executable)")   # ex.: ...\pythoncore-3.14-64\python.exe
 $dir = "C:\caminho\para\habitos-app\garmin"
 $action = New-ScheduledTaskAction -Execute $py -Argument "$dir\renovar-token.py" -WorkingDirectory $dir
-$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1)
-Register-ScheduledTask -TaskName "RenovarGarmin" -Action $action -Settings $settings -Trigger (New-ScheduledTaskTrigger -Daily -At 08:30)
-Register-ScheduledTask -TaskName "RenovarGarminLogon" -Action $action -Settings $settings -Trigger (New-ScheduledTaskTrigger -AtLogOn -User "$env:COMPUTERNAME\$env:USERNAME")
+
+# 1) diário 08:30 repetindo a cada 2h por ~23h (cobre qualquer hora com o note ligado)
+$tDaily = New-ScheduledTaskTrigger -Daily -At 08:30
+$tDaily.Repetition = (New-ScheduledTaskTrigger -Once -At 08:30 -RepetitionInterval (New-TimeSpan -Hours 2) -RepetitionDuration (New-TimeSpan -Hours 23)).Repetition
+# 2) a cada logon
+$tLogon = New-ScheduledTaskTrigger -AtLogOn -User "$env:COMPUTERNAME\$env:USERNAME"
+# 3) ao ACORDAR do sleep (evento Kernel-Power 107 no log System) — renova assim que o note volta
+$cls = Get-CimClass -Namespace ROOT\Microsoft\Windows\TaskScheduler -ClassName MSFT_TaskEventTrigger
+$tWake = New-CimInstance -CimClass $cls -ClientOnly; $tWake.Enabled = $true
+$tWake.Subscription = "<QueryList><Query Id='0' Path='System'><Select Path='System'>*[System[Provider[@Name='Microsoft-Windows-Kernel-Power'] and (EventID=107)]]</Select></Query></QueryList>"
+
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1) -MultipleInstances IgnoreNew
+Register-ScheduledTask -TaskName "RenovarGarmin" -Action $action -Trigger $tDaily,$tLogon,$tWake -Settings $settings -Force
 
 # Teste de verdade (rodar na mão NÃO testa o agendamento):
 Start-ScheduledTask RenovarGarmin; Start-Sleep 45
 (Get-ScheduledTaskInfo RenovarGarmin).LastTaskResult   # tem que ser 0
 ```
+
+Defesa em software (v7.19): mesmo que a renovação pare, o app não fica mais no escuro —
+>20h de garmin_bloqueio sem nenhum run "ok" acende âmbar no ⚙️ e manda um push
+"Renovação do Garmin parou — abra/pluge o notebook". Antes, o bloqueio era 100%
+silencioso e só se descobria abrindo o app e não vendo a análise.
 
 ```bash
 # Mac/Linux (cron): de hora em hora é barato (1 request por execução)

@@ -229,7 +229,19 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   runner está tentando o exchange bloqueado; a causa raiz mora no NOTEBOOK: `schtasks /Query /TN RenovarGarmin /V`
   e olhe o Last Result (0x80070002 = tarefa apontava para o alias `py` da Store, que o
   Agendador não executa — usar o python.exe real; ver garmin/README.md). Rodar
-  `renovar-token.py` na mão destrava na hora.
+  `renovar-token.py` na mão destrava na hora. **Segunda causa raiz aprendida em 22/07/2026
+  (treino não detectado o dia todo em 20-21/07)**: a tarefa `RenovarGarmin` estava com
+  bateria NÃO liberada (o `-AllowStartIfOnBatteries` do README não tinha pego — confira
+  `(Get-ScheduledTask RenovarGarmin).Settings | fl DisallowStartIfOnBatteries,StopIfGoingOnBatteries`,
+  os dois têm que ser `False`) e com gatilho único diário: num notebook desplugado às 08:30
+  a tarefa não roda e só tenta no dia seguinte — o OAuth2 vence e o dia inteiro vira bloqueio.
+  Fix aplicado: tarefa endurecida (bateria liberada + repetição a cada 2h + gatilho de acordar
+  do sleep via evento Kernel-Power 107 + logon) — comando novo no garmin/README.md.
+  **Defesa em software (v7.19)**: bloqueio >20h sem NENHUM run "ok" deixa de ser tratado como
+  transiente — `avaliar_bloqueio()` (pura, testada) marca `status.sustentado`/`horasSemSucesso`,
+  acende o âmbar do ⚙️ e dispara 1 push de aviso (máx 1/12h) "Renovação do Garmin parou —
+  abra/pluge o notebook". `status.ultimoSucesso` (timestamp do último run ok, carregado run a
+  run) é a âncora do cálculo; um run "ok" reseta tudo. Bloqueio curto continua quieto (INFO).
   **Runbook quando status=garmin_auth**:
   (1) confirmar que não é transiente — redisparar pelo 🛰️ do app e conferir o status;
   (2) se persistir, seguir o **`garmin/README.md` deste repo**: em qualquer máquina com
