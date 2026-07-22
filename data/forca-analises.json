@@ -1,7 +1,184 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-16T18:03:25-03:00",
+ "atualizadoEm": "2026-07-22T10:39:54-03:00",
  "analises": [
+  {
+   "date": "2026-07-21",
+   "activityId": 23683984548,
+   "geradoEm": "2026-07-22T10:39:55-03:00",
+   "sessao": {
+    "minutos": 45,
+    "series": 19,
+    "volumeKg": 4620,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 47
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 40
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 45
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 42
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 48
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 44
+       },
+       {
+        "reps": 8,
+        "kg": 15.0,
+        "s": 36
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 35
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 28
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 29
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 45
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 66
+       },
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 66
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 45.0,
+        "s": 32
+       },
+       {
+        "reps": 10,
+        "kg": 45.0,
+        "s": 66
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 68
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 47
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 29
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 73
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -1
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de empurrar foi bem executada, com 19 séries e um volume total de 4620kg em 45 minutos. O foco foi em peito, ombros e tríceps, alinhado com a fase de hipertrofia.",
+    "comparacao_plano": "A sessão seguiu o plano de 'Empurrar — peito/ombro/tríceps' de perto, realizando as 19 séries planejadas e todos os exercícios previstos. As faixas de repetições foram geralmente respeitadas, com progressão em alguns movimentos.",
+    "pontos_fortes": [
+     "No Tríceps Pulley (TRICEPS_PRESSDOWN), você conseguiu subir a carga em 5kg e manter as repetições dentro da faixa, demonstrando uma excelente aplicação da sobrecarga progressiva.",
+     "Houve um aumento nas repetições no Supino Inclinado com Halteres (INCLINE_DUMBBELL_BENCH_PRESS), indicando uma adaptação positiva e fortalecimento na execução.",
+     "A aderência ao plano foi completa, com todos os exercícios propostos realizados e o volume de séries conforme o planejado para a semana."
+    ],
+    "pontos_atencao": [
+     "No Supino Reto com Barra (BARBELL_BENCH_PRESS), você atingiu 11 repetições em dois sets, o que é o topo da faixa alvo. Isso sinaliza que a carga atual está bem dominada, mas as duas últimas séries caíram para 9 repetições, indicando fadiga.",
+     "No Supino Inclinado com Halteres, apesar da progressão geral, a última série ficou ligeiramente abaixo da faixa alvo (8 reps vs 9-11), um ponto para observar na consistência entre os sets.",
+     "A Elevação Lateral com Halteres (DUMBBELL_LATERAL_RAISE) e o Desenvolvimento Máquina (SMITH_MACHINE_OVERHEAD_PRESS) mantiveram as repetições na parte inferior da faixa alvo, e o Tríceps Testa (DUMBBELL_LYING_TRICEPS_EXTENSION) teve um leve ajuste de repetições em relação à sessão anterior. O foco é manter a qualidade do estímulo para a hipertrofia."
+    ],
+    "proxima_dica": "BARBELL_BENCH_PRESS: Você atingiu 11 reps em dois sets. Na próxima sessão, experimente subir a carga para 32,5kg e focar em 9-10 reps para reiniciar a progressão dentro da faixa alvo.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-07-16",
    "activityId": 23622133520,
