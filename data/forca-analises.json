@@ -1,7 +1,208 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-22T10:39:54-03:00",
+ "atualizadoEm": "2026-07-23T19:40:33-03:00",
  "analises": [
+  {
+   "date": "2026-07-23",
+   "activityId": 23708338909,
+   "geradoEm": "2026-07-23T19:40:34-03:00",
+   "sessao": {
+    "minutos": 55,
+    "series": 22,
+    "volumeKg": 6830,
+    "exercicios": [
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 59
+       },
+       {
+        "reps": 11,
+        "kg": 35.0,
+        "s": 44
+       },
+       {
+        "reps": 11,
+        "kg": 35.0,
+        "s": 46
+       },
+       {
+        "reps": 11,
+        "kg": 35.0,
+        "s": 44
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 77
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 68
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 78
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "DUMBBELL_BULGARIAN_SPLIT_SQUAT",
+      "categoria": "LUNGE",
+      "series": [
+       {
+        "reps": 9,
+        "kg": null,
+        "s": 52
+       },
+       {
+        "reps": 10,
+        "kg": null,
+        "s": 41
+       },
+       {
+        "reps": 10,
+        "kg": null,
+        "s": 43
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": null,
+      "deltaReps": -1
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 59.5,
+        "s": 42
+       },
+       {
+        "reps": 11,
+        "kg": 59.5,
+        "s": 72
+       },
+       {
+        "reps": 10,
+        "kg": 59.5,
+        "s": 81
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 7.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "BARBELL_STRAIGHT_LEG_DEADLIFT",
+      "categoria": "DEADLIFT",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "STANDING_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 59.5,
+        "s": 38
+       },
+       {
+        "reps": 11,
+        "kg": 66.0,
+        "s": 51
+       },
+       {
+        "reps": 11,
+        "kg": 66.0,
+        "s": 82
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 7.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "SEATED_DUMBBELL_TOE_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 18,
+        "kg": 15.0,
+        "s": 223
+       },
+       {
+        "reps": 18,
+        "kg": 15.0,
+        "s": 132
+       },
+       {
+        "reps": 18,
+        "kg": 15.0,
+        "s": 118
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de Pernas A foi focada na hipertrofia, com bom volume e intensidade, especialmente nos exercícios compostos e de isquiotibiais. Houve uma notável progressão de carga em múltiplos movimentos.",
+    "comparacao_plano": "A sessão seguiu de perto o plano de Pernas A, com a maioria dos exercícios executados dentro das faixas de repetições e com progressão de carga ou repetições. O Barbell Straight Leg Deadlift (Stiff) foi pulado, como em sessões anteriores, mas os demais exercícios foram bem abordados.",
+    "pontos_fortes": [
+     "Excelente progressão de carga no Leg Press (subiu 5kg e manteve 4x11 reps), superando a faixa alvo de repetições. Isso demonstra uma adaptação significativa à sobrecarga progressiva.",
+     "Boa progressão de carga no Leg Curl (subiu 7kg) e na Panturrilha em Pé (subiu 7kg), mantendo o volume de repetições efetivo e o estímulo para hipertrofia.",
+     "A Elevação Pélvica mostrou um aumento de repetições, indicando fortalecimento contínuo da cadeia posterior, fundamental para a potência na corrida.",
+     "A manutenção do Tibial Anterior com 3x18 reps é crucial para a prevenção da canelite, mostrando consistência neste exercício preventivo."
+    ],
+    "pontos_atencao": [
+     "O Barbell Straight Leg Deadlift (Stiff) foi pulado novamente. Este exercício é importante para a força da cadeia posterior e estabilidade do core, complementando o trabalho da corrida e protegendo a lombar, especialmente visando a Volta da Pampulha.",
+     "No Dumbbell Bulgarian Split Squat, houve uma leve queda nas repetições em comparação com a sessão anterior, indicando a necessidade de atenção à técnica ou talvez um breve ajuste na carga para consolidar a execução na próxima sessão."
+    ],
+    "proxima_dica": "No Leg Press, você bateu 4x11 reps com 35kg, superando a faixa alvo de 8-10. Para a próxima sessão de Pernas A, aumente a carga para 37,5kg ou 40kg e busque retornar à faixa de 8-10 repetições para continuar o estímulo de hipertrofia.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-07-21",
    "activityId": 23683984548,

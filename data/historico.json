@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-23T17:52:01-03:00",
+ "atualizadoEm": "2026-07-23T19:40:33-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1286,6 +1286,12 @@
    "activityId": 23683984548,
    "minutos": 45,
    "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-07-23",
+   "activityId": 23708338909,
+   "minutos": 55,
+   "nome": "QUI Pernas A"
   }
  ],
  "tendencias": {
