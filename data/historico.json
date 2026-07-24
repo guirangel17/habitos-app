@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-24T15:13:11-03:00",
+ "atualizadoEm": "2026-07-24T20:14:07-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1307,6 +1307,12 @@
    "activityId": 23708338909,
    "minutos": 55,
    "nome": "QUI Pernas A"
+  },
+  {
+   "date": "2026-07-24",
+   "activityId": 23720127415,
+   "minutos": 42,
+   "nome": "SEX Upper C + Core"
   }
  ],
  "tendencias": {

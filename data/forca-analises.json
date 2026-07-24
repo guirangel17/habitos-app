@@ -1,7 +1,167 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-23T19:40:33-03:00",
+ "atualizadoEm": "2026-07-24T20:14:07-03:00",
  "analises": [
+  {
+   "date": "2026-07-24",
+   "activityId": 23720127415,
+   "geradoEm": "2026-07-24T20:14:09-03:00",
+   "sessao": {
+    "minutos": 42,
+    "series": 16,
+    "volumeKg": 3618,
+    "exercicios": [
+     {
+      "nome": "CABLE_CROSSOVER",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 44
+       },
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 71
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 84
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SEATED_DUMBBELL_SHOULDER_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.5,
+        "s": 106
+       },
+       {
+        "reps": 10,
+        "kg": 32.5,
+        "s": 28
+       },
+       {
+        "reps": 9,
+        "kg": 32.5,
+        "s": 27
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "ONE_ARM_CABLE_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 33
+       },
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 79
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 55
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "FACE_PULL",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 32.5,
+        "s": 107
+       },
+       {
+        "reps": 9,
+        "kg": 32.5,
+        "s": 91
+       },
+       {
+        "reps": 8,
+        "kg": 32.5,
+        "s": 118
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "CABLE_OVERHEAD_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 42
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 70
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "EZ_BAR_PREACHER_CURL",
+      "categoria": "CURL",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 9.0,
+        "s": 90
+       },
+       {
+        "reps": 12,
+        "kg": 9.0,
+        "s": 104
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de Upper C foi bem executada, introduzindo novos exercícios com cargas adequadas para a fase de hipertrofia. O volume para os grupos musculares principais foi atingido de forma consistente.",
+    "comparacao_plano": "O treino seguiu o planejamento de Upper C, com 16 séries executadas para os músculos do tronco e braços, conforme as 16 séries planejadas. Os exercícios foram escolhidos de acordo com a proposta, e as repetições ficaram majoritariamente dentro da faixa de hipertrofia (8-12 reps) da fase atual. Os exercícios de core planejados (Abdominal Polia e Pallof Press) não foram realizados.",
+    "pontos_fortes": [
+     "A introdução dos novos exercícios foi feita com cargas bem ajustadas, permitindo um bom volume de trabalho dentro da faixa de hipertrofia para a maioria dos movimentos.",
+     "No Desenvolvimento com Halteres e na Extensão de Tríceps Overhead, as repetições foram executadas de forma excelente, alinhadas tanto com o plano quanto com a fase de hipertrofia.",
+     "A Rosca Scott (EZ Bar Preacher Curl) atingiu o topo da faixa de repetições em ambas as séries, sinalizando uma adaptação positiva e pronta para a próxima progressão de carga."
+    ],
+    "pontos_atencao": [
+     "Os exercícios de core (Abdominal Polia e Pallof Press) foram pulados. Lembre-se que o fortalecimento do core é fundamental para a estabilidade e a performance na corrida, além de auxiliar na prevenção de lesões na canela e joelho."
+    ],
+    "proxima_dica": "Na Rosca Scott (EZ Bar Preacher Curl), você completou 2 séries de 12 repetições com 9kg. Na próxima sessão, aumente a carga para 10kg e retome a faixa de 10-12 repetições para continuar o estímulo de sobrecarga progressiva.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-07-23",
    "activityId": 23708338909,
