@@ -1,9 +1,8 @@
 {
- "ultimaExecucao": "2026-07-28T21:08:18-03:00",
+ "ultimaExecucao": "2026-07-29T00:42:13-03:00",
  "status": "ok",
  "mensagem": "",
  "ultimaAnalise": "2026-07-23",
  "pendentes": 0,
- "pushErro": "WebPushException: Push failed: 410 Gone Response body:push subscription has unsubscribed or expired. , Response push subscription has unsubscribed or expired. ",
- "ultimoSucesso": "2026-07-28T21:08:18-03:00"
+ "ultimoSucesso": "2026-07-29T00:42:13-03:00"
 }
