@@ -10,7 +10,8 @@ from datetime import datetime, timedelta, timezone
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias, compactar_atividade,
     compactar_forca, corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace,
-    pace_seg, proxima_corrida, resumir_splits, tipo_atividade, validar_ia, zonas_de_pontos,
+    pace_seg, proxima_corrida, resolver_push_erro, resumir_splits, tipo_atividade, validar_ia,
+    zonas_de_pontos,
 )
 
 BRT = timezone(timedelta(hours=-3))
@@ -362,6 +363,33 @@ class TestAvaliarBloqueio(unittest.TestCase):
         r = avaliar_bloqueio({}, "garmin_bloqueio", self.ts, self.agora, 20, 12)
         self.assertEqual(r["ultimoSucesso"], self.ts)
         self.assertNotIn("sustentado", r)
+
+
+class TestResolverPushErro(unittest.TestCase):
+    """v7.20: o pushErro não pode evaporar num run que nem tentou notificar (bug de 29/07/2026)."""
+
+    ERRO = "WebPushException: Push failed: 410 Gone"
+
+    def test_falha_grava_o_erro(self):
+        self.assertEqual(resolver_push_erro({}, False, self.ERRO), self.ERRO)
+
+    def test_run_sem_push_carrega_erro_anterior(self):
+        # o caso do bug: análise nova falhou o push às 18:58, o cron das 19:22 rodou vazio
+        self.assertEqual(resolver_push_erro({"pushErro": self.ERRO}, False, None), self.ERRO)
+
+    def test_entrega_limpa_o_erro(self):
+        self.assertIsNone(resolver_push_erro({"pushErro": self.ERRO}, True, None))
+
+    def test_falha_nova_sobrepoe_erro_antigo(self):
+        self.assertEqual(resolver_push_erro({"pushErro": "erro velho"}, False, self.ERRO), self.ERRO)
+
+    def test_falha_manda_mesmo_com_outro_push_entregue(self):
+        # dois pushes no mesmo run (teste + análise): a falha é o que precisa aparecer na saúde
+        self.assertEqual(resolver_push_erro({}, True, self.ERRO), self.ERRO)
+
+    def test_sem_historico_e_sem_tentativa_fica_limpo(self):
+        self.assertIsNone(resolver_push_erro({}, False, None))
+        self.assertIsNone(resolver_push_erro(None, False, None))
 
 
 if __name__ == "__main__":

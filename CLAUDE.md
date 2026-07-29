@@ -303,8 +303,18 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   fora das duas primeiras — testavam `!== undefined`, então um `done:false` acidental
   suprimia o card de confirmar o treino do Garmin PRA SEMPRE naquele dia (foi por isso que a
   Social Run de 16/07 nunca ganhou card). Semântica certa: suprimir só com `done:true` OU
-  `foiPulado`. Ao mexer em qualquer gate novo de treino, correr atrás dos QUATRO lugares:
-  vincular, sugestão de remanejamento, cards de confirmação, checkpoint.
+  `foiPulado`. Ao mexer em qualquer gate novo de treino, correr atrás dos CINCO lugares:
+  vincular, sugestão de remanejamento, cards de confirmação, checkpoint do plano e o card
+  "🎯 Hoje: <checkpoint>" do slot contextual.
+  **Quarta rodada (v7.20, 29/07/2026)** — o card do checkpoint no slot era o quinto lugar e
+  tinha os DOIS defeitos: ignorava `foiPulado` e, pior, não cedia o slot para o card de
+  confirmação. Como o slot é único e o checkpoint sai com `return`, no dia do teste de 5 km a
+  corrida analisada não apareceu na Hoje o dia inteiro — e o gate do próprio checkpoint só
+  liberava com a corrida marcada, cujo caminho de 1 toque era justo o card suprimido. Regra:
+  um card que ENSINA a executar algo tem que ceder assim que esse algo aconteceu. A guarda olha
+  `dadosAnalises.porData[key]` direto e não o retorno de `analisePendenteConfirmacao` (que varre
+  4 dias e pode devolver outra data) — senão uma análise pendente antiga rouba o guia de
+  execução na manhã do checkpoint, que é exatamente quando ele serve.
 - **v7.12 — pular treino de propósito**: 3ª ação (junto de "vincular") na aba Treino pro dia
   planejado sem check — "– Pular essa corrida/esse treino (não vou fazer)" grava
   `workout {date, kind, done:false, pulado:true}`. Diferente de simplesmente não marcar: sinaliza
@@ -345,7 +355,17 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   `pipeline-status.json` (a saúde em Ajustes acusa e o ⚙️ acende âmbar) e o card de Ajustes
   compara `pushManager.getSubscription()` com `settings.pushSubscription` ao renderizar —
   inscrição sumida ou trocada ganha aviso pra recolar o Secret. Runbook: desligar/ligar o
-  toggle, colar o JSON novo no Secret e validar com o input `push_teste` do workflow.
+  toggle **no aparelho que vai receber** (a inscrição é por navegador e só cabe UMA no Secret),
+  colar o JSON novo no Secret e validar com o input `push_teste` do workflow.
+  **Pegadinha aprendida em 29/07/2026 (v7.20)**: a v7.16 gravava `pushErro` no status, mas o
+  status é remontado do zero a cada run e a chave só era escrita quando havia push a enviar —
+  então o run SEGUINTE, sem análise nova, não tentava push, não reescrevia a chave e o erro
+  evaporava. O 410 Gone das 18:58 sumiu no cron das 19:22 e a saúde voltou a ficar verde com a
+  inscrição morta: a mesma falha silenciosa que a v7.16 tinha ido consertar, por outro ângulo.
+  Agora `notificar_push` devolve `(enviou, erro)` — três estados, porque "nem tentou" (Secrets
+  ausentes) NÃO pode limpar um erro anterior — e `resolver_push_erro()` (pura, testada) só
+  limpa numa entrega de fato. Regra geral: status derivado de I/O intermitente tem que ser
+  carregado do run anterior, nunca remontado do zero (mesma lição de `avaliar_bloqueio`).
 
 ## Fluxo de desenvolvimento e verificação
 

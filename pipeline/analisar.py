@@ -608,13 +608,15 @@ def notificar_push(titulo, corpo):
     o envio falhar (inscrição expirada etc.), só loga e segue — o card de confirmação em Hoje
     continua funcionando normalmente na próxima vez que o app abrir. Nunca é uma dependência.
 
-    Retorna None quando enviou (ou nem tentou); string de erro quando a tentativa falhou —
-    o main() grava em status["pushErro"] pra saúde do app acusar inscrição morta (falha
-    silenciosa de 410 Gone foi exatamente o que escondeu o push quebrado em 16/07/2026)."""
+    Retorna `(enviou, erro)`: (True, None) entregue · (False, str) tentou e falhou ·
+    (False, None) nem tentou (Secrets ausentes). O main() usa os três estados em
+    resolver_push_erro() — "nem tentou" NÃO pode limpar um erro anterior (falha silenciosa de
+    410 Gone foi o que escondeu o push quebrado em 16/07/2026, e o erro sumindo sozinho no run
+    seguinte foi o que o escondeu de novo em 29/07/2026)."""
     sub_raw = os.environ.get("PUSH_SUBSCRIPTION")
     vapid_priv = os.environ.get("VAPID_PRIVATE_KEY")
     if not sub_raw or not vapid_priv:
-        return None
+        return (False, None)
     try:
         from pywebpush import webpush
         webpush(
@@ -624,10 +626,28 @@ def notificar_push(titulo, corpo):
             vapid_claims={"sub": "mailto:guirangel17@users.noreply.github.com"},
         )
         print(f"[ok] push enviado: {titulo}")
-        return None
+        return (True, None)
     except Exception as e:
         print(f"[aviso] push não enviado: {e}", file=sys.stderr)
-        return str(e).replace("\n", " ")[:160]
+        return (False, str(e).replace("\n", " ")[:160])
+
+
+def resolver_push_erro(status_prev, enviou, erro):
+    """Puro (sem I/O). Decide o `pushErro` que este run grava no status. Retorna a string do erro
+    ou None (o main omite a chave quando None).
+
+    O status é remontado do zero a cada run, então antes da v7.20 o `pushErro` de um run com
+    análise nova era APAGADO pelo run seguinte — que, sem análise pra notificar, nem tentava push
+    e por isso nunca reescrevia a chave. Resultado real em 29/07/2026: o push falhou com 410 Gone
+    às 18:58, o cron das 19:22 rodou vazio e a saúde em Ajustes voltou a ficar limpa com a
+    inscrição ainda morta — o mesmo modo de falha silenciosa que a v7.16 tinha ido consertar.
+
+    Regra: só uma ENTREGA de fato limpa o erro. Run que não tentou carrega o erro anterior."""
+    if erro:
+        return erro          # falhou agora: o erro novo manda (mesmo que outro push tenha ido)
+    if enviou:
+        return None          # entregou: a inscrição está viva, pode limpar
+    return (status_prev or {}).get("pushErro") or None  # nem tentou: preserva o diagnóstico
 
 
 def main():
@@ -636,12 +656,13 @@ def main():
     status = {"ultimaExecucao": agora.isoformat(timespec="seconds"), "status": "ok", "mensagem": "", "ultimaAnalise": None, "pendentes": 0}
     status_prev = carregar_json(ARQ_STATUS, {})  # p/ rastrear há quanto tempo o pipeline não fica "ok"
     codigo_saida = 0
+    # resultado consolidado dos pushes deste run (pode haver mais de um) — resolvido contra o
+    # status anterior lá embaixo, em resolver_push_erro()
+    push_enviou, push_erro = False, None
     # gatilho manual pra validar o setup do push sem esperar uma análise nova de verdade
     # (workflow_dispatch → input push_teste; ver analisar-corridas.yml)
     if os.environ.get("PUSH_TESTE") == "true":
-        erro_push = notificar_push("🔔 Teste de notificação", "Se você está vendo isso, o push chegou! Pode desligar o input de teste agora.")
-        if erro_push:
-            status["pushErro"] = erro_push
+        push_enviou, push_erro = notificar_push("🔔 Teste de notificação", "Se você está vendo isso, o push chegou! Pode desligar o input de teste agora.")
     try:
         plano_doc = json.loads(ARQ_PLANO.read_text())
         corridas_plano = plano_doc["CORRIDAS"]
@@ -829,9 +850,8 @@ def main():
                 partes.append("1 treino de força")
             elif push_forca_geradas > 1:
                 partes.append(f"{push_forca_geradas} treinos de força")
-            erro_push = notificar_push("🛰️ Atividade identificada", " + ".join(partes) + " — toque para confirmar.")
-            if erro_push:
-                status["pushErro"] = erro_push
+            enviou, erro = notificar_push("🛰️ Atividade identificada", " + ".join(partes) + " — toque para confirmar.")
+            push_enviou, push_erro = push_enviou or enviou, erro or push_erro
     except KeyError as e:
         status.update(status="erro", mensagem=f"variável/campo ausente: {e}")
         codigo_saida = 1
@@ -858,13 +878,16 @@ def main():
         if chave in info_bloq:
             status[chave] = info_bloq[chave]
     if info_bloq.get("alertar"):
-        erro_alerta = notificar_push(
+        enviou, erro = notificar_push(
             "⚠️ Renovação do Garmin parou",
             f"O pipeline não conecta há ~{info_bloq['horasSemSucesso']}h — abra e conecte o "
             f"notebook na tomada pra renovar o token. Suas atividades ficam salvas na Garmin.")
+        push_enviou, push_erro = push_enviou or enviou, erro or push_erro
         status["ultimoAlertaTs"] = status["ultimaExecucao"]
-        if erro_alerta:
-            status["pushErro"] = erro_alerta
+    # só uma entrega de fato limpa o erro; run que nem tentou push carrega o diagnóstico anterior
+    erro_push_final = resolver_push_erro(status_prev, push_enviou, push_erro)
+    if erro_push_final:
+        status["pushErro"] = erro_push_final
     escrever_json(ARQ_STATUS, status)
     print(f"status: {status['status']} · {status['mensagem'] or 'ok'}")
     sys.exit(codigo_saida)

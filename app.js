@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.19'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.20'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -429,7 +429,19 @@ function slotContextual(st, key) {
   // Vem antes da revisão de propósito: a véspera cai sempre em terça, mesmo dia em que a
   // revisão pendente ainda mora no slot — e o checkpoint tem hora marcada.
   const cpHoje = CHECKPOINTS.find((c) => c.date === key);
-  if (cpHoje && !D.workoutsDoDia(st.events, key).corrida) {
+  // O card ensina a EXECUTAR o teste — depois de corrido ele não tem mais função e precisa CEDER
+  // o slot único. Duas guardas além do check manual (bug do teste de 29/07/2026): (1) pulado de
+  // propósito encerra o card, mesma semântica do resto do arquivo — done:false acidental segue
+  // "sem decisão"; (2) análise do PRÓPRIO dia já no ar = a corrida aconteceu, e a ação útil virou
+  // confirmá-la. Sem (2) o checkpoint segurava o slot e o card de confirmar (passo 4) NUNCA
+  // renderizava justo no dia mais importante do plano — e o único jeito de 1 toque de confirmar
+  // era exatamente o card suprimido, então o slot ficava travado o dia inteiro.
+  // Olha `porData[key]` direto (e não o retorno de analisePendenteConfirmacao, que varre 4 dias e
+  // pode devolver outra data): uma análise pendente ANTIGA não pode roubar o guia de execução na
+  // manhã do checkpoint, que é quando ele serve.
+  const analiseDoCheckpointNoAr = !!dadosAnalises?.porData?.[key] && !st.settings[`garminDispensado_${key}`];
+  if (cpHoje && !D.workoutsDoDia(st.events, key).corrida
+      && !D.foiPulado(st.events, key, 'corrida') && !analiseDoCheckpointNoAr) {
     const c = el(`<button class="card card-revisao card-checkpoint">
       <span><b>🎯 Hoje: ${esc(cpHoje.titulo)}</b><br><small>O dia que define ${esc(cpHoje.define)}. Como executar — 2 min de leitura</small></span>
       <span class="seta">→</span></button>`);

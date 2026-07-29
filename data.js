@@ -201,22 +201,22 @@ export const CORRIDAS = [
   ['2026-09-30', 'tempo', 'Tempo Run 4 km moderado'],
   ['2026-10-01', 'social', 'Social Run 7 km leve'],
   ['2026-10-05', 'longo', 'LONGO 15 km — ritmo constante'],
-  ['2026-10-07', 'tiros', '4 × 1 km a 5:45–6:00 — rec. 2min30 ativa'],
+  ['2026-10-07', 'tiros', '4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
   ['2026-10-08', 'social', 'Social Run 7 km regenerativo'],
   ['2026-10-12', 'longo', 'LONGO 15 km — oscilações de relevo'],
-  ['2026-10-14', 'tiros', '4 × 1 km a 5:45–6:00 — rec. 2min30 ativa'],
+  ['2026-10-14', 'tiros', '4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
   ['2026-10-15', 'social', 'Social Run 7-8 km leve + 4 strides'],
   ['2026-10-19', 'longo', 'LONGO 16 km — passos curtos e rápidos'],
-  ['2026-10-21', 'tiros', '5 × 1 km a 5:40–5:50 — rec. 2min30 ativa'],
+  ['2026-10-21', 'tiros', '5 × 1 km a 5:16–5:26 — rec. 2min30 ativa'],
   ['2026-10-22', 'social', 'Social Run 7-8 km regenerativo'],
   ['2026-10-26', 'longo', 'LONGO 16 km progressivo'],
-  ['2026-10-28', 'tiros', '5 × 1 km a 5:40–5:50 — rec. 2min30 ativa'],
+  ['2026-10-28', 'tiros', '5 × 1 km a 5:16–5:26 — rec. 2min30 ativa'],
   ['2026-10-29', 'social', 'Social Run 7-8 km leve'],
   ['2026-11-02', 'longo', 'VOLTA COMPLETA 18 km 🔥 — simulação oficial no percurso (gel km 6 e 12)'],
-  ['2026-11-04', 'tiros', '4 × 1 km a 5:45–6:00 — rec. 2min30 ativa'],
+  ['2026-11-04', 'tiros', '4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
   ['2026-11-05', 'social', 'Social Run 6 km regenerativo'],
   ['2026-11-09', 'longo', 'LONGO 15 km — travar ritmo'],
-  ['2026-11-11', 'tiros', '3 × 1,5 km a 5:55–6:05 — rec. 3 min'],
+  ['2026-11-11', 'tiros', '3 × 1,5 km a 5:31–5:41 — rec. 3 min'],
   ['2026-11-12', 'social', 'Social Run 6 km leve'],
   ['2026-11-16', 'longo', 'LONGO 14 km — início da redução'],
   ['2026-11-18', 'tempo', 'Tempo Run 5 km a 6:10–6:20 controlado'],
@@ -298,7 +298,18 @@ export const CORRIDA_GUIA = {
   social: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm', sensacao: 'Conversa completa — é social de verdade', extra: 'Strides (quando indicados): 100 m progressivos até ~90% e solta.' },
   leve: { pace: '6:50–7:15 /km ou mais leve', fc: '≤ 152 bpm', sensacao: 'Regenerativo — errar para baixo', extra: null },
   tempo: { pace: '6:05–6:20 /km contínuo', fc: '~163–170 (logo abaixo do limiar)', sensacao: 'Só frases curtas, não uma conversa', extra: 'Aquecimento: 10 min de trote. Desaquecimento: 8-10 min muito leve.' },
-  tiros: { pace: '400 m: 5:35–5:50 · 800 m–1 km: 5:45–6:00 · 1,5 km: 5:55–6:05', fc: 'Mande pelo pace (FC atrasa no tiro); 9/10 no último', sensacao: 'Forte, mas não é sprint', extra: 'Aquecimento INEGOCIÁVEL: 15 min trote + 4 × 100 m progressivos. NUNCA fique parado entre tiros — descanso ativo (trote/caminhada). Desaquecimento 8-10 min.' },
+  // TIROS RECALIBRADOS em 29/07/2026 pelo checkpoint "TESTE 5 km contrarrelógio" (o dia que o
+  // plano define como árbitro dos paces de agosto). Resultado: 5,03 km em 28:00 = 5:34/km,
+  // contra o 5:58/km submáximo que ancorava a tabela anterior → tudo desce 24 s/km.
+  // MÉTODO (não são valores novos inventados; é a lógica interna da própria tabela aplicada ao
+  // dado novo): a tabela antiga era construída em offsets fixos sobre o pace de 5 km —
+  //   1,5 km ≈ pace de 5 km (−3 a +7 s) · 800 m–1 km ≈ −13 a +2 s · 400 m ≈ −23 a −8 s
+  // Os offsets foram preservados e só o ancoradouro mudou (5:58 → 5:34). Confere com a previsão
+  // escrita no próprio checkpoint (data.js CHECKPOINTS): "vindo em 5:30–5:44/km, os tiros descem
+  // um degrau inteiro". Ancorar no 5:34 é conservador de propósito — o teste foi a 30 °C e com os
+  // km do meio segurados (splits 5:47/5:49/5:45/5:27/5:05), então o 5 km real dele é mais rápido.
+  // Ao receber a tabela oficial do plano-hibrido-pampulha.md, confira contra estes valores.
+  tiros: { pace: '400 m: 5:11–5:26 · 800 m–1 km: 5:21–5:36 · 1,5 km: 5:31–5:41', fc: 'Mande pelo pace (FC atrasa no tiro); 9/10 no último', sensacao: 'Forte, mas não é sprint', extra: 'Aquecimento INEGOCIÁVEL: 15 min trote + 4 × 100 m progressivos. NUNCA fique parado entre tiros — descanso ativo (trote/caminhada). Desaquecimento 8-10 min.' },
   prova: { pace: 'Alvo 6:15–6:30 /km (Meta A: 1h52–1h55)', fc: 'Km 0–4: corra por pace, SEM olhar a FC (adrenalina infla 10-20 bpm). Do km 5 em diante: segure ≤ ~165 até o km 10, depois libere', sensacao: 'Prova de 18 km não se ganha no km 2 — se perde lá', extra: 'Gel nos km 6 e 12. Nada de novidade no dia da prova.' },
 };
 
