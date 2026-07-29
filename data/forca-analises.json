@@ -1,7 +1,183 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-24T20:14:07-03:00",
+ "atualizadoEm": "2026-07-28T21:08:18-03:00",
  "analises": [
+  {
+   "date": "2026-07-28",
+   "activityId": 23769826319,
+   "geradoEm": "2026-07-28T21:08:19-03:00",
+   "sessao": {
+    "minutos": 41,
+    "series": 19,
+    "volumeKg": 3883,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 35.0,
+        "s": 50
+       },
+       {
+        "reps": 9,
+        "kg": 35.0,
+        "s": 40
+       },
+       {
+        "reps": 9,
+        "kg": 35.0,
+        "s": 35
+       },
+       {
+        "reps": 8,
+        "kg": 35.0,
+        "s": 33
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 107
+       },
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 47
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 124
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 42
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 29
+       },
+       {
+        "reps": 7,
+        "kg": 32.0,
+        "s": 31
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 51
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 7
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 45.0,
+        "s": 39
+       },
+       {
+        "reps": 9,
+        "kg": 45.0,
+        "s": 72
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 88
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 5
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 7
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "A sessão de empurrar foi concluída em 41 minutos, com um volume total de 3883kg em 19 séries. Houve um bom trabalho de sobrecarga progressiva em exercícios chave, apesar de alguns ajustes no volume de outros.",
+    "comparacao_plano": "O plano de 19 séries de peito, ombro e tríceps foi bem alinhado com as 19 séries executadas. No Supino Reto, a carga foi aumentada para 35kg, e as repetições se ajustaram conforme o esperado (10, 9, 9, 8), demonstrando a aplicação correta do método de progressão dupla. No Supino Inclinado com Halteres, você manteve a carga de 15kg e atingiu 11 repetições em uma das séries, um bom indicativo de força. O Desenvolvimento Máquina teve um aumento no total de repetições com 32kg. O Tríceps Pulley também mostrou progressão, com a primeira série atingindo 11 repetições. A Elevação Lateral com Halteres foi iniciada, mas duas séries foram puladas, e o Tríceps Testa foi pulado intencionalmente.",
+    "pontos_fortes": [
+     "A sobrecarga progressiva foi aplicada com sucesso no Supino Reto, com um aumento de carga de 5kg e o ajuste esperado nas repetições, confirmando a eficácia do método de progressão dupla.",
+     "Houve um aumento no total de repetições no Desenvolvimento Máquina e no Tríceps Pulley, indicando um estímulo crescente e adaptação muscular.",
+     "A primeira série do Tríceps Pulley atingiu o limite superior da faixa de repetições (11 reps), sinalizando um bom desenvolvimento de força e resistência."
+    ],
+    "pontos_atencao": [
+     "A Elevação Lateral com Halteres teve uma execução incompleta, com duas séries puladas após a primeira. É importante garantir a consistência para o desenvolvimento dos ombros, que são importantes para a postura na corrida.",
+     "O Tríceps Testa foi pulado nesta sessão. Lembre-se que o trabalho de tríceps contribui para a hipertrofia dos braços, um dos seus objetivos na academia."
+    ],
+    "proxima_dica": "No Tríceps Pulley, como você atingiu 11 repetições na primeira série, na próxima sessão, aumente a carga para 47,5kg ou 50kg e retorne ao piso da faixa de repetições (9 reps) para continuar a progressão.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-07-24",
    "activityId": 23720127415,
