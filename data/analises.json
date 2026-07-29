@@ -1,7 +1,92 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-23T22:26:40-03:00",
+ "atualizadoEm": "2026-07-29T18:58:18-03:00",
  "analises": [
+  {
+   "date": "2026-07-29",
+   "activityId": 23781737377,
+   "geradoEm": "2026-07-29T18:58:30-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-07-29 18:21:04",
+    "distanciaKm": 5.03,
+    "duracaoMin": 28.0,
+    "paceMedio": "5:34",
+    "fcMedia": 165,
+    "fcMax": 188,
+    "cadencia": 169,
+    "elevacaoM": 21,
+    "trainingEffect": {
+     "aerobico": 3.9,
+     "anaerobico": 0.6,
+     "label": "VO2MAX",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "5:47",
+      "fc": 147
+     },
+     {
+      "km": 2,
+      "pace": "5:49",
+      "fc": 161
+     },
+     {
+      "km": 3,
+      "pace": "5:45",
+      "fc": 167
+     },
+     {
+      "km": 4,
+      "pace": "5:27",
+      "fc": 174
+     },
+     {
+      "km": 5,
+      "pace": "5:05",
+      "fc": 181
+     }
+    ],
+    "zonasFc": {
+     "z1": 2,
+     "z2": 10,
+     "z3": 34,
+     "z4": 38,
+     "z5": 16
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "tiros",
+    "nome": "TESTE 5 km contrarrelógio — define os paces de agosto",
+    "paceAlvo": "400 m: 5:35–5:50 · 800 m–1 km: 5:45–6:00 · 1,5 km: 5:55–6:05",
+    "fcAlvo": "Mande pelo pace (FC atrasa no tiro); 9/10 no último",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:55",
+    "paceZ2Ha8Sem": "7:31"
+   },
+   "ia": {
+    "resumo": "Guilherme realizou um teste de 5 km contrarrelógio com excelente progressão de ritmo, registrando um pace médio de 5:34/km em condições de calor (30°C), alcançando uma FC máxima de 188 bpm.",
+    "comparacao_plano": "O plano era um teste de 5 km para definir os paces de agosto. A corrida executada cumpriu o objetivo com 5.03 km em 28 minutos, resultando em um pace médio de 5:34/km. A FC média de 165 bpm e a FC máxima de 188 bpm, com 38% do tempo em Z4 e 16% em Z5, indicam um esforço máximo e progressivo, conforme esperado para um contrarrelógio, especialmente sob 30°C. Os splits demonstram uma estratégia de pacing madura, com aceleração consistente do início ao fim (5:47/km no km 1 para 5:05/km no km 5).",
+    "pontos_fortes": [
+     "Controle de ritmo e progressão: A execução com splits negativos (de 5:47/km para 5:05/km) em um teste de 5 km é um sinal de excelente leitura de esforço e capacidade de acelerar sob fadiga, maximizando o desempenho no contrarrelógio.",
+     "Esforço máximo e resposta fisiológica: A alta FC média (165 bpm) e a FC máxima (188 bpm), com tempo significativo nas zonas Z4 e Z5, confirmam que o teste foi realizado com o esforço máximo planejado, fornecendo dados valiosos para a recalibragem de paces.",
+     "Cadência consistente: A cadência média de 169 spm é muito boa para uma corrida de alta intensidade, indicando uma passada eficiente e protegendo a estrutura tibial, mesmo sob esforço elevado.",
+     "Adaptação ao calor: Manter um esforço tão intenso e progressivo em uma temperatura de 30°C demonstra boa capacidade de adaptação e resiliência fisiológica."
+    ],
+    "pontos_atencao": [
+     "A intensidade máxima do teste, combinada com a alta temperatura, exige uma recuperação ativa e focada para o próximo treino."
+    ],
+    "proxima_dica": "Para a Social Run de 5 km leve amanhã, concentre-se em manter a FC estritamente nas zonas Z1-Z2 (teto 152 bpm), mesmo que o pace resultante seja mais lento que o alvo de 6:50-7:15/km. Isso garantirá a recuperação adequada após o esforço intenso do contrarrelógio.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-07-23",
    "activityId": 23709741316,
