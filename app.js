@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.21'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.22'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -1635,16 +1635,21 @@ function sheetTreinoDetalhe(kind, plano, key) {
   } else {
     const c = plano.corrida;
     const g = c ? (CORRIDA_GUIA[c.tipo] || {}) : {};
+    const cp = CHECKPOINTS.find((x) => x.date === key);
+    // Dia de checkpoint tem alvo PRÓPRIO, que nem sempre é a faixa do tipo de corrida: o de
+    // 23/09 é ensaio de RITMO DE PROVA (deriva da Meta A dos 18k), num dia tipado como `tempo`,
+    // cuja faixa é de LIMIAR. Sem esta precedência o sheet mostrava 5:41–5:56 enquanto o card do
+    // checkpoint dizia 6:05–6:20 — dois números pro mesmo dia, e o errado em destaque.
+    const paceAlvo = cp?.alvo || g.pace;
     box = el(`<div><h3>${c ? `${TIPO_CORRIDA_ICONE[c.tipo]} ${esc(c.nome)}` : '🏃 Corrida extra'}</h3>
       ${!c ? '<p class="detalhe-fase">Fora do plano — não substitui nenhum treino planejado.</p>' : `
       <div class="exercicios">
-        <div class="exercicio"><span class="ex-num">⏱</span><span class="ex-nome">Pace alvo<small>${esc(g.pace || '—')}</small></span></div>
+        <div class="exercicio"><span class="ex-num">⏱</span><span class="ex-nome">Pace alvo${cp?.alvo ? ' <small style="color:var(--ink-2)">· alvo do checkpoint</small>' : ''}<small>${esc(paceAlvo || '—')}</small></span></div>
         <div class="exercicio"><span class="ex-num">❤️</span><span class="ex-nome">Frequência cardíaca<small>${esc(g.fc || '—')}</small></span></div>
         <div class="exercicio"><span class="ex-num">🗣</span><span class="ex-nome">Sensação<small>${esc(g.sensacao || '—')}</small></span></div>
         ${g.extra ? `<div class="exercicio"><span class="ex-num">☝️</span><span class="ex-nome">Execução<small>${esc(g.extra)}</small></span></div>` : ''}
       </div>`}</div>`);
     // checkpoint do plano: o sheet do dia ganha o guia de execução completo
-    const cp = CHECKPOINTS.find((x) => x.date === key);
     if (cp) {
       const b = el('<button class="acao-primaria" style="margin-top:12px">🎯 Plano do checkpoint — como executar ›</button>');
       b.onclick = () => sheetCheckpoint(cp);

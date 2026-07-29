@@ -131,6 +131,11 @@
 
 - ✅ **Tempo Run recalibrado** pelo mesmo teste de 5 km e o mesmo método da v7.20: a faixa era pace de 5 km +7 a +22 s (6:05–6:20 sobre o 5:58 submáximo) → **5:41–5:56** sobre o 5:34 real. Segue ~15-20 s/km mais lento que o pace de 5 km, que é onde o limiar deve cair; a FC (~163–170) manda e não mudou. Títulos alinhados: 02/09, 09/09 e 16/09 (`5:41–5:56`) e 18/11 (`5:46–5:56`, que tinha faixa própria +12 a +22). Os Tempo Run sem pace cravado (23/09 "checkpoint do alvo da prova", 30/09 "moderado") seguem relativos de propósito. Com isso o plano inteiro passa a falar do 5:34 — não sobrou pace ancorado no 5:58 em treino futuro.
 
+# Feito na v7.22 (jul/2026) — o relógio falando a mesma língua do app
+
+- ✅ **Alvo do checkpoint tem precedência no sheet do treino** (`cp?.alvo || g.pace`, com rótulo "· alvo do checkpoint"): dia de checkpoint tem alvo próprio que nem sempre é a faixa do tipo de corrida. O de 23/09 é ensaio de RITMO DE PROVA num dia tipado `tempo`, cuja faixa é de LIMIAR — o sheet mostrava 5:41–5:56 enquanto o card do checkpoint dizia 6:05–6:20, com o número errado em destaque.
+- ✅ **Treinos estruturados do Garmin recalibrados** (16 datas futuras, 10 treinos) via `criar.py --atualizar`, modo novo: `atualizar_workout()` faz PUT preservando o `workoutId`, então todas as datas agendadas herdam o conteúdo novo — sem `--limpar`, sem apagar, sem reagendar. Tem `--dry-run` (não precisa nem de login) que imprime as faixas por passo e as datas futuras afetadas. Fora de propósito: `Tiros 6x400m` (só datas passadas — atualizar reescreveria histórico do relógio sem beneficiar nada) e `Tempo Run 6km CHECKPOINT`, que virou a constante pinada `TEMPO_CHECKPOINT` (usava `TEMPO` só porque a faixa antiga coincidia). Z1/Z2/Z3 (governados por FC) e RP/RP_LARGADA (Meta A dos 18k) intactos — não derivam do teste.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

@@ -4,6 +4,7 @@ Mantém um registro local (garmin-criados.json) com tudo que foi criado,
 para permitir conferência e limpeza (--limpar) sem tocar em nada que
 não tenha sido criado por estes scripts.
 """
+import copy
 import json
 import os
 import socket
@@ -217,6 +218,28 @@ def criar_workout(payload):
     wid = resp["workoutId"]
     reg["workouts"][nome] = wid
     _salvar(reg)
+    return wid
+
+
+def atualizar_workout(nome, payload):
+    """PUT no treino JÁ EXISTENTE, preservando o workoutId.
+
+    Existe porque recalibrar pace (ex.: o teste de 5 km de 29/07/2026) não deveria custar
+    um --limpar + recriar: os agendamentos apontam para o workoutId, então sobrescrever o
+    treino no lugar faz TODAS as datas já agendadas passarem a valer o conteúdo novo, sem
+    apagar nada e sem reagendar. Atenção: isso vale para as datas PASSADAS também, já que o
+    ID é compartilhado — antes de atualizar, confira se o treino tem data passada e decida
+    se reescrever aquele histórico é aceitável (o TIRO_400 não é, por isso ficou de fora).
+
+    Retorna o workoutId, ou None se o nome não estiver no registro (nunca foi criado).
+    """
+    reg = _registro()
+    wid = reg["workouts"].get(nome)
+    if not wid:
+        return None
+    p = copy.deepcopy(payload)
+    p["workoutId"] = wid
+    garth.connectapi(f"/workout-service/workout/{wid}", method="PUT", json=p)
     return wid
 
 

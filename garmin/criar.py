@@ -7,13 +7,20 @@ Uso:
     python3 criar.py --forca     # todos os treinos de força agendados
     python3 criar.py --tudo      # tudo
     python3 criar.py --limpar    # apaga TUDO que estes scripts criaram
+
+    python3 criar.py --atualizar [--dry-run] [nome...]
+        Reescreve no lugar treinos JÁ criados (recalibragem de pace), preservando
+        workoutId e agendamentos. Sem nomes, atualiza os afetados por pace de corrida.
 """
 import copy
 import sys
+from datetime import date
 
 import garmin_api as api
 from treinos_corrida import AGENDA, CATALOGO
 from treinos_forca import AGENDA_FORCA, CATALOGO_FORCA
+
+HOJE = date.today().isoformat()
 
 
 def _sem_exercicios(payload, tirar_categoria=False):
@@ -55,8 +62,70 @@ def rodar(agenda, catalogo, forca=False):
     print(f"-> {len(criados)} treinos únicos, {agendados} datas agendadas")
 
 
+# Treinos cujo alvo de pace mudou na recalibragem de 29/07/2026. "Tiros 6x400m" NÃO entra:
+# só tem datas passadas (15/07, 22/07) e o workoutId é compartilhado, então atualizar
+# reescreveria aquele histórico no relógio sem nenhuma data futura para beneficiar.
+RECALIBRADOS = [
+    "Tiros 5x800m", "Tiros 6x800m", "Tiros 4x1km", "Tiros 5x1km forte", "Tiros 3x1500m",
+    "Tempo Run 4km", "Tempo Run 5km", "Tempo Run 5km taper", "Tempo Run 4km moderado",
+    "Tempo Run 6km CHECKPOINT",
+]
+
+
+def _pace_do_payload(payload):
+    """Faixas de pace (min/km) de cada passo com alvo — pra conferir o que foi/será gravado."""
+    out = []
+    for seg in payload["workoutSegments"]:
+        for grupo in seg["workoutSteps"]:
+            for st in grupo.get("workoutSteps", [grupo]):
+                alvo = st.get("targetType") or {}
+                if alvo.get("workoutTargetTypeKey") != "pace.zone":
+                    continue
+                lento, rapido = st.get("targetValueOne"), st.get("targetValueTwo")
+                if lento and rapido:
+                    # arredonda, não trunca: a Garmin devolve o m/s com 8 dígitos e o
+                    # truncamento faz 7:14.9999 virar "7:14", sugerindo uma mudança que não existe
+                    fmt = lambda ms: f"{round(1000 / ms) // 60}:{round(1000 / ms) % 60:02d}"
+                    out.append(f"{fmt(rapido)}-{fmt(lento)}")
+    return out
+
+
+def atualizar(nomes, dry_run=False):
+    datas = {}
+    for data_iso, nome in AGENDA:
+        datas.setdefault(nome, []).append(data_iso)
+    for nome in nomes:
+        payload = CATALOGO.get(nome)
+        if not payload:
+            print(f"  ?? {nome}: não está no catálogo — pulado")
+            continue
+        futuras = [d for d in datas.get(nome, []) if d > HOJE]
+        marca = "DRY-RUN" if dry_run else "gravado"
+        if dry_run:
+            wid = api._registro()["workouts"].get(nome)
+        else:
+            wid = api.atualizar_workout(nome, payload)
+        if not wid:
+            print(f"  ?? {nome}: não existe no registro (nunca criado) — pulado")
+            continue
+        print(f"  [{marca}] {nome:26} id={wid}  paces={' · '.join(_pace_do_payload(payload))}")
+        print(f"{'':13}{len(futuras)} data(s) futura(s): {', '.join(futuras) or '—'}")
+
+
 def main():
-    arg = sys.argv[1] if len(sys.argv) > 1 else "--piloto"
+    argv = sys.argv[1:]
+    dry_run = "--dry-run" in argv
+    argv = [a for a in argv if a != "--dry-run"]
+    arg = argv[0] if argv else "--piloto"
+
+    if arg == "--atualizar":
+        nomes = argv[1:] or RECALIBRADOS
+        if not dry_run:
+            api.conectar()
+        print(f"== ATUALIZANDO {len(nomes)} treino(s) {'(DRY-RUN)' if dry_run else ''} ==")
+        atualizar(nomes, dry_run)
+        return
+
     usuario = api.conectar()
     print(f"Conectado como: {usuario}\n")
 

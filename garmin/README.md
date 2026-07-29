@@ -108,6 +108,35 @@ python3 criar.py --tudo
 python3 criar.py --limpar
 ```
 
+## Recalibrar paces sem recriar nada (`--atualizar`)
+
+Quando um checkpoint recalibra os paces (ex.: o teste de 5 km de 29/07/2026), NÃO use
+`--limpar` + `--tudo`: os agendamentos apontam para o `workoutId`, então sobrescrever o
+treino no lugar faz todas as datas já agendadas herdarem o conteúdo novo — sem apagar
+nem reagendar nada.
+
+```bash
+# 1. edite as constantes de pace no topo de treinos_corrida.py
+# 2. veja o que MUDARIA, sem tocar na conta (não precisa nem de login):
+python3 criar.py --atualizar --dry-run
+# 3. piloto num treino só, e confira no app Garmin Connect:
+python3 criar.py --atualizar "Tiros 5x800m"
+# 4. o resto (sem nomes = a lista RECALIBRADOS do criar.py):
+python3 criar.py --atualizar
+```
+
+O dry-run imprime, por treino, as faixas de pace de cada passo e **quais datas futuras**
+são afetadas — é o que dá pra conferir antes de gravar.
+
+**Pegadinha:** o `workoutId` é compartilhado por TODAS as datas daquele treino, passadas
+inclusive. Antes de atualizar, olhe a coluna de datas: se o treino só tem data passada,
+atualizar só reescreve histórico do relógio sem beneficiar nada (foi o caso do
+`Tiros 6x400m` em 29/07 — ficou de fora de propósito). E cuidado com treinos que
+*coincidem* com uma faixa sem serem daquele tipo: o `Tempo Run 6km CHECKPOINT` usava a
+constante `TEMPO` só porque a faixa antiga batia, mas ele é ensaio de RITMO DE PROVA —
+virou `TEMPO_CHECKPOINT`, pinado, senão o relógio passaria a pedir pace de limiar num
+dia de prova simulada.
+
 ## O que será criado
 
 - 43 treinos de corrida estruturados (paces calibrados), agendados em 66 datas

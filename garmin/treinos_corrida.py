@@ -1,7 +1,13 @@
 """Todos os treinos de corrida do ciclo Pampulha (jul-dez/2026), com datas.
 
-Paces calibrados (07/07/2026): Z2 6:50-7:15 · RP 6:15-6:30 · tempo 6:10-6:25 ·
-tiros 1km/800m 5:50-6:05 · tiros 400m 5:40-5:55. Fonte: plano-hibrido-pampulha.md
+RECALIBRADO em 29/07/2026 pelo checkpoint "TESTE 5 km contrarrelógio": 5,03 km em
+28:00 = 5:34/km, contra o 5:58/km submáximo que ancorava a tabela de 07/07. Os offsets
+sobre o pace de 5 km foram preservados e só o ancoradouro mudou (-24 s/km) — mesmo
+método e mesmos números do data.js do app, que é a referência que o usuário lê.
+
+O que NÃO se move com o teste (e por isso ficou intacto): Z1/Z2/Z3 são governados por
+FC (teto 152 no fácil) e a série do app confirma o Z2 real em 6:55; RP/RP_LARGADA vêm
+da Meta A dos 18k (6:15-6:30), que a projeção nova (1h54 · 6:19) mantém válida.
 """
 from garmin_api import treino_corrida, passo, repeticao, alvo_pace
 
@@ -9,11 +15,19 @@ Z2 = alvo_pace("7:15", "6:50")
 Z3 = alvo_pace("6:45", "6:20")
 RP = alvo_pace("6:30", "6:15")          # ritmo de prova
 RP_LARGADA = alvo_pace("6:40", "6:30")  # primeiros km da prova (anti-ansiedade)
-TEMPO = alvo_pace("6:20", "6:05")
-TEMPO_MOD = alvo_pace("6:30", "6:15")
-TIRO_1K = alvo_pace("6:00", "5:45")
-TIRO_1K_F = alvo_pace("5:50", "5:40")
-TIRO_15 = alvo_pace("6:05", "5:55")
+TEMPO = alvo_pace("5:56", "5:41")       # era 6:05-6:20 (pace de 5 km +7 a +22 s)
+TEMPO_MOD = alvo_pace("6:06", "5:51")   # era 6:15-6:30 — deload, faixa própria +17 a +32
+TEMPO_TAPER = alvo_pace("5:56", "5:46")  # era 6:10-6:20 — taper tem faixa própria (+12 a +22)
+# PINADO de propósito: o checkpoint de 23/09 é ensaio de RITMO DE PROVA, não de limiar.
+# Coincidia com a faixa antiga de TEMPO, então seguir a constante faria o relógio pedir
+# 5:41-5:56 num dia que tem que ser 6:05-6:20 e travar a Meta A. Deriva de RP, não do teste.
+TEMPO_CHECKPOINT = alvo_pace("6:20", "6:05")
+TIRO_1K = alvo_pace("5:36", "5:21")     # era 5:45-6:00
+TIRO_1K_F = alvo_pace("5:26", "5:16")   # era 5:40-5:50 (faixa forte, +/- 10 s mais rápida)
+TIRO_15 = alvo_pace("5:41", "5:31")     # era 5:55-6:05
+# NÃO recalibrado: só tem datas PASSADAS (15/07 e 22/07) e nenhuma futura — mexer aqui
+# reescreveria o histórico do relógio sem benefício nenhum. A faixa nova de 400 m
+# (5:11-5:26) está no data.js; se voltar a existir tiro de 400 m no plano, use ela.
 TIRO_400 = alvo_pace("5:50", "5:35")
 Z1 = alvo_pace("7:40", "7:10")
 
@@ -91,7 +105,7 @@ CATALOGO = {
         [(11, Z2, "Base confortável"), (3, RP, "Ritmo de prova")]),
     "Tempo Run 4km": tempo_run("Tempo Run 4km", 4),
     "Tempo Run 5km": tempo_run("Tempo Run 5km", 5),
-    "Tempo Run 6km CHECKPOINT": tempo_run("Tempo Run 6km CHECKPOINT", 6, TEMPO,
+    "Tempo Run 6km CHECKPOINT": tempo_run("Tempo Run 6km CHECKPOINT", 6, TEMPO_CHECKPOINT,
         "Teste de fogo: se sair confortável, alvo da prova = 6:15-6:25"),
     "Tempo Run 4km moderado": tempo_run("Tempo Run 4km moderado", 4, TEMPO_MOD, "Moderado — semana de deload"),
     "Longao 14km 5-5-4": longao_blocos("Longao 14km 5-5-4",
@@ -115,7 +129,7 @@ CATALOGO = {
         [(10, Z2, "Base"), (5, RP, "Travar o ritmo de prova")]),
     "Tiros 3x1500m": tiros("Tiros 3x1500m", 3, 1500, TIRO_15, 180, "Resiliência — rec 1min caminhando + 2min trote"),
     "Longao 14km Z2 taper": facil("Longao 14km Z2 taper", 14, Z2, "Início da redução"),
-    "Tempo Run 5km taper": tempo_run("Tempo Run 5km taper", 5, alvo_pace("6:20", "6:10"), "Firme e controlado"),
+    "Tempo Run 5km taper": tempo_run("Tempo Run 5km taper", 5, TEMPO_TAPER, "Firme e controlado"),
     "Taper 12km c/ 5km RP": longao_blocos("Taper 12km c/ 5km RP",
         [(4, Z2, "Entrada"), (5, RP, "Ritmo de prova"), (3, Z2, "Solta")]),
     "Taper 10km c/ 3km RP": longao_blocos("Taper 10km c/ 3km RP",
