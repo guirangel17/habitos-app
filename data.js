@@ -186,13 +186,13 @@ export const CORRIDAS = [
   ['2026-08-26', 'tiros', '6 × 800 m ritmo de 5 km — rec. 2 min ativa'],
   ['2026-08-27', 'social', 'Social Run 5 km regenerativo'],
   ['2026-08-31', 'longo', 'LONGO 10 km — DELOAD (academia: metade das séries)'],
-  ['2026-09-02', 'tempo', 'Tempo Run 4 km a 6:05–6:20 — contínuo'],
+  ['2026-09-02', 'tempo', 'Tempo Run 4 km a 5:41–5:56 — contínuo'],
   ['2026-09-03', 'social', 'Social Run 6 km leve'],
   ['2026-09-07', 'longo', 'LONGO 14 km (5 Z2 + 5 Z3 + 4 Z2)'],
-  ['2026-09-09', 'tempo', 'Tempo Run 5 km a 6:05–6:20'],
+  ['2026-09-09', 'tempo', 'Tempo Run 5 km a 5:41–5:56'],
   ['2026-09-10', 'social', 'Social Run 6 km regenerativo'],
   ['2026-09-14', 'longo', 'LONGO 15 km (5 Z2 + 6 Z3 + 4 Z2)'],
-  ['2026-09-16', 'tempo', 'Tempo Run 5 km a 6:05–6:20'],
+  ['2026-09-16', 'tempo', 'Tempo Run 5 km a 5:41–5:56'],
   ['2026-09-17', 'social', 'Social Run 6 km leve + 4 strides'],
   ['2026-09-21', 'longo', 'LONGO 15 km (4 Z2 + 7 Z3 + 4 Z2)'],
   ['2026-09-23', 'tempo', 'Tempo Run 6 km — checkpoint do alvo da prova'],
@@ -219,7 +219,7 @@ export const CORRIDAS = [
   ['2026-11-11', 'tiros', '3 × 1,5 km a 5:31–5:41 — rec. 3 min'],
   ['2026-11-12', 'social', 'Social Run 6 km leve'],
   ['2026-11-16', 'longo', 'LONGO 14 km — início da redução'],
-  ['2026-11-18', 'tempo', 'Tempo Run 5 km a 6:10–6:20 controlado'],
+  ['2026-11-18', 'tempo', 'Tempo Run 5 km a 5:46–5:56 controlado'],
   ['2026-11-19', 'social', 'Social Run 5 km regenerativo'],
   ['2026-11-23', 'longo', 'TAPER: 12 km com 4-5 km em ritmo de prova no meio'],
   ['2026-11-25', 'leve', '4 km leve — giro articular'],
@@ -297,7 +297,11 @@ export const CORRIDA_GUIA = {
   longo: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm — a FC manda, não o pace', sensacao: 'Conversa completa possível', extra: 'Nos longões com ritmo de prova: 6:15–6:30 nos km indicados.' },
   social: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm', sensacao: 'Conversa completa — é social de verdade', extra: 'Strides (quando indicados): 100 m progressivos até ~90% e solta.' },
   leve: { pace: '6:50–7:15 /km ou mais leve', fc: '≤ 152 bpm', sensacao: 'Regenerativo — errar para baixo', extra: null },
-  tempo: { pace: '6:05–6:20 /km contínuo', fc: '~163–170 (logo abaixo do limiar)', sensacao: 'Só frases curtas, não uma conversa', extra: 'Aquecimento: 10 min de trote. Desaquecimento: 8-10 min muito leve.' },
+  // TEMPO RUN recalibrado em 29/07/2026 pelo mesmo teste e o mesmo método dos tiros abaixo:
+  // a faixa era pace de 5 km +7 a +22 s (6:05–6:20 sobre o 5:58 submáximo), então sobre o 5:34
+  // real vira 5:41–5:56. Continua ~15-20 s/km mais lento que o pace de 5 km, que é exatamente
+  // onde o limiar deve cair — a FC (~163–170) segue mandando e não mudou.
+  tempo: { pace: '5:41–5:56 /km contínuo', fc: '~163–170 (logo abaixo do limiar)', sensacao: 'Só frases curtas, não uma conversa', extra: 'Aquecimento: 10 min de trote. Desaquecimento: 8-10 min muito leve.' },
   // TIROS RECALIBRADOS em 29/07/2026 pelo checkpoint "TESTE 5 km contrarrelógio" (o dia que o
   // plano define como árbitro dos paces de agosto). Resultado: 5,03 km em 28:00 = 5:34/km,
   // contra o 5:58/km submáximo que ancorava a tabela anterior → tudo desce 24 s/km.
