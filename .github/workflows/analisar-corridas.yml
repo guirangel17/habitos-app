@@ -23,6 +23,10 @@ on:
         description: 'Enviar push de teste (ignora se há análise nova — só valida o setup)'
         type: boolean
         default: false
+      modelo:
+        description: 'Modelo do Gemini (vazio = gemini-3.5-flash; cai pro 2.5-flash sozinho se não houver acesso)'
+        type: string
+        default: ''
   schedule:
     - cron: '15,45 10-12 * * *'   # 07:15–09:45 BRT — pós-treino da manhã
     - cron: '15,45 22,23 * * *'   # 19:15–20:45 BRT — pós-treino da noite
@@ -55,6 +59,7 @@ jobs:
           PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           PUSH_TESTE: ${{ inputs.push_teste }}
+          GEMINI_MODELO: ${{ inputs.modelo }}
       - name: Previsão do tempo das janelas de treino
         if: always()
         run: python pipeline/clima.py || echo "clima indisponível — segue sem"

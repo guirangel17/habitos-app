@@ -79,8 +79,8 @@ pelo mapa gatilho×período). Tipos:
 (primeira data de uso — âncora dos contadores), `lastBackupTs`, `lembretes {lanche, revisao}`,
 chaves `notifLanche_*`/`notifRevisao_*` (guarda de notificação disparada), `pushAtivo` +
 `pushSubscription` (inscrição de Web Push deste aparelho, v7.10 — ver seção de notificação),
-`geminiKey` + `iaSemana {semanaIni: {leitura, destaque, alavanca, ts, assinatura}}` (v7.23 —
-leitura da semana pela IA, ver seção do balanço semanal).
+`geminiKey` + `iaModelo` + `iaSemana {semanaIni: {leitura, destaque, padrao, alavanca, ts, modelo,
+assinatura}}` (v7.23/v7.24 — leitura da semana pela IA, ver seção do balanço semanal).
 
 ## Regras de negócio críticas (implementadas em `derive.js`, cobertas por testes)
 
@@ -261,6 +261,15 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   FCmax 190 → Z1 <133 · Z2 133–152 · Z3 153–165 · Z4 166–177 · Z5 178+ (const `ZONAS_FC` no
   analisar.py, espelha plano-hibrido-pampulha.md). Calculadas da série temporal de FC
   (endpoint `details`); **lat/lon são descartados na leitura e NUNCA entram nos JSONs**.
+- **Modelo (v7.24)**: `MODELO_GEMINI` vem da env `GEMINI_MODELO` (input `modelo` do workflow), padrão
+  `gemini-3.5-flash`, com **fallback automático** pro `gemini-2.5-flash` (`MODELO_FALLBACK`). As duas
+  funções que decidem são puras e testadas: `modelo_indisponivel` (403/404 sim; 400 só quando a
+  mensagem cita o modelo — 400 genérico é payload NOSSO e trocar esconderia o bug) e
+  `trocar_de_modelo` (429 só troca depois dos retries, porque quota costuma passar sozinha e o
+  modelo melhor vale a espera; 500/503 nunca troca). A troca é UMA vez e vale pro resto do run.
+  `pipeline-status.json` grava `modeloIA` (+ `modeloTrocou` quando caiu), que aparece na linha de
+  status em Ajustes. Regra: modelo indisponível degrada a QUALIDADE, nunca derruba a análise —
+  "o app não analisou meu treino" é o sintoma mais caro deste projeto.
 - **Tom da IA**: system prompt com as regras do plano (Z2 por FC manda nos fáceis; tiros por
   splits, nunca pace médio) e zero linguagem punitiva — mesma regra do app (princípio 1).
 - **Disparo rápido**: o app dispara `workflow_dispatch` e lê os JSONs pela API do GitHub usando
@@ -408,6 +417,19 @@ NUNCA some sozinho (sumir seria pior: perder a leitura por registrar uma refeiç
 fechar o wizard de domingo (silenciosa). Regra igual à do push: **nunca é dependência** — sem chave,
 sem rede ou com erro, o card inteiro continua de pé no narrador determinístico. O prompt
 (`SYSTEM_IA_SEMANA`) repete as regras do plano e o tom sem punição, como o do pipeline.
+
+**Modelo e contexto (v7.24).** `settings.iaModelo` escolhe entre `IA_MODELOS`; padrão
+**`gemini-3.5-flash`** — é o mais capaz da linha e tem free tier, enquanto **`gemini-2.5-pro` NÃO tem**
+(exige faturamento ativo; se ele der 403/404 a mensagem manda trocar de modelo em Ajustes). A
+assinatura Gemini Pro/Google One do usuário **não** vale para a API — não confunda os dois produtos.
+`thinkingConfig.thinkingLevel` só vai nos modelos que declaram `thinking` no catálogo e, se a API
+devolver 400 citando thinking, a chamada é repetida sem o campo (degradar > falhar). O `contextoIA`
+manda, além da semana: as 6 semanas anteriores em resumo (com o ajuste de cada domingo), os pareceres
+que o pipeline já escreveu sobre as corridas/sessões da semana (o prompt manda CRUZAR com hábito, não
+repetir), o que o plano cobra no resto da semana e na próxima, o próximo checkpoint e só os ESCALARES
+de `tendencias` — as séries (`paceZ2Serie`, `efSerie`) ficam fora de propósito: inflam o payload e a
+curva inteira não ajuda a ler uma semana. Campo `padrao` no schema é a leitura entre semanas, com
+instrução de voltar vazio quando a amostra não sustenta.
 
 ## Fluxo de desenvolvimento e verificação
 

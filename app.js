@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.23'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.24'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -2724,7 +2724,16 @@ function linhaHistorico(bal) {
 // significaria commitar peso/deslizes num repo PÚBLICO — por isso a chamada sai daqui,
 // com a chave do próprio usuário, e a resposta fica no aparelho. Nunca é dependência:
 // sem chave (ou com erro) o card segue inteiro com o narrador determinístico.
-const IA_MODELO = 'gemini-2.5-flash';
+// modelos: o 3.5-flash é o mais capaz COM free tier (o 2.5-pro não tem — exige faturamento
+// ativo no projeto). `thinking` só é enviado onde a família aceita `thinkingLevel`; se a API
+// reclamar do campo, `pedirLeituraIA` repete a chamada sem ele em vez de falhar.
+const IA_MODELOS = [
+  { id: 'gemini-3.5-flash', rot: 'Gemini 3.5 Flash', nota: 'o mais capaz com free tier — recomendado', thinking: 'high' },
+  { id: 'gemini-3.6-flash', rot: 'Gemini 3.6 Flash', nota: 'mais rápido, um passo abaixo em raciocínio', thinking: 'medium' },
+  { id: 'gemini-2.5-pro', rot: 'Gemini 2.5 Pro', nota: 'sem free tier — só com faturamento ativo', thinking: null },
+  { id: 'gemini-2.5-flash', rot: 'Gemini 2.5 Flash', nota: 'o mesmo que analisa suas corridas', thinking: null },
+];
+const modeloIA = () => IA_MODELOS.find((m) => m.id === S.getState().settings.iaModelo) || IA_MODELOS[0];
 const chaveIA = () => S.getState().settings.geminiKey || null;
 const iaDaSemana = (ini) => (S.getState().settings.iaSemana || {})[ini] || null;
 const IA_MAX_SEMANAS = 12;
@@ -2734,12 +2743,64 @@ const IA_MAX_SEMANAS = 12;
 const assinaturaBal = (bal) => [bal.ate, bal.refeicoes.feitas, bal.treinos.feito, bal.treinos.perdidos,
   bal.deslizes.total, bal.dias.limpos, bal.atleta.corridas, bal.atleta.km].join('|');
 
+// contexto do modelo. Modelo bom com contexto pobre continua pobre: além da semana, vão
+// as 6 semanas anteriores (pra ele enxergar PADRÃO, não só o retrato), os pareceres que a IA
+// do pipeline já escreveu sobre cada corrida/sessão da semana, e o que o plano cobra na
+// semana que vem — é isso que permite uma alavanca específica em vez de conselho genérico.
 function contextoIA(bal) {
   const st = S.getState();
   const gat = st.events
     .filter((e) => e.trigger && (e.date || '') >= bal.ini && (e.date || '') <= bal.ate)
     .reduce((acc, e) => { acc[e.trigger] = (acc[e.trigger] || 0) + 1; return acc; }, {});
+
+  // semanas anteriores (resumo curto — o suficiente pra achar tendência e recorrência)
+  const anteriores = D.semanasComBalanco(st.events, st.settings, D.addDays(bal.ini, -1), 6, {
+    viagens: viagensCfg(), corridas: dadosHistorico?.corridas || [], forcas: dadosHistorico?.forcas || [], comparar: false,
+  }).map((b) => ({
+    de: b.ini,
+    refeicoes: `${b.refeicoes.feitas}/${b.refeicoes.metaSemana}`,
+    treinos: `${b.treinos.feito}/${b.treinos.planSemana}`,
+    deslizes: b.deslizes.total,
+    km: b.atleta.km,
+    estado: b.selo,
+    ajusteDoDomingo: b.revisao?.ajuste || null,
+    notaDoDomingo: b.revisao?.nota || null,
+  }));
+
+  // o que a IA do pipeline já disse sobre cada treino desta semana (não repetir, cruzar)
+  const pareceres = [];
+  for (let d = bal.ini; d <= bal.ate; d = D.addDays(d, 1)) {
+    for (const a of analisesDoDia(d)) {
+      pareceres.push({ data: d, tipo: 'corrida', km: a.garmin?.distanciaKm, pace: a.garmin?.paceMedio, fcMedia: a.garmin?.fcMedia, cadencia: a.garmin?.cadencia, derivaFcPct: a.garmin?.derivaCardiacaPct, resumo: a.ia?.resumo, dica: a.ia?.proxima_dica });
+    }
+    for (const a of forcaAnalisesDoDia(d)) {
+      pareceres.push({ data: d, tipo: 'forca', sessao: a.sessao?.nome, resumo: a.ia?.resumo, dica: a.ia?.proxima_dica });
+    }
+  }
+
+  // o que vem pela frente: resto desta semana + a semana seguinte + o próximo checkpoint
+  const pelaFrente = [];
+  for (let i = 1; i <= 7 + bal.diasRestantes; i++) {
+    const d = D.addDays(bal.ate, i);
+    const p = D.treinoDoDia(d);
+    if (p.corrida) pelaFrente.push({ data: d, corrida: p.corrida.nome, tipo: p.corrida.tipo });
+  }
+  const cp = CHECKPOINTS.find((c) => c.date >= bal.ate);
+  // só os escalares do tendencias — as séries (paceZ2Serie, efSerie…) inflariam o payload
+  // sem ajudar: o que importa aqui é onde o atleta está, não a curva inteira
+  const t = dadosHistorico?.tendencias;
+
   return {
+    anteriores,
+    treinosJaAnalisados: pareceres,
+    pelaFrente,
+    proximoCheckpoint: cp ? { data: cp.date, titulo: cp.titulo, alvo: cp.alvo, define: cp.define } : null,
+    tendencias: t ? {
+      paceZ2Atual: t.paceZ2Atual, paceZ2Ha8Sem: t.paceZ2Ha8Sem,
+      efAtual: t.efAtual, efHa8Sem: t.efHa8Sem,
+      cadencia4Sem: t.cadencia4Sem, kmPorSemana4Sem: t.kmPorSemana4Sem,
+      vo2max: t.vo2max?.valor ?? t.vo2max, projecao18k: t.projecao18k,
+    } : null,
     semana: { de: bal.ini, ate: bal.ate, emCurso: bal.emCurso, diasCorridos: bal.diasCorridos, diasRestantes: bal.diasRestantes, diasViagem: bal.diasViagem },
     fase: D.fase(bal.ate),
     semanasAteProva: D.semanasAteProva(bal.ate),
@@ -2779,44 +2840,86 @@ TOM (regra dura):
 - O atleta é técnico e gosta de entender o porquê: nomeie a métrica e o mecanismo quando explicar algo.
 - Use SOMENTE os números do JSON. Nunca invente dado que não está lá, nunca redesenhe o plano.
 
+O QUE VEM NO JSON além da semana:
+- "anteriores": as 6 semanas anteriores em resumo. Use para achar PADRÃO e recorrência (o mesmo dia \
+falhando, o ajuste de domingo que pegou ou não, treino subindo enquanto dieta desce).
+- "treinosJaAnalisados": o parecer que já foi escrito sobre cada corrida/sessão desta semana. NÃO \
+repita esses pareceres — cruze com os hábitos (ex.: FC alta na quinta + noite fora na quarta).
+- "pelaFrente": o que o calendário cobra no resto desta semana e na próxima. Uma alavanca boa é \
+específica ao que VEM.
+- "proximoCheckpoint" e "tendencias": o arco de meses (pace em Z2, eficiência aeróbica, projeção da \
+prova). Só cite se ajudar a interpretar a semana.
+
 CAMPOS:
 - leitura: 2 a 4 frases ligando hábito e treino — o que essa semana está sendo, com os números que \
 importam. Se houver nota/ajuste da revisão de domingo, leve em conta.
 - destaque: uma frase curta (máx. 90 caracteres) com o fato mais relevante da semana. Nunca negativo.
-- alavanca: se a semana está EM CURSO, UMA ação concreta e específica pros dias que faltam. Se está \
-FECHADA, UM aprendizado aplicável à próxima semana.`;
+- padrao: 1 frase sobre algo que só aparece OLHANDO VÁRIAS SEMANAS (recorrência, tendência, o efeito \
+de um ajuste anterior). Se as semanas anteriores não sustentarem nenhuma leitura honesta, devolva \
+string vazia — inventar padrão com amostra pequena é pior que não falar.
+- alavanca: se a semana está EM CURSO, UMA ação concreta e específica pros dias que faltam, ancorada \
+no que vem em "pelaFrente". Se está FECHADA, UM aprendizado aplicável à próxima semana.`;
 
 const SCHEMA_IA_SEMANA = {
   type: 'OBJECT',
-  properties: { leitura: { type: 'STRING' }, destaque: { type: 'STRING' }, alavanca: { type: 'STRING' } },
-  required: ['leitura', 'destaque', 'alavanca'],
+  properties: {
+    leitura: { type: 'STRING' }, destaque: { type: 'STRING' },
+    padrao: { type: 'STRING' }, alavanca: { type: 'STRING' },
+  },
+  required: ['leitura', 'destaque', 'padrao', 'alavanca'],
 };
 
 async function pedirLeituraIA(bal, { silencioso = false } = {}) {
   const chave = chaveIA();
   if (!chave) { if (!silencioso) snackbar('Configure a chave do Gemini em Ajustes para a leitura da IA.'); return null; }
-  try {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${IA_MODELO}:generateContent`, {
+  const modelo = modeloIA();
+  const chamar = async (comThinking) => {
+    const gen = { temperature: 0.4, responseMimeType: 'application/json', responseSchema: SCHEMA_IA_SEMANA };
+    if (comThinking && modelo.thinking) gen.thinkingConfig = { thinkingLevel: modelo.thinking };
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo.id}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': chave },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM_IA_SEMANA }] },
         contents: [{ role: 'user', parts: [{ text: JSON.stringify(contextoIA(bal)) }] }],
-        generationConfig: { temperature: 0.4, responseMimeType: 'application/json', responseSchema: SCHEMA_IA_SEMANA },
+        generationConfig: gen,
       }),
     });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const resp = await r.json();
+    if (!r.ok) {
+      const corpo = await r.text().catch(() => '');
+      const err = new Error(`HTTP ${r.status}`);
+      err.corpo = corpo;
+      throw err;
+    }
+    return r.json();
+  };
+  try {
+    let resp;
+    try {
+      resp = await chamar(true);
+    } catch (e) {
+      // 400 falando do campo de raciocínio = essa família não aceita thinkingLevel; tenta sem.
+      // Melhor degradar a qualidade do que devolver erro por causa de um parâmetro opcional.
+      if (e.message === 'HTTP 400' && /thinking/i.test(e.corpo || '') && modelo.thinking) resp = await chamar(false);
+      else throw e;
+    }
     const txt = resp?.candidates?.[0]?.content?.parts?.[0]?.text;
     const ia = JSON.parse(txt);
     if (!ia.leitura) throw new Error('resposta vazia');
     // guarda só as últimas semanas — o localStorage é o cofre dos dados, não um cache infinito
-    const todas = { ...(S.getState().settings.iaSemana || {}), [bal.ini]: { ...ia, ts: Date.now(), assinatura: assinaturaBal(bal) } };
+    const todas = { ...(S.getState().settings.iaSemana || {}), [bal.ini]: { ...ia, ts: Date.now(), modelo: modelo.id, assinatura: assinaturaBal(bal) } };
     const podadas = Object.fromEntries(Object.entries(todas).sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, IA_MAX_SEMANAS));
     S.setSetting('iaSemana', podadas);
     return ia;
   } catch (e) {
-    if (!silencioso) snackbar(`Não consegui falar com a IA (${e.message}) — os números acima continuam valendo.`);
+    // traduz o que dá pra agir: chave errada, modelo sem faturamento, quota estourada
+    const MOTIVO = {
+      'HTTP 400': 'chave inválida ou incompleta — confira em Ajustes',
+      'HTTP 403': 'a chave não tem acesso a este modelo — troque o modelo em Ajustes',
+      'HTTP 404': `o modelo ${modelo.id} não existe nesta chave — escolha outro em Ajustes`,
+      'HTTP 429': 'quota do modelo estourada — tente mais tarde ou escolha um modelo com free tier',
+    };
+    if (!silencioso) snackbar(`IA: ${MOTIVO[e.message] || e.message}. Os números acima continuam valendo.`);
     return null;
   }
 }
@@ -2828,8 +2931,9 @@ function blocoIASemana(bal) {
     const velha = ia && ia.assinatura !== assinaturaBal(bal);
     wrap.innerHTML = `<div class="bal-ia-cab">✨ LEITURA DA SEMANA · IA</div>${ia ? `
       <p>${esc(ia.leitura)}</p>
+      ${ia.padrao ? `<p class="bal-ia-padrao">🔁 ${esc(ia.padrao)}</p>` : ''}
       <p class="bal-ia-dica">→ ${esc(ia.alavanca)}</p>
-      <small>${velha ? 'os números mudaram desde esta leitura · ' : ''}gerada ${fmtData(D.dateKey(new Date(ia.ts)))}</small>`
+      <small>${velha ? 'os números mudaram desde esta leitura · ' : ''}gerada ${fmtData(D.dateKey(new Date(ia.ts)))} · ${esc(ia.modelo || 'gemini')}</small>`
       : `<p class="bal-ia-vazio">${chaveIA() ? 'Sem leitura desta semana ainda.' : 'A leitura da IA é opcional: com sua chave do Gemini em Ajustes, os números desta semana (sem nome, sem localização) vão direto deste aparelho pro modelo e voltam como texto. Sem ela, o balanço acima continua completo.'}</p>`}
       <button class="acao-secundaria" id="ia-pedir">${ia ? (velha ? 'atualizar leitura ✨' : 'gerar de novo ✨') : 'ler esta semana com a IA ✨'}</button>`;
     wrap.querySelector('#ia-pedir').onclick = async (e) => {
@@ -3385,7 +3489,9 @@ function renderAjustes(root) {
     const rotFinal = (s.status === 'garmin_bloqueio' && s.sustentado)
       ? `⚠ Garmin bloqueado há ~${s.horasSemSucesso || '24+'}h — abra/pluge o notebook pra renovar o token`
       : rot;
-    alvo.textContent = `${rotFinal} · executou ${s.ultimaExecucao.slice(0, 16).replace('T', ' ')}${s.ultimaAnalise ? ` · última análise ${fmtData(s.ultimaAnalise)}` : ''}`;
+    // qual modelo escreveu os pareceres (v7.24) — o fallback é silencioso no run, não aqui
+    const mod = s.modeloIA ? ` · ${s.modeloTrocou ? `⚠ ${s.modeloTrocou}` : s.modeloIA}` : '';
+    alvo.textContent = `${rotFinal} · executou ${s.ultimaExecucao.slice(0, 16).replace('T', ' ')}${s.ultimaAnalise ? ` · última análise ${fmtData(s.ultimaAnalise)}` : ''}${mod}`;
   });
   root.append(cardGar);
 
@@ -3399,7 +3505,17 @@ function renderAjustes(root) {
       <button class="acao-primaria" style="margin:0;width:auto;padding:11px 14px" id="ia-salvar">Salvar</button>
     </div>
     ${temIA ? '<button class="acao-secundaria" id="ia-remover" style="margin-top:6px">remover chave deste aparelho</button>' : ''}
+    <div class="secao" style="padding:12px 0 6px">MODELO</div>
+    <div class="chips" id="ia-modelos">${IA_MODELOS.map((m) => `<button data-id="${m.id}" class="${modeloIA().id === m.id ? 'sel' : ''}">${m.rot}</button>`).join('')}</div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:8px" id="ia-modelo-nota">${modeloIA().nota}</p>
   </div>`);
+  cardIA.querySelectorAll('#ia-modelos button').forEach((b) => {
+    b.onclick = () => {
+      S.setSetting('iaModelo', b.dataset.id);
+      cardIA.querySelectorAll('#ia-modelos button').forEach((x) => x.classList.toggle('sel', x === b));
+      cardIA.querySelector('#ia-modelo-nota').textContent = modeloIA().nota;
+    };
+  });
   cardIA.querySelector('#ia-salvar').onclick = () => {
     const v = cardIA.querySelector('#ia-key').value.trim();
     if (!v) return snackbar('Cole a chave no campo antes de salvar.');

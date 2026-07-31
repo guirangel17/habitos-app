@@ -52,7 +52,13 @@ DIST_MINIMA_M = 1000   # ignora atividades-teste
 # aconteceu em 20-21/07/2026, treino não detectado o dia todo sem ninguém saber).
 LIMIAR_SUSTENTADO_H = 20   # sem run "ok" por mais que isso = renovação parou (não é transiente)
 ALERTA_REPETE_H = 12       # no máximo 1 push de aviso a cada Nh enquanto o bloqueio persistir
-MODELO_GEMINI = "gemini-2.5-flash"
+# Modelo da IA: o 3.5-flash é o mais capaz da linha COM free tier (o 2.5-pro não tem — exige
+# faturamento ativo). Configurável pela env GEMINI_MODELO (input do workflow) sem mexer no código.
+# Se ele não estiver liberado nesta chave, `chamar_gemini` CAI PRO FALLBACK em vez de derrubar o
+# run: análise com modelo anterior é infinitamente melhor que "o app não analisou meu treino".
+MODELO_GEMINI = os.environ.get("GEMINI_MODELO") or "gemini-3.5-flash"
+MODELO_FALLBACK = "gemini-2.5-flash"
+_MODELO = {"atual": MODELO_GEMINI, "trocou": None}  # estado do run (o app lê no status)
 BRT = timezone(timedelta(hours=-3))
 
 SYSTEM_PROMPT = """Você é o treinador de corrida do Guilherme (M, 31, 180cm ~84kg, atleta híbrido \
@@ -469,27 +475,66 @@ def garmin_get(path, **params):
     return garth.connectapi(path)
 
 
+def modelo_indisponivel(code, detalhe=""):
+    """O erro é 'esse modelo não serve pra esta chave' (troque de modelo) ou outra coisa
+    (não troque)? 404 = não existe · 403 = sem acesso (ex.: Pro sem faturamento ativo).
+    400 só conta quando a mensagem cita o modelo — 400 genérico costuma ser payload nosso,
+    e trocar de modelo por causa dele esconderia o bug de verdade."""
+    if code in (403, 404):
+        return True
+    return code == 400 and "model" in (detalhe or "").lower()
+
+
+def trocar_de_modelo(code, detalhe, tentativa, tentativas_max=3):
+    """Vale desistir do modelo preferido e usar o fallback? Indisponibilidade troca na hora.
+    Quota (429) só troca DEPOIS dos retries: 429 costuma passar sozinho e o modelo melhor
+    vale os 30 s de espera — mas ficar sem parecer nenhum não vale."""
+    if modelo_indisponivel(code, detalhe):
+        return "indisponível"
+    if code == 429 and tentativa >= tentativas_max - 1:
+        return "sem quota"
+    return None
+
+
+def _post_gemini(modelo, chave, corpo):
+    req = urllib.request.Request(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent",
+        data=json.dumps(corpo).encode(),
+        headers={"Content-Type": "application/json", "x-goog-api-key": chave},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=90) as r:
+        return json.load(r)
+
+
 def chamar_gemini(chave, contexto, system=None):
     corpo = {
         "systemInstruction": {"parts": [{"text": system or SYSTEM_PROMPT}]},
         "contents": [{"role": "user", "parts": [{"text": json.dumps(contexto, ensure_ascii=False, indent=1)}]}],
         "generationConfig": {"temperature": 0.4, "responseMimeType": "application/json", "responseSchema": SCHEMA_IA},
     }
-    req = urllib.request.Request(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{MODELO_GEMINI}:generateContent",
-        data=json.dumps(corpo).encode(),
-        headers={"Content-Type": "application/json", "x-goog-api-key": chave},
-        method="POST",
-    )
-    for tentativa in (1, 2):
+    for tentativa in (1, 2, 3):
+        modelo = _MODELO["atual"]
         try:
-            with urllib.request.urlopen(req, timeout=90) as r:
-                resp = json.load(r)
+            resp = _post_gemini(modelo, chave, corpo)
             texto = resp["candidates"][0]["content"]["parts"][0]["text"]
             return validar_ia(json.loads(texto))
         except (urllib.error.HTTPError, urllib.error.URLError) as e:
             code = getattr(e, "code", None)
-            if tentativa == 1 and code in (429, 500, 503):
+            detalhe = ""
+            if hasattr(e, "read"):
+                try:
+                    detalhe = e.read().decode("utf-8", "replace")[:300]
+                except Exception:  # noqa: BLE001 — corpo do erro é diagnóstico, nunca fluxo
+                    pass
+            # troca UMA vez e segue trocado pelo resto do run (não insiste no que já falhou)
+            motivo = trocar_de_modelo(code, detalhe, tentativa) if modelo != MODELO_FALLBACK else None
+            if motivo:
+                _MODELO["atual"] = MODELO_FALLBACK
+                _MODELO["trocou"] = f"{modelo} {motivo} ({code}) — analisando com {MODELO_FALLBACK}"
+                print(f"[aviso] {_MODELO['trocou']}", file=sys.stderr)
+                continue
+            if tentativa < 3 and code in (429, 500, 503):
                 time.sleep(30)
                 continue
             raise
@@ -884,6 +929,10 @@ def main():
             f"notebook na tomada pra renovar o token. Suas atividades ficam salvas na Garmin.")
         push_enviou, push_erro = push_enviou or enviou, erro or push_erro
         status["ultimoAlertaTs"] = status["ultimaExecucao"]
+    # qual modelo escreveu os pareceres deste run (e se caiu pro fallback) — visível em Ajustes
+    status["modeloIA"] = _MODELO["atual"]
+    if _MODELO["trocou"]:
+        status["modeloTrocou"] = _MODELO["trocou"]
     # só uma entrega de fato limpa o erro; run que nem tentou push carrega o diagnóstico anterior
     erro_push_final = resolver_push_erro(status_prev, push_enviou, push_erro)
     if erro_push_final:

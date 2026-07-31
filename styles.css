@@ -555,6 +555,7 @@ main { padding: 0 14px; display: grid; gap: 12px; }
 .bal-ia { border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 14px; }
 .bal-ia-cab { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; color: var(--serie-1); margin-bottom: 8px; }
 .bal-ia p { font-size: 0.84rem; line-height: 1.55; color: var(--ink-2); }
+.bal-ia .bal-ia-padrao { margin-top: 8px; color: var(--ink-2); font-style: italic; }
 .bal-ia .bal-ia-dica { color: var(--ink); margin-top: 8px; }
 .bal-ia .bal-ia-vazio { color: var(--muted); font-size: 0.78rem; }
 .bal-ia small { display: block; margin-top: 8px; font-size: 0.68rem; color: var(--muted); }

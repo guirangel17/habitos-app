@@ -158,6 +158,29 @@
   com erro, o balanço segue inteiro no narrador determinístico.
 - ✅ Dev: `?semana=YYYY-MM-DD` abre o sheet do balanço daquela semana.
 
+# Feito na v7.24 (jul/2026) — a leitura da semana ficou inteligente de verdade
+
+- ✅ **Modelo escolhível** em Ajustes (`settings.iaModelo`), padrão **`gemini-3.5-flash`**: é o mais
+  capaz da linha e, ao contrário do `gemini-2.5-pro`, TEM free tier (o Pro exige faturamento ativo
+  no projeto — $1,25/M entrada, $10/M saída). Onde a família aceita, vai `thinkingConfig.thinkingLevel`;
+  se a API reclamar do campo, a chamada repete sem ele em vez de falhar. Erro agora vira mensagem
+  acionável por código (400 chave, 403 acesso ao modelo, 404 modelo inexistente, 429 quota).
+- ✅ **Contexto muito mais rico** — modelo bom com contexto pobre continua pobre. Além da semana vão:
+  as **6 semanas anteriores** em resumo (com o ajuste escolhido em cada domingo, pra ele ver se pegou),
+  os **pareceres que a IA do pipeline já escreveu** sobre cada corrida/sessão da semana (pra cruzar com
+  hábito, não repetir), **o que o plano cobra no resto da semana e na próxima**, o próximo checkpoint e
+  os escalares de tendência (pace Z2, EF, cadência, projeção 18k — as séries ficam fora de propósito).
+- ✅ Campo novo **`padrao`** no schema: a leitura que só aparece olhando várias semanas. Com instrução
+  explícita de devolver vazio quando a amostra não sustenta — inventar padrão é pior que calar.
+- ✅ A leitura guarda qual modelo a gerou (aparece no rodapé do bloco).
+- ✅ **O pipeline de corrida/força também subiu de modelo**: `MODELO_GEMINI` agora sai da env
+  `GEMINI_MODELO` (input novo do workflow) com padrão `gemini-3.5-flash` e **fallback automático**
+  pro `gemini-2.5-flash` — `modelo_indisponivel` e `trocar_de_modelo` são puras e testadas (6 asserts):
+  403/404 troca na hora, 400 só troca se a mensagem citar o modelo (400 genérico é payload nosso e
+  trocar esconderia o bug), 429 troca só depois dos retries (costuma passar sozinho), 500/503 nunca.
+  A troca acontece uma vez e vale pro resto do run. `pipeline-status.json` ganhou `modeloIA` e
+  `modeloTrocou`, visíveis na linha de status em Ajustes.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

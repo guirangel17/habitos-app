@@ -10,8 +10,8 @@ from datetime import datetime, timedelta, timezone
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias, compactar_atividade,
     compactar_forca, corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace,
-    pace_seg, proxima_corrida, resolver_push_erro, resumir_splits, tipo_atividade, validar_ia,
-    zonas_de_pontos,
+    modelo_indisponivel, pace_seg, proxima_corrida, resolver_push_erro, resumir_splits,
+    tipo_atividade, trocar_de_modelo, validar_ia, zonas_de_pontos,
 )
 
 BRT = timezone(timedelta(hours=-3))
@@ -390,6 +390,44 @@ class TestResolverPushErro(unittest.TestCase):
     def test_sem_historico_e_sem_tentativa_fica_limpo(self):
         self.assertIsNone(resolver_push_erro({}, False, None))
         self.assertIsNone(resolver_push_erro(None, False, None))
+
+
+class TestModeloIndisponivel(unittest.TestCase):
+    """Quando trocar de modelo e quando NÃO trocar (v7.24)."""
+
+    def test_404_e_403_trocam(self):
+        # 404 = modelo não existe nesta chave · 403 = sem acesso (Pro sem faturamento ativo)
+        self.assertTrue(modelo_indisponivel(404, "models/gemini-3.5-flash is not found"))
+        self.assertTrue(modelo_indisponivel(403, "permission denied"))
+
+    def test_400_so_troca_se_citar_o_modelo(self):
+        self.assertTrue(modelo_indisponivel(400, "Unsupported model: gemini-3.5-flash"))
+        # 400 genérico é payload NOSSO: trocar de modelo esconderia o bug de verdade
+        self.assertFalse(modelo_indisponivel(400, "Invalid JSON payload received"))
+        self.assertFalse(modelo_indisponivel(400, ""))
+
+    def test_transientes_nao_trocam(self):
+        # 429/500/503 são retry com espera — o modelo está certo, a hora é que não
+        for code in (429, 500, 503):
+            self.assertFalse(modelo_indisponivel(code, "quota exceeded for model"))
+        self.assertFalse(modelo_indisponivel(None, ""))
+
+
+class TestTrocarDeModelo(unittest.TestCase):
+    """Quem realmente decide a troca no run (v7.24)."""
+
+    def test_indisponivel_troca_na_primeira(self):
+        self.assertEqual(trocar_de_modelo(404, "model not found", 1), "indisponível")
+
+    def test_quota_espera_os_retries_antes_de_desistir(self):
+        # 429 costuma passar sozinho: só troca na última tentativa, depois das esperas
+        self.assertIsNone(trocar_de_modelo(429, "quota", 1))
+        self.assertEqual(trocar_de_modelo(429, "quota", 2), "sem quota")
+
+    def test_erro_de_servidor_nunca_troca(self):
+        # 500/503 é do lado deles — trocar de modelo não resolve e degradaria à toa
+        self.assertIsNone(trocar_de_modelo(503, "", 2))
+        self.assertIsNone(trocar_de_modelo(500, "", 3))
 
 
 if __name__ == "__main__":
