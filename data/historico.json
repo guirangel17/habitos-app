@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-30T20:19:54-03:00",
+ "atualizadoEm": "2026-07-30T22:10:14-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -954,6 +954,21 @@
    "paradoPct": 0,
    "ef": 1.088,
    "tipoPlano": "tiros"
+  },
+  {
+   "date": "2026-07-30",
+   "activityId": 23795096245,
+   "distanciaKm": 6.73,
+   "paceMedio": "8:02",
+   "paceSeg": 482,
+   "fcMedia": 137,
+   "fcMax": 161,
+   "cadencia": 102,
+   "vo2max": 48.0,
+   "teAerobico": 3.0,
+   "paradoPct": 24,
+   "ef": 0.909,
+   "tipoPlano": "social"
   }
  ],
  "forcas": [
@@ -1440,7 +1455,7 @@
    "ha8Sem": 47.0
   },
   "cadencia4Sem": 157,
-  "kmPorSemana4Sem": 13.8,
+  "kmPorSemana4Sem": 15.5,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1632,7 +1647,7 @@
    },
    {
     "semana": "2026-07-27",
-    "km": 5.0
+    "km": 11.8
    }
   ],
   "longaoMes": [

@@ -1,7 +1,101 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-29T18:58:18-03:00",
+ "atualizadoEm": "2026-07-30T22:10:14-03:00",
  "analises": [
+  {
+   "date": "2026-07-30",
+   "activityId": 23795096245,
+   "geradoEm": "2026-07-30T22:10:26-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-07-30 20:40:53",
+    "distanciaKm": 6.73,
+    "duracaoMin": 54.0,
+    "paceMedio": "8:02",
+    "fcMedia": 137,
+    "fcMax": 161,
+    "cadencia": 102,
+    "elevacaoM": 81,
+    "trainingEffect": {
+     "aerobico": 3.0,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:46",
+      "fc": 139
+     },
+     {
+      "km": 2,
+      "pace": "8:14",
+      "fc": 134
+     },
+     {
+      "km": 3,
+      "pace": "8:32",
+      "fc": 138
+     },
+     {
+      "km": 4,
+      "pace": "7:08",
+      "fc": 142
+     },
+     {
+      "km": 5,
+      "pace": "7:57",
+      "fc": 138
+     },
+     {
+      "km": 6,
+      "pace": "8:03",
+      "fc": 133
+     },
+     {
+      "km": 7,
+      "pace": "8:42",
+      "fc": 134
+     }
+    ],
+    "zonasFc": {
+     "z1": 31,
+     "z2": 65,
+     "z3": 4,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 5 km leve",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:55",
+    "paceZ2Ha8Sem": "7:31"
+   },
+   "ia": {
+    "resumo": "Uma Social Run de 6.73 km em Belo Horizonte, realizada à noite sob 30°C, com pace médio de 8:02/km e FC média de 137 bpm. O treino foi executado com excelente controle de esforço cardiovascular.",
+    "comparacao_plano": "O plano era uma Social Run de 5 km leve, com pace alvo de 6:50–7:15/km e FC alvo de ≤ 152 bpm (Z1/Z2). Guilherme correu 6.73 km, superando a distância planejada. O pace médio de 8:02/km ficou mais lento que a faixa alvo, mas a FC média de 137 bpm (Z2) esteve perfeitamente dentro do limite estabelecido, indicando uma execução correta do estímulo fisiológico em condições de calor (30°C).",
+    "pontos_fortes": [
+     "O controle da frequência cardíaca foi exemplar, mantendo a FC média em 137 bpm (Z2), bem abaixo do teto de 152 bpm, mesmo com a temperatura elevada de 30°C. Isso demonstra uma leitura madura do esforço e priorização da intensidade fisiológica correta.",
+     "Apesar da elevação de 81m no percurso, os splits de pace oscilaram naturalmente enquanto a FC se manteve estável e baixa, evidenciando uma adaptação inteligente ao relevo sem comprometer o objetivo de baixa intensidade.",
+     "Aumentou o volume da corrida para 6.73 km, superando os 5 km planejados, o que mostra boa disposição e capacidade de estender o treino sem elevar o esforço cardiovascular."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 102 spm ficou consideravelmente abaixo do alvo de 165+ spm para corridas leves. Manter passos mais curtos e frequentes é fundamental para proteger a tíbia e reduzir o impacto, especialmente em treinos de volume e recuperação."
+    ],
+    "proxima_dica": "No seu próximo LONGO de 12 km, concentre-se em aumentar gradualmente a cadência para a faixa de 165+ spm durante as porções de ritmo leve (Z1/Z2), buscando passos mais curtos e eficientes.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-07-29",
    "activityId": 23781737377,
