@@ -364,5 +364,102 @@ ok(ab.verdeAnterior === false, 'aberturaSemana: mesmas 20 refeições sem viagem
 let rpv = D.resumoPeriodo([], '2026-07-06', '2026-07-12', VIAG);
 ok(rpv.treinoPlan === 1, `resumoPeriodo: viagem seg–sex deixa só o gym de sábado (plan ${rpv.treinoPlan})`);
 
+// ================================================================
+// BALANÇO SEMANAL (v7.23)
+// ================================================================
+// semana de referência: 06/07 (seg) a 12/07 (dom). Plano dessa semana:
+// gym Ter–Sáb (5) + corridas 08/07 (leve) e 09/07 (social) = 7 sessões.
+const SEM = '2026-07-06';
+const QUI = '2026-07-09';
+const cfg = { baseline: { delivery: 4, sweet: 5, drinks: 5 }, startKey: '2026-06-01' };
+
+const jan = D.janelaSemana(SEM, QUI);
+ok(jan.ate === QUI && jan.diasCorridos === 4 && jan.diasRestantes === 3 && jan.emCurso, 'janelaSemana: quinta = 4 dias corridos, 3 restantes, em curso');
+ok(D.janelaSemana(SEM, '2026-07-20').ate === '2026-07-12' && !D.janelaSemana(SEM, '2026-07-20').emCurso, 'janelaSemana: semana passada fecha no domingo');
+ok(D.balancoSemana([], cfg, '2026-08-10', QUI) === null, 'balancoSemana: semana futura devolve null');
+
+// 4 dias × 5 refeições até quinta
+const refSem = [0, 1, 2, 3].flatMap((i) => meals5(D.addDays(SEM, i), 5));
+let b = D.balancoSemana(refSem, cfg, SEM, QUI);
+ok(b.refeicoes.feitas === 20 && b.refeicoes.metaParcial === 16 && b.refeicoes.noRitmo, 'balanço: 20 refeições até quinta ≥ meta parcial 16 → no ritmo');
+ok(b.refeicoes.metaSemana === 28 && b.refeicoes.faltam === 8 && b.refeicoes.verdePossivel && !b.refeicoes.verde, 'balanço: meta da semana 28, faltam 8, verde ainda possível');
+ok(b.alavanca.id === 'fechar_verde' && b.alavanca.dados.faltam === 8, 'alavanca: fechar a semana verde com 8 refeições');
+
+// treinos: hoje (quinta) nunca conta como perdido
+const treinosOk = [
+  mk('workout', '2026-07-07', { kind: 'gym', done: true }),
+  mk('workout', '2026-07-08', { kind: 'gym', done: true }),
+  mk('workout', '2026-07-08', { kind: 'corrida', done: true }),
+];
+b = D.balancoSemana([...refSem, ...treinosOk], cfg, SEM, QUI);
+ok(b.treinos.plan === 5 && b.treinos.feito === 3 && b.treinos.hojePendente === 2 && b.treinos.perdidos === 0,
+  `balanço: quinta ainda aberta → 2 pendentes de hoje, 0 perdidos (plan ${b.treinos.plan}/feito ${b.treinos.feito}/hoje ${b.treinos.hojePendente})`);
+ok(b.treinos.restantes === 2 && b.treinos.planSemana === 7, 'balanço: sex+sáb = 2 sessões restantes, 7 na semana');
+ok(b.treinos.semFalta && b.destaques[0].id === 'treinos_sem_falta', 'destaque: sem falta em treino é a manchete');
+
+// treino não feito em dia JÁ PASSADO vira perdido (e um done:false acidental não é "pulado")
+b = D.balancoSemana([...refSem, mk('workout', '2026-07-07', { kind: 'gym', done: false })], cfg, SEM, QUI);
+ok(b.treinos.perdidos === 3 && b.treinos.pulados === 0, `balanço: ter+qua sem check = 3 perdidos (${b.treinos.perdidos})`);
+b = D.balancoSemana([...refSem, mk('workout', '2026-07-07', { kind: 'gym', done: false, pulado: true })], cfg, SEM, QUI);
+ok(b.treinos.pulados === 1 && b.treinos.perdidos === 2, 'balanço: pulado de propósito sai dos perdidos');
+
+// manchete NUNCA é negativa — semana com 3 treinos perdidos E deslize hoje lidera pela adesão
+b = D.balancoSemana([...refSem, mk('sweet', QUI)], cfg, SEM, QUI);
+ok(b.treinos.perdidos === 3 && b.destaques[0].id === 'adesao' && !b.destaques.some((d) => d.tom === 'ruim'),
+  `destaques: com furo em treino e deslize hoje, a manchete cai na adesão (nunca em falha) — ${b.destaques[0].id}`);
+
+// orçamento de deslizes (§4: −50% do baseline → 2 delivery, 2,5 doces)
+b = D.balancoSemana([...refSem, mk('delivery', '2026-07-07'), mk('sweet', '2026-07-08')], cfg, SEM, QUI);
+ok(b.deslizes.restaDelivery === 1 && b.deslizes.restaSweet === 1.5 && !b.deslizes.foraOrcamento, 'orçamento: 1 delivery e 1 doce ainda dentro do alvo');
+b = D.balancoSemana([...refSem, ...[7, 8, 9].map((d) => mk('sweet', `2026-07-0${d}`))], cfg, SEM, QUI);
+ok(b.deslizes.foraOrcamento && b.selo === 'virar', 'orçamento: 3 doces estoura o alvo de 2,5 → selo "dá pra virar"');
+b = D.balancoSemana([...refSem, mk('sweet', '2026-07-08', { planejado: true })], cfg, SEM, QUI);
+ok(b.deslizes.sweet === 0 && b.deslizes.planejados === 1, 'orçamento: doce planejado não é deslize (mas aparece como planejado)');
+
+// dias limpos + never miss twice dentro da semana
+b = D.balancoSemana([...refSem, mk('sweet', '2026-07-07')], cfg, SEM, QUI);
+ok(b.dias.limpos === 3 && b.dias.sequencia === 2 && b.dias.recuperacoes === 1, `never miss twice: deslize na terça, qua+qui limpas → 1 recuperação (seq ${b.dias.sequencia})`);
+b = D.balancoSemana([...refSem, mk('sweet', '2026-07-05')], cfg, SEM, QUI);
+ok(b.dias.recuperacoes === 1, 'never miss twice: deslize no domingo anterior conta a recuperação da segunda');
+
+// selo
+b = D.balancoSemana([...refSem, ...treinosOk], cfg, SEM, QUI);
+ok(b.selo === 'redonda', 'selo: no ritmo, sem perdidos e dentro do orçamento = redonda');
+
+// COMPARATIVO MAÇÃ COM MAÇÃ: semana anterior CHEIA vs 4 dias da atual
+const semAnteriorCheia = [0, 1, 2, 3, 4, 5, 6].flatMap((i) => meals5(D.addDays(SEM, -7 + i), 5)); // 35 refeições
+b = D.balancoSemana([...refSem, ...semAnteriorCheia], cfg, SEM, QUI);
+ok(b.comparativo.refeicoes === 0 && b.comparativo.anterior.refeicoes === 20,
+  `comparativo: compara seg→qui com seg→qui (${b.comparativo.anterior.refeicoes} refeições antes, delta ${b.comparativo.refeicoes}) — nunca 4 dias contra 7`);
+b = D.balancoSemana([...refSem, ...semAnteriorCheia, mk('delivery', '2026-06-30')], cfg, SEM, QUI);
+ok(b.comparativo.delivery === -1 && b.destaques.some((d) => d.id === 'menos_deslizes'), 'comparativo: 1 delivery a menos que a semana passada nesta altura vira destaque');
+
+// semana fechada não tem alavanca (não há o que mudar) e devolve a revisão de domingo
+b = D.balancoSemana([...refSem, mk('review', '2026-07-12', { week: SEM, nota: 'sprint apertada', ajuste: 'Bloquear buffer' })], cfg, SEM, '2026-07-20');
+ok(b.alavanca === null && !b.emCurso && b.revisao.ajuste === 'Bloquear buffer', 'semana fechada: sem alavanca, com a revisão de domingo anexada');
+ok(b.refeicoes.metaSemana === 28 && b.refeicoes.faltam === 8 && !b.refeicoes.verde, 'semana fechada: meta cheia, sem verde (20/28)');
+
+// verde impossível → alvo alternativo em vez de derrota
+b = D.balancoSemana(meals5('2026-07-06', 1), cfg, SEM, '2026-07-11'); // sábado, 1 refeição na semana
+ok(!b.refeicoes.verdePossivel && b.alavanca.id === 'alvo_alternativo', 'verde fora de alcance no sábado → alavanca vira alvo alternativo');
+
+// viagem desconta a meta e não conta dia limpo/deslize
+const VIAGEM_SEM = [{ ini: '2026-07-06', fim: '2026-07-08' }];
+b = D.balancoSemana(refSem.filter((e) => e.date === QUI), cfg, SEM, QUI, { viagens: VIAGEM_SEM });
+ok(b.refeicoes.cobrados === 1 && b.refeicoes.metaParcial === 4 && b.diasViagem === 3, `viagem: 3 dias sem registro saem da cobrança (cobrados ${b.refeicoes.cobrados})`);
+ok(b.treinos.plan === 2, `viagem: só o plano de quinta é cobrado (plan ${b.treinos.plan})`);
+
+// risco à frente: dia vulnerável que ainda VEM na semana (guarda de 5 deslizes em 90d)
+const historicoSextas = ['2026-05-08', '2026-05-15', '2026-05-22', '2026-05-29', '2026-06-05', '2026-06-12'].map((d) => mk('delivery', d));
+b = D.balancoSemana([...refSem, ...historicoSextas], cfg, SEM, QUI);
+ok(b.risco && b.risco.dow === 4 && b.risco.date === '2026-07-10', `risco: sexta é o dia vulnerável e ainda está por vir (${b.risco?.date})`);
+b = D.balancoSemana([...refSem, ...historicoSextas], cfg, SEM, '2026-07-11');
+ok(b.risco === null, 'risco: passada a sexta, não há mais o que pré-decidir nesta semana');
+
+// histórico de semanas: da mais recente pra trás, limitado pelo startKey
+const hist = D.semanasComBalanco(refSem, { ...cfg, startKey: '2026-06-22' }, QUI, 12);
+ok(hist.length === 3 && hist[0].ini === SEM && hist[2].ini === '2026-06-22', `histórico: 3 semanas desde 22/06, atual primeiro (${hist.length})`);
+ok(D.semanasComBalanco(refSem, cfg, QUI, 2).length === 2, 'histórico: limite respeitado');
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);

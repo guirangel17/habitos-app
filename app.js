@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.22'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.23'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -55,6 +55,7 @@ function urlBase64ToUint8Array(base64String) {
 
 let abaAtiva = ['hoje', 'dieta', 'treino', 'evolucao', 'relatorio', 'ajustes'].includes(params.get('aba')) ? params.get('aba') : 'hoje';
 let periodoRelatorio = 30; // 30 | 90 | 0 (tudo)
+let histSemanas = 6; // linhas do histórico de semanas no Relatório ("ver mais" soma 8)
 let diaTreinoSel = null; // dia selecionado no card Semana da aba Treino (null = hoje)
 let semTreinoIni = null; // segunda (dateKey) da semana exibida na aba Treino (null = semana atual)
 if (params.get('dia')) { // dev: ?aba=treino&dia=YYYY-MM-DD
@@ -62,6 +63,8 @@ if (params.get('dia')) { // dev: ?aba=treino&dia=YYYY-MM-DD
   const w = D.inicioSemana(diaTreinoSel);
   if (w !== D.inicioSemana(hojeKey())) semTreinoIni = w; // dia de outra semana abre já naquela semana
 }
+// dev: ?semana=YYYY-MM-DD abre o sheet do balanço daquela semana (aceita qualquer dia dela)
+const semanaDev = params.get('semana') ? D.inicioSemana(params.get('semana')) : null;
 if (params.get('viagem')) { // dev: ?viagem=YYYY-MM-DD:YYYY-MM-DD — cadastra a viagem (persiste, como o seed)
   const [vIni, vFim] = params.get('viagem').split(':');
   if (vIni && vFim && vFim >= vIni) S.setSetting('viagens', [...(S.getState().settings.viagens || []).filter((v) => v.ini !== vIni), { ini: vIni, fim: vFim }]);
@@ -2060,6 +2063,12 @@ function wizardRevisao(semanaIni, passoInicial = 0) {
         S.addEvent({ type: 'review', week: semanaIni, nota: nota || null, ajuste });
         fecharSOS();
         snackbar('Semana revisada. A rota até a Pampulha ganhou um segmento.');
+        // fecha o loop: a semana revisada ganha a leitura da IA sozinha (silenciosa — se a
+        // chave não existe ou a rede falha, o histórico segue com o narrador determinístico)
+        if (chaveIA()) {
+          const bal = balancoDaSemana(semanaIni);
+          if (bal) pedirLeituraIA(bal, { silencioso: true });
+        }
       };
       acoes.append(btn);
     }
@@ -2591,10 +2600,348 @@ function textoResumoMensal(st, key) {
 // ================================================================
 // TELA RELATÓRIO — o mês em números + cruzamentos que testam o protocolo
 // ================================================================
+// ================================================================
+// BALANÇO SEMANAL (v7.23) — a semana até aqui + o histórico de todas elas
+// ================================================================
+// Mora no topo do Relatório (a aba do "como foi / como está indo"). A Hoje NÃO ganha card
+// novo — princípio 2. O mesmo componente serve a semana em curso e as fechadas; o que muda
+// é a alavanca (só em semana aberta) e a revisão de domingo (só nas fechadas, onde ela
+// finalmente vira leitura: até aqui a nota do wizard era gravada e nunca mais lida).
+
+const SELO_BAL = {
+  redonda: { aberta: 'semana redonda', fechada: 'semana redonda', cls: 'bom' },
+  corredor: { aberta: 'no corredor', fechada: 'no corredor', cls: 'meio' },
+  virar: { aberta: 'dá pra virar', fechada: 'semana difícil', cls: 'virar' },
+};
+const fmt1 = (v) => (v === null || v === undefined ? '–' : String(Math.round(v * 10) / 10).replace('.', ','));
+const plural = (n, s, p) => (n === 1 ? s : p);
+const nomeDia = (key) => DIA_NOME[D.parseKey(key).getDay()];
+
+// texto dos destaques: derive devolve fatos com id, a frase mora aqui (toda a cópia do app
+// vive na UI). Regra do catálogo: nenhuma frase negativa — o que falta é papel da alavanca.
+const FRASE_DESTAQUE = {
+  // "plan" é o cobrado ATÉ AQUI e a barra mostra o plano da semana inteira: dizer quantos
+  // ainda vêm evita a leitura de que 4/6 e 4/8 se contradizem
+  treinos_sem_falta: (d) => (d.cheio
+    ? `👟 <b>${d.feito}/${d.plan} treinos feitos</b> — nada perdido até aqui${d.restantes ? `, ${d.restantes} pela frente` : ' e a semana inteira cumprida'}.`
+    : `👟 <b>Nenhum treino perdido</b> até aqui: ${d.feito} de ${d.plan} feitos${d.restantes ? ` · ${d.restantes} ainda ${plural(d.restantes, 'vem', 'vêm')}` : ''}.`),
+  semana_limpa: (d) => `🌱 <b>${d.dias} dias limpos</b> — a semana está inteira.`,
+  recuperacao: (d) => (d.n === 1
+    ? '♻️ <b>Never miss twice respeitado</b>: o deslize não virou dois dias seguidos.'
+    : `♻️ <b>${d.n} recuperações</b> no dia seguinte — nunca duas vezes.`),
+  verde_garantida: (d) => `✅ <b>Semana verde já garantida</b>: ${d.feitas} refeições no plano (meta ${d.meta}).`,
+  longao: (d) => `📏 <b>Longão de ${fmt1(d.km)} km</b>${d.pace ? ` a ${d.pace}/km` : ''}${d.fc ? ` · FC ${d.fc}` : ''} — o eixo da semana.`,
+  adesao: (d) => `🍽 Adesão em <b>${d.pct}%</b> (${d.feitas} refeições em ${d.cobrados} ${plural(d.cobrados, 'dia', 'dias')})${d.noRitmo ? ' — no ritmo da semana verde.' : '.'}`,
+  menos_deslizes: (d) => `📉 <b>${d.n} ${plural(d.n, 'deslize', 'deslizes')} a menos</b> que a semana passada nesta mesma altura.`,
+  viagem: (d) => `✈️ ${d.dias} ${plural(d.dias, 'dia', 'dias')} de viagem — modo manutenção, leia os números com esse desconto.`,
+};
+
+// a alavanca: UMA ação pros dias que sobram. Quando a semana verde sai de alcance, o alvo
+// MUDA (nunca vira derrota) — é o mesmo espírito do never miss twice aplicado à semana.
+const FRASE_ALAVANCA = {
+  fechar_verde: (d) => `Faltam <b>${d.faltam} ${plural(d.faltam, 'refeição', 'refeições')}</b> registradas${d.treinosRestantes ? ` e ${d.treinosRestantes} ${plural(d.treinosRestantes, 'treino', 'treinos')}` : ''} pra fechar a semana verde${d.folga >= 5 ? ' — dá com folga' : ''}.`,
+  alvo_alternativo: (d) => `A semana verde não sai mais — e tudo bem. O alvo dos ${d.diasRestantes} ${plural(d.diasRestantes, 'dia', 'dias')} que sobram: ${d.treinosRestantes ? `${d.treinosRestantes} ${plural(d.treinosRestantes, 'treino', 'treinos')} do plano` : 'fechar limpo'}${d.sequencia ? ` e segurar os ${d.sequencia} dias limpos` : ''}. Semana torta com treino em dia ainda constrói a Pampulha.`,
+  treinos_restantes: (d) => `Refeições já estão no alvo. Faltam <b>${d.n} ${plural(d.n, 'treino', 'treinos')}</b> pra semana cheia.`,
+  pre_decidir: (d) => `<b>${nomeDia(d.date)}</b> é o seu dia mais vulnerável (${d.n} deslizes em 90 dias) e ainda vem esta semana — pré-decida o jantar dele hoje (1B).`,
+};
+
+function balancoDaSemana(semanaIni, hoje = hojeKey()) {
+  const st = S.getState();
+  return D.balancoSemana(st.events, st.settings, semanaIni, hoje, {
+    viagens: viagensCfg(),
+    corridas: dadosHistorico?.corridas || [],
+    forcas: dadosHistorico?.forcas || [],
+  });
+}
+
+// barra com MARCA DE RITMO: onde você deveria estar HOJE, não onde a semana termina.
+// Sem essa marca, toda terça pareceria 30% de uma meta semanal — e o card viraria ruído.
+function barraBalanco({ rotulo, valor, teto, marca, texto, estado = '' }) {
+  const p = (v) => `${Math.max(0, Math.min(100, teto > 0 ? (v / teto) * 100 : 0))}%`;
+  return `<div class="bal-barra">
+    <div class="bal-cab"><span>${rotulo}</span><span class="num">${texto}</span></div>
+    <div class="bal-trilho"><i class="bal-fill ${estado}" style="width:${p(valor)}"></i>
+      ${marca != null ? `<i class="bal-marca" style="left:${p(marca)}"></i>` : ''}</div>
+  </div>`;
+}
+
+function barrasBalanco(bal) {
+  const r = bal.refeicoes, t = bal.treinos, d = bal.deslizes;
+  const alvoDeslize = (d.alvoDelivery ?? 0) + (d.alvoSweet ?? 0);
+  return `
+    ${barraBalanco({
+    rotulo: '🍽 Refeições no plano',
+    valor: r.feitas, teto: r.metaSemana, marca: bal.emCurso ? r.metaParcial : null,
+    texto: `${r.feitas}/${r.metaSemana}`,
+    estado: r.verde ? 'bom' : r.noRitmo ? '' : 'atras',
+  })}
+    ${t.planSemana ? barraBalanco({
+    rotulo: '👟 Treinos do plano',
+    valor: t.feito, teto: t.planSemana, marca: bal.emCurso ? t.plan : null,
+    texto: `${t.feito}/${t.planSemana}${t.pulados ? ` · ${t.pulados} pulado${t.pulados > 1 ? 's' : ''}` : ''}`,
+    estado: t.feito === t.planSemana ? 'bom' : t.perdidos ? 'atras' : '',
+  }) : ''}
+    ${alvoDeslize > 0 ? barraBalanco({
+    rotulo: '🍫 Orçamento de deslizes',
+    valor: d.total, teto: alvoDeslize, marca: null,
+    texto: d.foraOrcamento ? `${d.total} de ${fmt1(alvoDeslize)}` : `${d.total} de ${fmt1(alvoDeslize)} usados`,
+    estado: d.foraOrcamento ? 'atras' : 'bom',
+  }) : ''}`;
+}
+
+// card do topo do Relatório (semana em curso) — headline + barras + alavanca + 1 toque pro detalhe
+function cardBalancoSemana(bal) {
+  const selo = SELO_BAL[bal.selo];
+  const manchete = bal.destaques[0] ? FRASE_DESTAQUE[bal.destaques[0].id](bal.destaques[0].dados) : '🍽 Semana ainda sem registros — o primeiro toque acende este card.';
+  const card = el(`<div class="card bal-card">
+    <div class="bal-topo">
+      <h2 style="margin:0">${fmtData(bal.ini)} – ${fmtData(bal.fim)} <small>· ${bal.emCurso ? `até ${nomeDia(bal.ate)}` : 'fechada'}</small></h2>
+      <span class="bal-selo ${selo.cls}">${bal.emCurso ? selo.aberta : selo.fechada}</span>
+    </div>
+    <p class="bal-manchete">${manchete}</p>
+    ${barrasBalanco(bal)}
+    ${bal.alavanca ? `<p class="bal-alavanca">→ ${FRASE_ALAVANCA[bal.alavanca.id](bal.alavanca.dados)}</p>` : ''}
+    <button class="acao-secundaria bal-ver">ver a semana ›</button>
+  </div>`);
+  card.querySelector('.bal-ver').onclick = () => sheetBalancoSemana(bal.ini);
+  return card;
+}
+
+// linha do histórico: mesma semana, densidade de lista
+function linhaHistorico(bal) {
+  const selo = SELO_BAL[bal.selo];
+  const b = el(`<button class="hist-sem">
+    <span class="hist-per num">${fmtData(bal.ini)}<small>–${fmtData(bal.fim)}</small></span>
+    <span class="hist-nums num">${bal.refeicoes.feitas}/${bal.refeicoes.metaSemana} 🍽 · ${bal.treinos.feito}/${bal.treinos.planSemana} 👟 · ${bal.deslizes.total} 🍫${bal.atleta.km ? ` · ${fmt1(bal.atleta.km)} km` : ''}</span>
+    <span class="hist-marcas">${bal.revisao ? '<i title="revisada no domingo">✍️</i>' : ''}${iaDaSemana(bal.ini) ? '<i title="leitura da IA">✨</i>' : ''}<i class="hist-dot ${selo.cls}"></i></span>
+  </button>`);
+  b.onclick = () => sheetBalancoSemana(bal.ini);
+  return b;
+}
+
+// ---------- leitura da IA (opt-in, chave do usuário, direto do aparelho) ----------
+// Os dados de hábito vivem SÓ no localStorage. Mandar a semana pro pipeline do Actions
+// significaria commitar peso/deslizes num repo PÚBLICO — por isso a chamada sai daqui,
+// com a chave do próprio usuário, e a resposta fica no aparelho. Nunca é dependência:
+// sem chave (ou com erro) o card segue inteiro com o narrador determinístico.
+const IA_MODELO = 'gemini-2.5-flash';
+const chaveIA = () => S.getState().settings.geminiKey || null;
+const iaDaSemana = (ini) => (S.getState().settings.iaSemana || {})[ini] || null;
+const IA_MAX_SEMANAS = 12;
+
+// assinatura dos números que a IA leu: se mudarem, o texto vira "desatualizado" (nunca
+// some sozinho — sumir seria pior: o usuário perderia a leitura por registrar 1 refeição)
+const assinaturaBal = (bal) => [bal.ate, bal.refeicoes.feitas, bal.treinos.feito, bal.treinos.perdidos,
+  bal.deslizes.total, bal.dias.limpos, bal.atleta.corridas, bal.atleta.km].join('|');
+
+function contextoIA(bal) {
+  const st = S.getState();
+  const gat = st.events
+    .filter((e) => e.trigger && (e.date || '') >= bal.ini && (e.date || '') <= bal.ate)
+    .reduce((acc, e) => { acc[e.trigger] = (acc[e.trigger] || 0) + 1; return acc; }, {});
+  return {
+    semana: { de: bal.ini, ate: bal.ate, emCurso: bal.emCurso, diasCorridos: bal.diasCorridos, diasRestantes: bal.diasRestantes, diasViagem: bal.diasViagem },
+    fase: D.fase(bal.ate),
+    semanasAteProva: D.semanasAteProva(bal.ate),
+    refeicoes: { feitas: bal.refeicoes.feitas, metaAteAqui: bal.refeicoes.metaParcial, metaDaSemana: bal.refeicoes.metaSemana, noRitmo: bal.refeicoes.noRitmo, verdePossivel: bal.refeicoes.verdePossivel },
+    treinos: { feitos: bal.treinos.feito, cobradosAteAqui: bal.treinos.plan, planoDaSemana: bal.treinos.planSemana, perdidos: bal.treinos.perdidos, pulados: bal.treinos.pulados, restantes: bal.treinos.restantes },
+    deslizes: { delivery: bal.deslizes.delivery, doces: bal.deslizes.sweet, docePlanejado: bal.deslizes.planejados, orcamentoDelivery: bal.deslizes.alvoDelivery, orcamentoDoces: bal.deslizes.alvoSweet, saidas: bal.deslizes.saidas, drinksPorSaida: bal.deslizes.drinks },
+    diasLimpos: { total: bal.dias.limpos, sequenciaAtual: bal.dias.sequencia, recuperacoes: bal.dias.recuperacoes },
+    atleta: { corridas: bal.atleta.corridas, km: bal.atleta.km, sessoesForca: bal.atleta.forcas, eficienciaAerobica: bal.atleta.ef, longao: bal.atleta.longao ? { km: bal.atleta.longao.distanciaKm, pace: bal.atleta.longao.paceMedio, fc: bal.atleta.longao.fcMedia } : null, longaoPlanejado: bal.atleta.longaoPlanejado?.nome || null, longaoFeito: bal.atleta.longaoFeito },
+    gatilhos: Object.entries(gat).sort((a, b) => b[1] - a[1]).map(([g, n]) => `${g} ×${n}`),
+    mesmoPontoSemanaPassada: bal.comparativo ? { refeicoes: bal.comparativo.anterior.refeicoes, treinos: bal.comparativo.anterior.treinos, deslizes: bal.comparativo.anterior.deslizes, km: bal.comparativo.anterior.km } : null,
+    diaVulneravelQueAindaVem: bal.risco ? { dia: nomeDia(bal.risco.date), deslizesEm90dias: bal.risco.n } : null,
+    revisaoDeDomingo: bal.revisao ? { nota: bal.revisao.nota, ajusteEscolhido: bal.revisao.ajuste } : null,
+  };
+}
+
+const SYSTEM_IA_SEMANA = `Você é o parceiro de accountability do Guilherme (M, 31, dev, BH) na execução de um \
+protocolo de hábitos (Fogg/Atomic Habits/TCC) + plano híbrido corrida-musculação rumo à Volta da Pampulha \
+(18 km, 06/12/2026). Você recebe o BALANÇO de UMA semana em JSON e devolve a leitura dela. Responda em \
+português, APENAS o JSON do schema.
+
+REGRAS DO PLANO (aplique, não questione):
+- Semana começa na SEGUNDA. "Semana verde" = pelo menos 80% das refeições do plano (28 de 35 numa semana \
+cheia); exigir 35/35 é contra o protocolo.
+- Metas de consumo (§4): delivery e doces com teto de −50% do baseline por semana; drinks ≤ 3 por saída. \
+Doce PLANEJADO (pré-decidido) NÃO é deslize — é restrição flexível, e conta como acerto.
+- Never miss twice: um deslize isolado não quebra nada; o que importa é não repetir no dia seguinte. \
+Recuperação no dia seguinte é CONQUISTA e merece ser nomeada.
+- Dias de viagem são modo manutenção e já saem das metas — nunca cobre desempenho neles.
+- Constância vence volume: treino feito em semana difícil vale mais que semana perfeita.
+- Se a semana está EM CURSO, os números são PARCIAIS: compare só com "mesmoPontoSemanaPassada", nunca \
+com uma semana inteira, e nunca trate o que ainda não aconteceu como perdido.
+
+TOM (regra dura):
+- ZERO linguagem punitiva. PROIBIDO: "falhou", "ruim", "fraco", "erro", "abaixo do esperado", "deveria ter", \
+"pecou". Desvio = fato + causa provável + ajuste construtivo.
+- PROIBIDO clichê motivacional e apelido ("campeão", "guerreiro", "fera", "vamos com tudo").
+- O atleta é técnico e gosta de entender o porquê: nomeie a métrica e o mecanismo quando explicar algo.
+- Use SOMENTE os números do JSON. Nunca invente dado que não está lá, nunca redesenhe o plano.
+
+CAMPOS:
+- leitura: 2 a 4 frases ligando hábito e treino — o que essa semana está sendo, com os números que \
+importam. Se houver nota/ajuste da revisão de domingo, leve em conta.
+- destaque: uma frase curta (máx. 90 caracteres) com o fato mais relevante da semana. Nunca negativo.
+- alavanca: se a semana está EM CURSO, UMA ação concreta e específica pros dias que faltam. Se está \
+FECHADA, UM aprendizado aplicável à próxima semana.`;
+
+const SCHEMA_IA_SEMANA = {
+  type: 'OBJECT',
+  properties: { leitura: { type: 'STRING' }, destaque: { type: 'STRING' }, alavanca: { type: 'STRING' } },
+  required: ['leitura', 'destaque', 'alavanca'],
+};
+
+async function pedirLeituraIA(bal, { silencioso = false } = {}) {
+  const chave = chaveIA();
+  if (!chave) { if (!silencioso) snackbar('Configure a chave do Gemini em Ajustes para a leitura da IA.'); return null; }
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${IA_MODELO}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': chave },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_IA_SEMANA }] },
+        contents: [{ role: 'user', parts: [{ text: JSON.stringify(contextoIA(bal)) }] }],
+        generationConfig: { temperature: 0.4, responseMimeType: 'application/json', responseSchema: SCHEMA_IA_SEMANA },
+      }),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const resp = await r.json();
+    const txt = resp?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const ia = JSON.parse(txt);
+    if (!ia.leitura) throw new Error('resposta vazia');
+    // guarda só as últimas semanas — o localStorage é o cofre dos dados, não um cache infinito
+    const todas = { ...(S.getState().settings.iaSemana || {}), [bal.ini]: { ...ia, ts: Date.now(), assinatura: assinaturaBal(bal) } };
+    const podadas = Object.fromEntries(Object.entries(todas).sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, IA_MAX_SEMANAS));
+    S.setSetting('iaSemana', podadas);
+    return ia;
+  } catch (e) {
+    if (!silencioso) snackbar(`Não consegui falar com a IA (${e.message}) — os números acima continuam valendo.`);
+    return null;
+  }
+}
+
+function blocoIASemana(bal) {
+  const wrap = el('<div class="bal-ia"></div>');
+  const pintar = () => {
+    const ia = iaDaSemana(bal.ini);
+    const velha = ia && ia.assinatura !== assinaturaBal(bal);
+    wrap.innerHTML = `<div class="bal-ia-cab">✨ LEITURA DA SEMANA · IA</div>${ia ? `
+      <p>${esc(ia.leitura)}</p>
+      <p class="bal-ia-dica">→ ${esc(ia.alavanca)}</p>
+      <small>${velha ? 'os números mudaram desde esta leitura · ' : ''}gerada ${fmtData(D.dateKey(new Date(ia.ts)))}</small>`
+      : `<p class="bal-ia-vazio">${chaveIA() ? 'Sem leitura desta semana ainda.' : 'A leitura da IA é opcional: com sua chave do Gemini em Ajustes, os números desta semana (sem nome, sem localização) vão direto deste aparelho pro modelo e voltam como texto. Sem ela, o balanço acima continua completo.'}</p>`}
+      <button class="acao-secundaria" id="ia-pedir">${ia ? (velha ? 'atualizar leitura ✨' : 'gerar de novo ✨') : 'ler esta semana com a IA ✨'}</button>`;
+    wrap.querySelector('#ia-pedir').onclick = async (e) => {
+      if (!chaveIA()) { snackbar('Chave do Gemini fica em Ajustes → Leitura da semana por IA.'); return; }
+      e.target.disabled = true;
+      e.target.textContent = 'lendo a semana…';
+      const nova = await pedirLeituraIA(bal);
+      if (nova) pintar(); else { e.target.disabled = false; pintar(); }
+    };
+  };
+  pintar();
+  return wrap;
+}
+
+// ---------- sheet: a semana inteira ----------
+function sheetBalancoSemana(semanaIni) {
+  const bal = balancoDaSemana(semanaIni);
+  if (!bal) return;
+  const selo = SELO_BAL[bal.selo];
+  const a = bal.atleta, t = bal.treinos, d = bal.deslizes;
+  const linha = (rot, val, extra = '') => `<div class="rev-metrica"><span>${rot}</span><span class="num">${val}</span>${extra ? `<small style="color:var(--muted)">${extra}</small>` : ''}</div>`;
+  const cmp = bal.comparativo;
+  const sinal = (v, bomQuandoCai) => {
+    if (!v) return '<span class="rel-delta">=</span>';
+    const bom = bomQuandoCai ? v < 0 : v > 0;
+    return `<span class="rel-delta ${bom ? 'bom' : 'ruim'}">${v > 0 ? '+' : ''}${fmt1(v)}</span>`;
+  };
+  const corpo = el(`<div>
+    <div class="bal-topo">
+      <h3 style="margin:0">${fmtData(bal.ini)} – ${fmtData(bal.fim)}</h3>
+      <span class="bal-selo ${selo.cls}">${bal.emCurso ? selo.aberta : selo.fechada}</span>
+    </div>
+    <p class="bal-manchete" style="margin-top:6px">${bal.emCurso ? `Semana em curso · ${bal.diasCorridos} de 7 dias · ${bal.diasRestantes} ${plural(bal.diasRestantes, 'dia', 'dias')} pra jogar` : 'Semana fechada'}</p>
+    ${bal.destaques.slice(0, 4).map((x) => `<p class="bal-fato">${FRASE_DESTAQUE[x.id](x.dados)}</p>`).join('')}
+    ${barrasBalanco(bal)}
+    ${bal.alavanca ? `<p class="bal-alavanca">→ ${FRASE_ALAVANCA[bal.alavanca.id](bal.alavanca.dados)}</p>` : ''}
+    ${bal.risco && bal.alavanca?.id !== 'pre_decidir' ? `<p class="bal-risco">⚠ ${FRASE_ALAVANCA.pre_decidir(bal.risco)}</p>` : ''}
+
+    <div class="secao" style="margin-top:14px">OS NÚMEROS</div>
+    ${linha('🍽 Refeições no plano', `${bal.refeicoes.feitas}/${bal.refeicoes.metaSemana}`, `meta da semana verde · ${bal.refeicoes.cobrados} ${plural(bal.refeicoes.cobrados, 'dia cobrado', 'dias cobrados')}`)}
+    ${linha('👟 Treinos', `${t.feito}/${t.planSemana}`, [
+    t.perdidos ? `${t.perdidos} sem check` : '',
+    t.pulados ? `${t.pulados} pulado${t.pulados > 1 ? 's' : ''} de propósito` : '',
+    t.restantes ? `${t.restantes} pela frente` : (!t.perdidos && !t.pulados ? 'plano da semana cumprido' : ''),
+  ].filter(Boolean).join(' · '))}
+    ${linha('🛵 Delivery', `${d.delivery}`, d.alvoDelivery === null ? 'sem baseline configurado' : `orçamento ${fmt1(d.alvoDelivery)}/sem · ${d.restaDelivery >= 0 ? `${fmt1(d.restaDelivery)} de folga` : 'acima do alvo'}`)}
+    ${linha('🍫 Doces fora do plano', `${d.sweet}`, d.alvoSweet === null ? 'sem baseline configurado' : `orçamento ${fmt1(d.alvoSweet)}/sem${d.planejados ? ` · ${d.planejados} doce planejado (não é deslize)` : ''}`)}
+    ${d.saidas ? linha('🍻 Saídas', `${d.saidas}`, `${fmt1(d.drinks)} drinks por saída · meta ≤ 3`) : ''}
+    ${linha('🌱 Dias limpos', `${bal.dias.limpos}/${bal.diasCorridos}`, bal.dias.recuperacoes ? `${bal.dias.recuperacoes} ${plural(bal.dias.recuperacoes, 'recuperação', 'recuperações')} no dia seguinte` : bal.dias.sequencia ? `${bal.dias.sequencia} seguidos até aqui` : '')}
+
+    ${a.corridas || a.forcas || a.longaoPlanejado ? `<div class="secao" style="margin-top:14px">O ATLETA</div>
+      ${linha('🏃 Corridas', `${a.corridas}`, a.km ? `${fmt1(a.km)} km na semana` : '')}
+      ${a.longao ? linha('📏 Longão', `${fmt1(a.longao.distanciaKm)} km`, `${a.longao.paceMedio}/km${a.longao.fcMedia ? ` · FC ${a.longao.fcMedia}` : ''}`)
+    : a.longaoPlanejado ? linha('📏 Longão',
+      a.longaoFeito ? 'feito ✓' : a.longaoPlanejado.date > bal.ate ? 'a fazer' : 'sem registro',
+      esc(a.longaoPlanejado.nome)) : ''}
+      ${linha('🏋️ Sessões de força', `${a.forcas}`, 'registradas no Garmin')}
+      ${a.ef ? linha('⚡ Eficiência aeróbica', a.ef.toFixed(2).replace('.', ','), 'm/batimento · corridas limpas até Z3') : ''}` : ''}
+
+    ${cmp ? `<div class="secao" style="margin-top:14px">VS A SEMANA PASSADA ${bal.emCurso ? 'NESTA ALTURA' : ''}</div>
+      <div class="card" style="padding:12px"><div class="tiles" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="tile"><div class="l">🍽 Refeições</div><div class="v num">${bal.refeicoes.feitas}</div>${sinal(cmp.refeicoes, false)}</div>
+        <div class="tile"><div class="l">👟 Treinos</div><div class="v num">${t.feito}</div>${sinal(cmp.treinos, false)}</div>
+        <div class="tile"><div class="l">🍫 Deslizes</div><div class="v num">${d.total}</div>${sinal(cmp.delivery + cmp.sweet, true)}</div>
+        ${a.km || cmp.anterior.km ? `<div class="tile"><div class="l">📏 Km</div><div class="v num">${fmt1(a.km)}</div>${sinal(cmp.km, false)}</div>` : ''}
+      </div>
+      <small style="color:var(--muted);font-size:.7rem">comparado com ${fmtData(D.addDays(bal.ini, -7))} – ${fmtData(cmp.ate)} — mesmo número de dias, maçã com maçã.</small></div>` : ''}
+
+    ${bal.revisao ? `<div class="secao" style="margin-top:14px">SUA REVISÃO DE DOMINGO</div>
+      <div class="card" style="font-size:.84rem;color:var(--ink-2);line-height:1.5">
+        ${bal.revisao.nota ? `“${esc(bal.revisao.nota)}”<br>` : ''}
+        ${bal.revisao.ajuste ? `<b style="color:var(--ink)">Ajuste escolhido:</b> ${esc(bal.revisao.ajuste)}` : '<span style="color:var(--muted)">semana fechada sem ajuste de ambiente</span>'}
+      </div>` : ''}
+  </div>`);
+  corpo.append(blocoIASemana(bal));
+  // semana fechada e não revisada: o wizard é o caminho, não um segundo formulário aqui
+  if (!bal.emCurso && !bal.revisao) {
+    const btn = el('<button class="acao-primaria">📋 Revisar esta semana</button>');
+    btn.onclick = () => { fecharSheet(); wizardRevisao(bal.ini); };
+    corpo.append(btn);
+  }
+  abrirSheet(corpo);
+}
+
+function secaoSemanas(root, key) {
+  const st = S.getState();
+  carregarAnalises(); // km/longão da semana vêm do historico.json — re-renderiza ao chegar
+  const bal = balancoDaSemana(D.inicioSemana(key));
+  if (!bal) return;
+  root.append(el(`<div class="secao">ESTA SEMANA · ${bal.emCurso ? `segunda → ${nomeDia(bal.ate)}` : 'fechada'}</div>`));
+  root.append(cardBalancoSemana(bal));
+
+  const todas = D.semanasComBalanco(st.events, st.settings, key, histSemanas + 1, {
+    viagens: viagensCfg(), corridas: dadosHistorico?.corridas || [], forcas: dadosHistorico?.forcas || [],
+  }).slice(1); // a primeira é a semana atual, já no card acima
+  if (!todas.length) return;
+  root.append(el('<div class="secao">HISTÓRICO DE SEMANAS</div>'));
+  const lista = el('<div class="card" style="padding:8px"></div>');
+  todas.slice(0, histSemanas).forEach((b) => lista.append(linhaHistorico(b)));
+  root.append(lista);
+  if (todas.length > histSemanas) {
+    const mais = el('<button class="acao-secundaria">ver mais semanas</button>');
+    mais.onclick = () => { histSemanas += 8; render(); };
+    root.append(mais);
+  }
+}
+
 function renderRelatorio(root) {
   const st = S.getState();
   const key = hojeKey();
   const inicio = st.settings.startKey || key;
+  secaoSemanas(root, key);
 
   // seletor de período
   const chips = el(`<div class="chips" style="padding:2px 4px">${[[30, '30 dias'], [90, '90 dias'], [0, 'Tudo']]
@@ -2602,7 +2949,6 @@ function renderRelatorio(root) {
   chips.querySelectorAll('button').forEach((b) => {
     b.onclick = () => { periodoRelatorio = Number(b.dataset.v); render(); };
   });
-  root.append(chips);
 
   const dias = periodoRelatorio || Math.max(1, D.diffDays(inicio, key) + 1);
   const ini = periodoRelatorio ? D.addDays(key, -dias + 1) : inicio;
@@ -2621,6 +2967,7 @@ function renderRelatorio(root) {
   const pct = (v) => (v === null ? '–' : Math.round(v * 100));
   const num1 = (v) => (v === null || v === undefined ? '–' : (Math.round(v * 10) / 10).toFixed(1).replace('.', ','));
   root.append(el('<div class="secao">PLACAR · ' + (periodoRelatorio ? `ÚLTIMOS ${dias} DIAS VS ${dias} ANTERIORES` : 'DESDE O INÍCIO') + '</div>'));
+  root.append(chips);
   root.append(el(`<div class="card"><div class="tiles" style="grid-template-columns:1fr 1fr 1fr">
     <div class="tile"><div class="l">🛵 iFood impulso</div><div class="v num">${agora_.delivery}</div>${delta(agora_.delivery, antes?.delivery, true)}</div>
     <div class="tile"><div class="l">🍫 Doces fora</div><div class="v num">${agora_.sweet}</div>${delta(agora_.sweet, antes?.sweet, true)}</div>
@@ -3042,6 +3389,31 @@ function renderAjustes(root) {
   });
   root.append(cardGar);
 
+  // leitura da semana por IA (v7.23) — opt-in, chave do usuário, chamada DIRETO do aparelho.
+  // Não passa pelo pipeline de propósito: o repo é público e a semana carrega peso/deslizes.
+  const temIA = !!st.settings.geminiKey;
+  const cardIA = el(`<div class="card"><h2>Leitura da semana por IA <small>· opcional</small></h2>
+    <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px">Chave do Google AI Studio (Gemini). Com ela, o balanço semanal no Relatório ganha um botão que manda <b>só os números derivados da semana</b> (sem nome, sem localização, sem histórico bruto) deste aparelho direto pro modelo. A chave e o texto ficam SÓ aqui — nada vai pro repositório público. Sem chave, o balanço funciona inteiro.</p>
+    <div style="display:flex;gap:8px">
+      <input class="rev-input" style="margin:0;flex:1" type="password" id="ia-key" placeholder="${temIA ? '•••••••• (chave salva)' : 'AIza…'}">
+      <button class="acao-primaria" style="margin:0;width:auto;padding:11px 14px" id="ia-salvar">Salvar</button>
+    </div>
+    ${temIA ? '<button class="acao-secundaria" id="ia-remover" style="margin-top:6px">remover chave deste aparelho</button>' : ''}
+  </div>`);
+  cardIA.querySelector('#ia-salvar').onclick = () => {
+    const v = cardIA.querySelector('#ia-key').value.trim();
+    if (!v) return snackbar('Cole a chave no campo antes de salvar.');
+    S.setSetting('geminiKey', v);
+    snackbar('Chave salva neste aparelho ✓');
+    render();
+  };
+  cardIA.querySelector('#ia-remover')?.addEventListener('click', () => {
+    S.setSetting('geminiKey', null);
+    snackbar('Chave removida (as leituras já geradas continuam salvas).');
+    render();
+  });
+  root.append(cardIA);
+
   // versão + atualização manual (o CDN do Pages pode atrasar ~10 min)
   const cardUpd = el(`<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
     <div><h2 style="margin-bottom:2px">Versão do app</h2>
@@ -3198,6 +3570,8 @@ if (params.get('checkpoint')) { // dev: abre o guia do próximo checkpoint
   const cp = CHECKPOINTS.find((c) => c.date >= hojeKey()) || CHECKPOINTS[CHECKPOINTS.length - 1];
   sheetCheckpoint(cp);
 }
+// dev: sheet do balanço semanal já com corridas/força do Garmin resolvidas
+if (semanaDev) carregarAnalises().then(() => sheetBalancoSemana(semanaDev));
 
 // service worker + atualização
 // PWA standalone no Android quase nunca morre ao "fechar" — sem navegação nova, o browser não

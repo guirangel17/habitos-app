@@ -651,3 +651,205 @@ export function gatilhosFrequentes(events, dias = 14, hojeKey) {
   }
   return Object.entries(cont).sort((a, b) => b[1] - a[1]);
 }
+
+// ================================================================
+// BALANÇO SEMANAL (v7.23) — o retrato de UMA semana, parcial ou fechada
+// ================================================================
+// Duas regras de design que o resto do arquivo não tinha como impor sozinho:
+// 1. MAÇÃ COM MAÇÃ: semana em curso só se compara com o MESMO PONTO da semana anterior
+//    (seg→qui vs seg→qui). Comparar 4 dias contra 7 faria toda terça parecer fracasso —
+//    o card vira ruído e o usuário aprende a ignorar.
+// 2. Nada é "perdido" antes do dia acabar (mesma regra da gradeForca): o treino planejado
+//    de HOJE fica em `hojePendente`, nunca em `perdidos`.
+// Os dados do Garmin (corridas/forças do historico.json) entram por parâmetro, como em
+// gradeForca — derive.js segue sem I/O.
+
+export function janelaSemana(semanaIni, hojeKey) {
+  const fim = addDays(semanaIni, 6);
+  const futura = hojeKey < semanaIni;
+  const ate = hojeKey > fim ? fim : hojeKey; // último dia contado
+  return {
+    ini: semanaIni, fim, ate, futura,
+    emCurso: !futura && hojeKey <= fim,
+    diasCorridos: futura ? 0 : diffDays(semanaIni, ate) + 1,
+    diasRestantes: futura ? 7 : diffDays(ate, fim),
+  };
+}
+
+export function balancoSemana(events, settings = {}, semanaIni, hojeKey, opts = {}) {
+  const { corridas = [], forcas = [], comparar = true } = opts;
+  const viagens = opts.viagens || settings.viagens || [];
+  const j = janelaSemana(semanaIni, hojeKey);
+  if (j.futura) return null;
+  const baseline = settings.baseline || {};
+
+  // ---- refeições: a meta é a semana verde (80%), com desconto de viagem ----
+  let feitas = 0, cobrados = 0, cobradosSemana = 0, maxRestante = 0, diasViagem = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(semanaIni, i);
+    const n = mealsDone(mealsOfDay(events, d));
+    const viagem = emViagem(d, viagens);
+    if (viagem) diasViagem++;
+    if (d <= j.ate) {
+      feitas += n;
+      if (!(viagem && n === 0)) { cobrados++; cobradosSemana++; } // viagem só sai se não registrou
+    } else if (!viagem) { cobradosSemana++; maxRestante += 5; }
+  }
+  const metaParcial = metaSemanaRefeicoes(cobrados);
+  const metaSemana = metaSemanaRefeicoes(cobradosSemana);
+  const refeicoes = {
+    feitas, cobrados, metaParcial, metaSemana, maxRestante,
+    faltam: Math.max(0, metaSemana - feitas),
+    noRitmo: feitas >= metaParcial,
+    verde: cobradosSemana > 0 && feitas >= metaSemana,
+    verdePossivel: cobradosSemana > 0 && feitas + maxRestante >= metaSemana,
+  };
+
+  // ---- treinos: viagem sai do plano (a menos que tenha treinado); hoje nunca é "perdido" ----
+  const treinos = { plan: 0, feito: 0, pulados: 0, perdidos: 0, hojePendente: 0, restantes: 0, planSemana: 0, abertos: [] };
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(semanaIni, i);
+    const plano = treinoDoDia(d);
+    const feito = workoutsDoDia(events, d);
+    const viagem = emViagem(d, viagens);
+    for (const kind of ['corrida', 'gym']) {
+      if (!plano[kind] || (viagem && feito[kind] !== true)) continue;
+      treinos.planSemana++;
+      if (d > j.ate) { treinos.restantes++; continue; }
+      treinos.plan++;
+      if (feito[kind] === true) treinos.feito++;
+      else if (foiPulado(events, d, kind)) treinos.pulados++;
+      else if (d < hojeKey) { treinos.perdidos++; treinos.abertos.push({ date: d, kind }); }
+      else treinos.hojePendente++;
+    }
+  }
+  treinos.semFalta = treinos.plan > 0 && treinos.perdidos === 0;
+  treinos.cheio = treinos.plan > 0 && treinos.feito === treinos.plan;
+
+  // ---- deslizes: ORÇAMENTO da semana (§4), nunca "erro" ----
+  const naJanela = (e) => { const d = e.date || dateKey(new Date(e.ts)); return d >= semanaIni && d <= j.ate; };
+  const conta = (type) => events.filter((e) => naJanela(e) && ehDeslize(e, type)).length;
+  const alvoDe = (m) => (baseline[m] != null ? baseline[m] * METAS_30D[m] : null);
+  const saidas = events.filter((e) => e.type === 'night_out' && naJanela(e));
+  const deslizes = {
+    delivery: conta('delivery'),
+    sweet: conta('sweet'),
+    planejados: events.filter((e) => naJanela(e) && e.type === 'sweet' && e.planejado).length,
+    alvoDelivery: alvoDe('delivery'),
+    alvoSweet: alvoDe('sweet'),
+    saidas: saidas.length,
+    drinks: saidas.length ? saidas.reduce((s, e) => s + (e.drinks || 0), 0) / saidas.length : null,
+  };
+  deslizes.total = deslizes.delivery + deslizes.sweet;
+  deslizes.restaDelivery = deslizes.alvoDelivery === null ? null : deslizes.alvoDelivery - deslizes.delivery;
+  deslizes.restaSweet = deslizes.alvoSweet === null ? null : deslizes.alvoSweet - deslizes.sweet;
+  deslizes.foraOrcamento = (deslizes.restaDelivery !== null && deslizes.restaDelivery < 0)
+    || (deslizes.restaSweet !== null && deslizes.restaSweet < 0);
+
+  // ---- dias limpos e never miss twice DENTRO da semana ----
+  // o dia anterior à segunda entra na conta: recuperar na segunda é recuperação igual
+  const sujo = (d) => !emViagem(d, viagens)
+    && events.some((e) => (e.date || dateKey(new Date(e.ts))) === d && (ehDeslize(e, 'delivery') || ehDeslize(e, 'sweet')));
+  let limpos = 0, sequencia = 0, recuperacoes = 0;
+  let antesSujo = sujo(addDays(semanaIni, -1));
+  for (let d = semanaIni; d <= j.ate; d = addDays(d, 1)) {
+    const s = sujo(d);
+    if (s) sequencia = 0;
+    else { limpos++; sequencia++; if (antesSujo) recuperacoes++; }
+    antesSujo = s;
+  }
+  const dias = { limpos, sequencia, recuperacoes, todosLimpos: limpos === j.diasCorridos };
+
+  // ---- o atleta: corridas/força do Garmin + o longão da semana ----
+  const naSemana = (x) => x && x.date >= semanaIni && x.date <= j.ate;
+  const corridasSem = corridas.filter(naSemana);
+  const efs = corridasSem.filter((c) => c.ef && (c.paradoPct || 0) <= 10 && c.fcMedia && c.fcMedia <= 165);
+  let longaoPlanejado = null, longaoFeito = false;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(semanaIni, i);
+    const c = treinoDoDia(d).corrida;
+    if (c && c.tipo === 'longo') {
+      longaoPlanejado = { date: d, nome: c.nome };
+      if (workoutsDoDia(events, d).corrida === true) longaoFeito = true;
+    }
+  }
+  const atleta = {
+    corridas: corridasSem.length,
+    km: Math.round(corridasSem.reduce((s, c) => s + (c.distanciaKm || 0), 0) * 10) / 10,
+    longao: corridasSem.filter((c) => c.tipoPlano === 'longo').sort((a, b) => (b.distanciaKm || 0) - (a.distanciaKm || 0))[0] || null,
+    longaoPlanejado, longaoFeito,
+    forcas: forcas.filter(naSemana).length,
+    ef: efs.length ? Math.round((efs.reduce((s, c) => s + c.ef, 0) / efs.length) * 100) / 100 : null,
+  };
+
+  // ---- risco à frente: o dia vulnerável (90d) que ainda VEM nesta semana ----
+  // é o que uma análise parcial tem e uma retrospectiva não: dá pra mudar o resultado
+  const ds = deslizesPorDiaSemana(events, j.ate, 90);
+  let risco = null;
+  if (ds) {
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(semanaIni, i);
+      if (d <= j.ate) continue;
+      const n = ds[i].delivery + ds[i].sweet;
+      if (n >= 2 && (!risco || n > risco.n)) risco = { date: d, dow: i, n, delivery: ds[i].delivery, sweet: ds[i].sweet };
+    }
+  }
+
+  // ---- comparativo maçã com maçã (1 nível de recursão, comparar:false) ----
+  let comparativo = null;
+  if (comparar) {
+    const ant = balancoSemana(events, settings, addDays(semanaIni, -7), addDays(j.ate, -7), { ...opts, comparar: false });
+    if (ant && (ant.refeicoes.cobrados > 0 || ant.treinos.plan > 0)) {
+      comparativo = {
+        ate: ant.ate,
+        refeicoes: feitas - ant.refeicoes.feitas,
+        treinos: treinos.feito - ant.treinos.feito,
+        delivery: deslizes.delivery - ant.deslizes.delivery,
+        sweet: deslizes.sweet - ant.deslizes.sweet,
+        km: Math.round((atleta.km - ant.atleta.km) * 10) / 10,
+        anterior: { refeicoes: ant.refeicoes.feitas, treinos: ant.treinos.feito, deslizes: ant.deslizes.total, km: ant.atleta.km },
+      };
+    }
+  }
+
+  // ---- selo: três estados, nenhum punitivo ----
+  const selo = (treinos.perdidos === 0 && refeicoes.noRitmo && !deslizes.foraOrcamento) ? 'redonda'
+    : (treinos.perdidos >= 2 || !refeicoes.verdePossivel || deslizes.foraOrcamento) ? 'virar'
+      : 'corredor';
+
+  // ---- destaques: fatos ordenados por relevância. O texto mora na UI (app.js) ----
+  // Regra: manchete NUNCA é negativa. O que falta aparece nas barras e na alavanca —
+  // liderar com o furo é o caminho mais curto pro usuário parar de abrir a tela.
+  const destaques = [];
+  if (treinos.semFalta && treinos.feito > 0) destaques.push({ id: 'treinos_sem_falta', tom: 'bom', dados: { feito: treinos.feito, plan: treinos.plan, restantes: treinos.restantes, cheio: treinos.cheio } });
+  if (dias.todosLimpos && j.diasCorridos >= 3) destaques.push({ id: 'semana_limpa', tom: 'bom', dados: { dias: dias.limpos } });
+  if (dias.recuperacoes > 0) destaques.push({ id: 'recuperacao', tom: 'bom', dados: { n: dias.recuperacoes } });
+  if (refeicoes.verde) destaques.push({ id: 'verde_garantida', tom: 'bom', dados: { feitas, meta: metaSemana } });
+  if (atleta.longao && atleta.longao.distanciaKm) destaques.push({ id: 'longao', tom: 'bom', dados: { km: atleta.longao.distanciaKm, pace: atleta.longao.paceMedio, fc: atleta.longao.fcMedia } });
+  if (refeicoes.cobrados > 0) destaques.push({ id: 'adesao', tom: 'neutro', dados: { feitas, metaParcial, cobrados, pct: Math.round((feitas / (refeicoes.cobrados * 5)) * 100), noRitmo: refeicoes.noRitmo } });
+  if (comparativo && (comparativo.delivery + comparativo.sweet) < 0) destaques.push({ id: 'menos_deslizes', tom: 'bom', dados: { n: -(comparativo.delivery + comparativo.sweet) } });
+  if (diasViagem > 0) destaques.push({ id: 'viagem', tom: 'neutro', dados: { dias: diasViagem } });
+
+  // ---- a alavanca: UMA coisa acionável nos dias que sobram (só em semana aberta) ----
+  const alavanca = !j.emCurso || j.diasRestantes === 0 ? null
+    : !refeicoes.verdePossivel ? { id: 'alvo_alternativo', dados: { sequencia: dias.sequencia, treinosRestantes: treinos.restantes, diasRestantes: j.diasRestantes } }
+      : refeicoes.faltam > 0 ? { id: 'fechar_verde', dados: { faltam: refeicoes.faltam, diasRestantes: j.diasRestantes, treinosRestantes: treinos.restantes, folga: refeicoes.maxRestante - refeicoes.faltam } }
+        : treinos.restantes > 0 ? { id: 'treinos_restantes', dados: { n: treinos.restantes } }
+          : risco ? { id: 'pre_decidir', dados: risco }
+            : null;
+
+  const revisao = [...events].reverse().find((e) => e.type === 'review' && e.week === semanaIni) || null;
+
+  return { ...j, refeicoes, treinos, deslizes, dias, atleta, risco, comparativo, selo, destaques, alavanca, revisao, diasViagem };
+}
+
+// lista de semanas com balanço, da mais recente para a mais antiga (histórico do Relatório)
+export function semanasComBalanco(events, settings, hojeKey, limite = 12, opts = {}) {
+  const primeira = inicioSemana(settings.startKey || hojeKey);
+  const out = [];
+  for (let s = inicioSemana(hojeKey); s >= primeira && out.length < limite; s = addDays(s, -7)) {
+    const b = balancoSemana(events, settings, s, hojeKey, opts);
+    if (b) out.push(b);
+  }
+  return out;
+}

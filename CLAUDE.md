@@ -78,7 +78,9 @@ pelo mapa gatilho×período). Tipos:
 `settings`: `baseline {delivery, sweet, drinks}`, `dayTypeOverrides {date: TIPO}`, `startKey`
 (primeira data de uso — âncora dos contadores), `lastBackupTs`, `lembretes {lanche, revisao}`,
 chaves `notifLanche_*`/`notifRevisao_*` (guarda de notificação disparada), `pushAtivo` +
-`pushSubscription` (inscrição de Web Push deste aparelho, v7.10 — ver seção de notificação).
+`pushSubscription` (inscrição de Web Push deste aparelho, v7.10 — ver seção de notificação),
+`geminiKey` + `iaSemana {semanaIni: {leitura, destaque, alavanca, ts, assinatura}}` (v7.23 —
+leitura da semana pela IA, ver seção do balanço semanal).
 
 ## Regras de negócio críticas (implementadas em `derive.js`, cobertas por testes)
 
@@ -367,6 +369,46 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   limpa numa entrega de fato. Regra geral: status derivado de I/O intermitente tem que ser
   carregado do run anterior, nunca remontado do zero (mesma lição de `avaliar_bloqueio`).
 
+## Balanço semanal (v7.23) — a semana até aqui e o histórico de todas elas
+
+Vive no TOPO do Relatório (`secaoSemanas` → `cardBalancoSemana` + `linhaHistorico` +
+`sheetBalancoSemana`), sobre `D.balancoSemana` (pura, 25 asserts). A Hoje não ganhou nada:
+princípio 2 continua valendo. O mesmo componente serve a semana em curso e as fechadas.
+
+- **Maçã com maçã**: semana em curso só se compara com o MESMO PONTO da semana anterior
+  (seg→qui vs seg→qui, `comparativo`, 1 nível de recursão com `comparar:false`). Comparar 4 dias
+  contra 7 faria toda terça parecer fracasso — e um card que sempre acusa é um card que o usuário
+  aprende a ignorar. Se mexer no comparativo, mantenha isso.
+- **Nada é "perdido" antes do dia acabar** (mesma regra da `gradeForca`): treino planejado de HOJE
+  vai para `hojePendente`, nunca para `perdidos`. `perdidos` só conta dia < hoje, sem check e sem
+  `foiPulado` — é o SEXTO lugar da família de gates de treino descrita na v7.10/v7.17/v7.20.
+- **Marca de ritmo** nas barras (`.bal-marca`): a meta PARCIAL de hoje, não a da semana. Sem ela,
+  8/28 numa terça pareceria 30% de fracasso.
+- **Deslize é ORÇAMENTO, não erro**: a barra mostra consumido/alvo (§4, −50% do baseline). Doce
+  planejado fica fora (não é deslize) mas aparece nomeado no sheet.
+- **A manchete nunca é negativa** — o catálogo `FRASE_DESTAQUE` (texto na UI; `derive` devolve só
+  `{id, tom, dados}`) não tem frase de falha. O que falta é papel da **alavanca**: UMA ação pros
+  dias restantes. Quando a semana verde sai de alcance, o alvo MUDA (`alvo_alternativo`) em vez de
+  virar derrota — é o never miss twice aplicado à semana.
+- **Risco à frente** (`risco`): o dia da semana mais vulnerável (90d, guarda de 5 deslizes) que
+  AINDA VEM. É o que uma análise parcial tem e uma retrospectiva não: dá pra mudar o resultado.
+- O sheet mostra a **nota + o ajuste da revisão de domingo** daquela semana. Até a v7.22 o evento
+  `review` era gravado pelo wizard e nunca mais lido por ninguém — o histórico é a casa dele.
+- Dev: `?semana=YYYY-MM-DD` abre o sheet daquela semana (aceita qualquer dia dela).
+
+**Leitura da IA (v7.23) — por que ela NÃO passa pelo pipeline.** Os dados de hábito vivem só no
+localStorage do aparelho; o repo é PÚBLICO. Mandar a semana pro Actions (que já tem
+`GEMINI_API_KEY`) significaria commitar peso, deslizes e adesão em repositório aberto — inclusive
+pelos logs do run. Por isso a chamada sai do próprio aparelho (`pedirLeituraIA`), com a chave do
+usuário em `settings.geminiKey` (mesma pegada do `garminPat`: só no device, nunca commitada),
+`x-goog-api-key` direto no `generativelanguage.googleapis.com` (o `sw.js` não intercepta: só trata
+GET do próprio escopo). Resposta cacheada em `settings.iaSemana` (12 semanas, podadas na escrita) com
+`assinatura` dos números lidos — se os números mudarem, o texto ganha aviso de desatualizado mas
+NUNCA some sozinho (sumir seria pior: perder a leitura por registrar uma refeição). Gera sozinha ao
+fechar o wizard de domingo (silenciosa). Regra igual à do push: **nunca é dependência** — sem chave,
+sem rede ou com erro, o card inteiro continua de pé no narrador determinístico. O prompt
+(`SYSTEM_IA_SEMANA`) repete as regras do plano e o tom sem punição, como o do pipeline.
+
 ## Fluxo de desenvolvimento e verificação
 
 ```bash
@@ -384,6 +426,7 @@ lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto 
 `?posalmoco=1` (registra café/lanche1/almoço agora → escudo pós-almoço no hero; use `hoje` = data
 REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo),
 `?checkpoint=1` (abre o guia do próximo checkpoint — CHECKPOINTS em data.js),
+`?semana=YYYY-MM-DD` (sheet do balanço da semana daquele dia),
 `?viagem=YYYY-MM-DD:YYYY-MM-DD` (cadastra viagem em settings — persiste, como o seed).
 
 **Screenshots headless** (o Chrome clampa janela em ~500px; o truque é scale factor 2):
@@ -433,7 +476,9 @@ os dois temas se a mudança mexe em CSS.
   fora das tendências de pace/cadência/EF de propósito, mas contam no volume) → CONSTÂNCIA (linhas semanais, ✓ verde a
   28/35) → PADRÕES (ajuste da última revisão + gatilho×período quando ≥2 sem de dados, senão
   barras). As métricas da semana atual moraram aqui até a v5 — hoje vivem na aba Dieta.
-- **Relatório**: seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
+- **Relatório**: **ESTA SEMANA** (v7.23: balanço da semana em curso — manchete, barras com marca de
+  ritmo, alavanca; toque → sheet da semana) → **HISTÓRICO DE SEMANAS** (uma linha por semana, ✍️ = revisada,
+  ✨ = com leitura da IA; "ver mais" soma 8) → seletor de período (30/90/tudo) → placar com deltas vs período anterior (iFood, doces, drinks/saída, adesão %, treinos %, Δ peso) → insights automáticos COM GUARDA DE AMOSTRA MÍNIMA que testam as teses do protocolo (lanche 16h × doce; saída × adesão do dia seguinte; taxa de sucesso do SOS; semana verde × Δ peso; R$ economizados vs baseline) → deslizes por dia da semana (barras empilhadas delivery/doce) → totais desde o início. Insights usam `diasObservados` (dia com ≥1 refeição registrada) para não contar dias sem uso do app.
 - **Ajustes** (acessível pelo ⚙️ no header, NÃO pela nav — decisão de UX da v6: destino de
   manutenção ~1×/semana não merece slot na zona do polegar; 6 abas não cabem bem em 360px):
   saúde do sistema (v7.5: `checarSaude()` — pipeline/análises/clima/token/backup; pipeline
@@ -442,7 +487,8 @@ os dois temas se a mudança mexe em CSS.
   `settings.tema`), baseline, override do tipo de dia, backup export/import, lembretes opt-in
   (best-effort, sem push server — dependem do app aberto), notificação de atividade (v7.10, push
   real via VAPID — funciona com o app fechado, setup de 1 vez colando a inscrição no Secret do
-  repo), versão + buscar atualização.
+  repo), leitura da semana por IA (v7.23: chave do Gemini, fica só neste aparelho),
+  versão + buscar atualização.
 - **Wizard de revisão** (domingo ≥18h até terça): 6 passos — métricas prontas → O ATLETA
   (v7.4: corridas×plano + km + longão + EF da semana, via historico.json) → gatilhos →
   1 pergunta → 1 ajuste de AMBIENTE (lista do protocolo) → frase de identidade + lembrete de

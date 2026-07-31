@@ -136,6 +136,28 @@
 - ✅ **Alvo do checkpoint tem precedência no sheet do treino** (`cp?.alvo || g.pace`, com rótulo "· alvo do checkpoint"): dia de checkpoint tem alvo próprio que nem sempre é a faixa do tipo de corrida. O de 23/09 é ensaio de RITMO DE PROVA num dia tipado `tempo`, cuja faixa é de LIMIAR — o sheet mostrava 5:41–5:56 enquanto o card do checkpoint dizia 6:05–6:20, com o número errado em destaque.
 - ✅ **Treinos estruturados do Garmin recalibrados** (16 datas futuras, 10 treinos) via `criar.py --atualizar`, modo novo: `atualizar_workout()` faz PUT preservando o `workoutId`, então todas as datas agendadas herdam o conteúdo novo — sem `--limpar`, sem apagar, sem reagendar. Tem `--dry-run` (não precisa nem de login) que imprime as faixas por passo e as datas futuras afetadas. Fora de propósito: `Tiros 6x400m` (só datas passadas — atualizar reescreveria histórico do relógio sem beneficiar nada) e `Tempo Run 6km CHECKPOINT`, que virou a constante pinada `TEMPO_CHECKPOINT` (usava `TEMPO` só porque a faixa antiga coincidia). Z1/Z2/Z3 (governados por FC) e RP/RP_LARGADA (Meta A dos 18k) intactos — não derivam do teste.
 
+# Feito na v7.23 (jul/2026) — a semana até aqui + o histórico de todas elas
+
+- ✅ **Balanço semanal no topo do Relatório** (`D.balancoSemana`, pura, 25 asserts novos): manchete +
+  3 barras com **marca de ritmo** (onde a meta parcial está HOJE, não onde a semana termina) +
+  UMA alavanca acionável pros dias que faltam. Duas regras que o card impõe: **maçã com maçã**
+  (semana em curso só se compara com o MESMO PONTO da semana anterior — seg→qui vs seg→qui) e
+  **nada é "perdido" antes do dia acabar** (o treino de hoje fica em `hojePendente`).
+  Deslize vira **orçamento da semana** (§4: −50% do baseline), nunca "erro"; a manchete NUNCA é
+  negativa (o que falta é papel da alavanca); quando a semana verde sai de alcance o alvo MUDA
+  ("3 dias limpos fecham a semana") em vez de virar derrota.
+- ✅ **Histórico de semanas** com uma linha por semana (números + ✍️ revisada + ✨ com leitura da IA)
+  → sheet com o retrato inteiro: os números, o atleta (corridas/km/longão/força/EF), o comparativo
+  no mesmo ponto e **a nota + o ajuste que você escolheu no domingo** — até aqui o `review` era
+  gravado pelo wizard e nunca mais lido. Semana fechada sem revisão ganha atalho pro wizard.
+- ✅ **Leitura da semana por IA** (opt-in, `settings.geminiKey` em Ajustes): chamada DIRETO do
+  aparelho pro Gemini, com os números derivados da semana (sem nome, sem localização, sem evento
+  bruto), cache em `settings.iaSemana` (12 semanas) e assinatura pra avisar "os números mudaram
+  desde esta leitura". Não passa pelo pipeline de propósito — o repo é público e a semana carrega
+  peso e deslizes. Roda sozinha ao fechar o wizard de domingo. Nunca é dependência: sem chave ou
+  com erro, o balanço segue inteiro no narrador determinístico.
+- ✅ Dev: `?semana=YYYY-MM-DD` abre o sheet do balanço daquela semana.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
