@@ -1,7 +1,91 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-30T22:10:14-03:00",
+ "atualizadoEm": "2026-08-01T11:11:11-03:00",
  "analises": [
+  {
+   "date": "2026-08-01",
+   "activityId": 23811971990,
+   "geradoEm": "2026-08-01T11:11:22-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-08-01 08:46:01",
+    "distanciaKm": 5.61,
+    "duracaoMin": 39.0,
+    "paceMedio": "6:58",
+    "fcMedia": 138,
+    "fcMax": 169,
+    "cadencia": 114,
+    "elevacaoM": 45,
+    "trainingEffect": {
+     "aerobico": 3.1,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 31.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:17",
+      "fc": 132
+     },
+     {
+      "km": 2,
+      "pace": "7:11",
+      "fc": 134
+     },
+     {
+      "km": 3,
+      "pace": "6:40",
+      "fc": 140
+     },
+     {
+      "km": 4,
+      "pace": "6:32",
+      "fc": 143
+     },
+     {
+      "km": 5,
+      "pace": "6:25",
+      "fc": 138
+     },
+     {
+      "km": 6,
+      "pace": "8:08",
+      "fc": 142
+     }
+    ],
+    "zonasFc": {
+     "z1": 34,
+     "z2": 48,
+     "z3": 17,
+     "z4": 1,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": null,
+   "historico": {
+    "paceZ2Atual": "6:55",
+    "paceZ2Ha8Sem": "7:31"
+   },
+   "ia": {
+    "resumo": "Uma corrida extra de 5,6 km realizada sob forte calor de 31°C, mantida predominantemente em ritmo regenerativo e aeróbico. O esforço foi muito bem controlado, resultando em uma frequência cardíaca média de 138 bpm, perfeitamente dentro da sua Zona 2.",
+    "comparacao_plano": "Não havia treino de corrida planejado para este dia. Embora a sessão tenha sido fisiologicamente leve, este volume adicional de 5,6 km sob calor intenso exige atenção, pois pode interferir na recuperação necessária para o treino-chave de segunda-feira.",
+    "pontos_fortes": [
+     "Excelente eficiência cardiovascular: mesmo sob temperatura de 31°C, você manteve 82% do tempo nas Zonas 1 e 2, mostrando ótima adaptação ao clima.",
+     "Evolução consistente da base aeróbica, com o pace de Zona 2 progredindo de 7:31/km há 8 semanas para 6:55/km atualmente.",
+     "Controle de ritmo maduro ao longo dos splits, iniciando de forma conservadora a 7:17/km e progredindo de forma controlada até 6:25/km no quinto quilômetro."
+    ],
+    "pontos_atencao": [
+     "Gerenciamento de fadiga: correr em dias de descanso programado adiciona estresse estrutural que pode afetar a qualidade do próximo treino de volume.",
+     "A cadência média de 114 spm indica uma provável falha de registro do sensor do relógio (leitura de apenas um pé), visto que sua cadência habitual é mais alta para proteger a tíbia contra impactos."
+    ],
+    "proxima_dica": "Para o Longo de 12 km na segunda-feira, capriche na hidratação nas próximas 24 horas e inicie os primeiros quilômetros estritamente na faixa de 7:00 a 7:15/km para garantir energia para os 2 km finais em ritmo de prova.",
+    "nota_execucao": null
+   }
+  },
   {
    "date": "2026-07-30",
    "activityId": 23795096245,
