@@ -1,9 +1,9 @@
 {
- "ultimaExecucao": "2026-08-02T11:13:12-03:00",
+ "ultimaExecucao": "2026-08-02T14:55:39-03:00",
  "status": "ok",
  "mensagem": "",
  "ultimaAnalise": "2026-08-01",
  "pendentes": 0,
- "ultimoSucesso": "2026-08-02T11:13:12-03:00",
+ "ultimoSucesso": "2026-08-02T14:55:39-03:00",
  "modeloIA": "gemini-3.5-flash"
 }
