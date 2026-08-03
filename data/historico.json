@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-03T15:44:29-03:00",
+ "atualizadoEm": "2026-08-03T19:04:58-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -984,6 +984,21 @@
    "paradoPct": 26,
    "ef": 1.041,
    "tipoPlano": null
+  },
+  {
+   "date": "2026-08-03",
+   "activityId": 23841440593,
+   "distanciaKm": 12.02,
+   "paceMedio": "6:51",
+   "paceSeg": 411,
+   "fcMedia": 144,
+   "fcMax": 152,
+   "cadencia": 158,
+   "vo2max": 47.0,
+   "teAerobico": 3.6,
+   "paradoPct": 1,
+   "ef": 1.014,
+   "tipoPlano": "longo"
   }
  ],
  "forcas": [
@@ -1461,16 +1476,20 @@
    {
     "date": "2026-07-22",
     "seg": 425
+   },
+   {
+    "date": "2026-08-03",
+    "seg": 411
    }
   ],
-  "paceZ2Atual": "6:55",
+  "paceZ2Atual": "6:56",
   "paceZ2Ha8Sem": "7:47",
   "vo2max": {
-   "atual": 48.0,
+   "atual": 47.0,
    "ha8Sem": 46.0
   },
-  "cadencia4Sem": 156,
-  "kmPorSemana4Sem": 14.2,
+  "cadencia4Sem": 157,
+  "kmPorSemana4Sem": 17.2,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1611,9 +1630,13 @@
    {
     "date": "2026-07-29",
     "ef": 1.088
+   },
+   {
+    "date": "2026-08-03",
+    "ef": 1.014
    }
   ],
-  "efAtual": 1.035,
+  "efAtual": 1.042,
   "efHa8Sem": 0.903,
   "kmSemanas": [
    {
@@ -1662,7 +1685,7 @@
    },
    {
     "semana": "2026-08-03",
-    "km": 0
+    "km": 12.0
    }
   ],
   "longaoMes": [
@@ -1703,8 +1726,8 @@
    },
    {
     "mes": "2026-08",
-    "km": 5.61,
-    "date": "2026-08-01"
+    "km": 12.02,
+    "date": "2026-08-03"
    }
   ],
   "projecao18k": {

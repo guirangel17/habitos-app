@@ -1,7 +1,127 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-01T11:11:11-03:00",
+ "atualizadoEm": "2026-08-03T19:04:58-03:00",
  "analises": [
+  {
+   "date": "2026-08-03",
+   "activityId": 23841440593,
+   "geradoEm": "2026-08-03T19:05:28-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Longao 12km final RP",
+    "inicio": "2026-08-03 17:12:32",
+    "distanciaKm": 12.02,
+    "duracaoMin": 82.3,
+    "paceMedio": "6:51",
+    "fcMedia": 144,
+    "fcMax": 152,
+    "cadencia": 158,
+    "elevacaoM": 22,
+    "trainingEffect": {
+     "aerobico": 3.6,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 47.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:42",
+      "fc": 134
+     },
+     {
+      "km": 2,
+      "pace": "6:56",
+      "fc": 141
+     },
+     {
+      "km": 3,
+      "pace": "6:54",
+      "fc": 139
+     },
+     {
+      "km": 4,
+      "pace": "6:53",
+      "fc": 142
+     },
+     {
+      "km": 5,
+      "pace": "6:55",
+      "fc": 145
+     },
+     {
+      "km": 6,
+      "pace": "7:06",
+      "fc": 146
+     },
+     {
+      "km": 7,
+      "pace": "7:03",
+      "fc": 146
+     },
+     {
+      "km": 8,
+      "pace": "7:12",
+      "fc": 149
+     },
+     {
+      "km": 9,
+      "pace": "7:04",
+      "fc": 148
+     },
+     {
+      "km": 10,
+      "pace": "7:01",
+      "fc": 146
+     },
+     {
+      "km": 11,
+      "pace": "6:12",
+      "fc": 149
+     },
+     {
+      "km": 12,
+      "pace": "6:15",
+      "fc": 149
+     }
+    ],
+    "zonasFc": {
+     "z1": 3,
+     "z2": 97,
+     "z3": 0,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": 3.0
+   },
+   "plano": {
+    "tipo": "longo",
+    "nome": "LONGO 12 km — últimos 2 km em ritmo de prova",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm — a FC manda, não o pace",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:56",
+    "paceZ2Ha8Sem": "7:47"
+   },
+   "ia": {
+    "resumo": "Guilherme completou com maestria o longão de 12 km sob forte calor de 30°C, mantendo a intensidade rigorosamente dentro da zona aeróbica (Z2) e acelerando com precisão nos 2 km finais para o ritmo de prova planejado.",
+    "comparacao_plano": "O treino foi executado perfeitamente dentro do planejado. Nos primeiros 10 km, o ritmo médio ficou em torno de 6:57/km com a frequência cardíaca totalmente controlada abaixo do teto de 152 bpm (média de 144 bpm). Nos 2 km finais de ritmo de prova, o ritmo encaixou em 6:12 e 6:15/km sem que a FC ultrapassasse o limite da Z2 (149 bpm), demonstrando excelente eficiência cardiovascular mesmo no calor.",
+    "pontos_fortes": [
+     "Controle impecável do ritmo inicial (km 1 a 6:42/km), evitando a ansiedade e mantendo o esforço sob controle desde a largada.",
+     "Excelente resposta cardiovascular com uma derivaCardiacaPct de apenas 3,0%, o que comprova uma base aeróbica extremamente sólida para a distância de 12 km.",
+     "Evolução nítida no limiar aeróbico: o pace em Z2 evoluiu de 7:47/km há 8 semanas para 6:56/km hoje, um ganho expressivo de eficiência.",
+     "Execução perfeita do bloco final em ritmo de prova (6:12 e 6:15/km) mantendo a frequência cardíaca em 149 bpm, mesmo sob temperatura de 30°C."
+    ],
+    "pontos_atencao": [
+     "A cadência média ficou em 158 spm, abaixo do alvo de 165+ spm. Para proteger a tíbia direita contra o impacto, busque encurtar levemente a passada e aumentar a frequência dos passos, especialmente nos quilômetros finais quando a fadiga se acumula."
+    ],
+    "proxima_dica": "Para o treino de tiros de 5 × 800 m (alvo de 5:21 a 5:36/km), foque em usar os 2 minutos de recuperação ativa para caminhar e garantir que a frequência cardíaca retorne para abaixo de 152 bpm (Z2) antes de iniciar o próximo tiro, protegendo a velocidade das repetições finais.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-08-01",
    "activityId": 23811971990,
