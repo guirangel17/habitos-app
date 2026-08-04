@@ -1,7 +1,183 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-07-30T20:17:00-03:00",
+ "atualizadoEm": "2026-08-04T20:16:26-03:00",
  "analises": [
+  {
+   "date": "2026-08-04",
+   "activityId": 23854815270,
+   "geradoEm": "2026-08-04T20:16:28-03:00",
+   "sessao": {
+    "minutos": 42,
+    "series": 19,
+    "volumeKg": 2806,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 54
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 43
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 68
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 38
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -5.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 45
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 40
+       },
+       {
+        "reps": 7,
+        "kg": 15.0,
+        "s": 32
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -2
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 99
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 29
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 29
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 32
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 74
+       },
+       {
+        "reps": 8,
+        "kg": 9.0,
+        "s": 103
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 172
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 7
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": null,
+      "deltaReps": -11
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 4,
+        "kg": null,
+        "s": 8
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 6
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 14
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Uma sessão de empurrar muito consistente, com excelente aproveitamento nos exercícios multiarticulares para peito e ombros. O foco na progressão de carga e repetições foi mantido nos movimentos principais, enquanto o volume de tríceps foi estrategicamente reduzido.",
+    "comparacao_plano": "Os exercícios de peito e ombros atingiram perfeitamente o estímulo planejado, alcançando o topo da faixa de repetições (11 reps) no supino reto e no desenvolvimento. O treino de tríceps foi abreviado de forma consciente, uma excelente decisão de autorregulação para preservar a musculatura.",
+    "pontos_fortes": [
+     "Aplicação perfeita da sobrecarga progressiva no Supino Reto, consolidando 11 repetições (topo da faixa) nas três primeiras séries com 30kg.",
+     "Evolução de repetições no Desenvolvimento no Smith, tocando o teto de 11 repetições na primeira série com 32kg, demonstrando ganho de força nos deltoides.",
+     "Ótimo controle de carga na Elevação Lateral com 9kg, mantendo o estímulo ideal para a saúde e estabilização dos ombros."
+    ],
+    "pontos_atencao": [
+     "A abreviação do volume de tríceps (polia e testa) sinaliza uma gestão inteligente de tempo ou de energia, garantindo que o treino não gerasse fadiga excessiva para os treinos de corrida.",
+     "No Supino Inclinado, a queda para 7 repetições na última série é um reflexo natural do alto desgaste gerado pelo supino reto anterior, mostrando que a musculatura trabalhou em alta intensidade."
+    ],
+    "proxima_dica": "No Supino Reto, como você atingiu o topo da faixa de repetições (11) em várias séries, suba a carga para 32kg na próxima sessão, permitindo que as repetições recuem naturalmente para a base da faixa (9 reps) conforme o método de progressão dupla.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-07-30",
    "activityId": 23793782064,
