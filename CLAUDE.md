@@ -280,6 +280,13 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   últimas 12 semanas (limpa, ≥4 km, FC média ≥155) — recalibra sozinha quando teste/prova nova
   chega; `pipeline/clima.py` (open-meteo BH, sem chave) grava `data/clima.json` com as janelas
   6h/19h de hoje+amanhã no mesmo workflow — o app mostra a PRÓXIMA janela na linha do treino.
+- **`derivaCardiacaPct` NÃO vale em longão com bloco de qualidade no fim** (v7.25): a métrica
+  compara as duas METADES do treino, então 2 km finais em ritmo de prova (pace muito mais rápido
+  com FC parecida) derrubam o custo por metro da 2ª metade e mascaram a deriva real da parte fácil.
+  No longão de 03/08 ela marcou +3,0% enquanto os km fáceis subiam ~15 bpm — e a IA elogiou o
+  número. O cálculo segue igual de propósito (achar onde o bloco começa exigiria adivinhação; o
+  nome do treino no plano já diz isso à IA); a ressalva mora no SYSTEM_PROMPT e na docstring de
+  `deriva_cardiaca`. Regra geral: métrica de metades só é honesta em esforço LISO.
 - Confirmação de treino feito é SEMPRE 1 toque (slot contextual, prioridade mais baixa) — nunca
   automática. Vale para corrida (via analises.json; dispensa em `settings.garminDispensado_{date}`)
   e, desde a v7.6, para FORÇA: o pipeline também busca `strength_training` e grava o campo

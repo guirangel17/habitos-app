@@ -181,6 +181,21 @@
   A troca acontece uma vez e vale pro resto do run. `pipeline-status.json` ganhou `modeloIA` e
   `modeloTrocou`, visíveis na linha de status em Ajustes.
 
+# Feito na v7.25 (ago/2026) — a deriva cardíaca não vale em longão com bloco final
+
+- ✅ **Ressalva da `derivaCardiacaPct` no prompt da IA + docstring da função.** Achado no longão de
+  03/08 (12 km com 2 km finais em ritmo de prova, 30 °C): a métrica marcou **+3,0%** e a IA celebrou
+  como "base aeróbica extremamente sólida" — mas a parte fácil tinha derivado de **134 bpm no km 1
+  (6:42/km) para 149 bpm no km 8 (7:12/km)**, ou seja ~15 bpm mais lento E mais alto. A deriva compara
+  METADES, e os 2 km de ritmo de prova (6:12/6:15 com FC quase igual) derrubam o custo por metro da
+  2ª metade e mascaram a deriva real. Agora o prompt manda não celebrar o número quando o plano
+  indicar bloco de qualidade no fim, e ler a deriva pelos splits fáceis (1º km vs o último antes do
+  bloco). **Não filtramos o bloco no cálculo de propósito**: exigiria adivinhar onde ele começa, e
+  quem sabe isso é o nome do treino no plano, que a IA já recebe.
+- Contexto do mesmo dia, sem mudança de código: a FC de 149 bpm nos 2 km de ritmo de prova NÃO era
+  erro de sensor (era cinta XOSS X2, e o histórico tem 6:05/km a 149 bpm em 20/05) — e os 190 de
+  FCmax do modelo canônico estão certos, com 188 bpm registrados em 08/03, 28/06 e no teste de 29/07.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

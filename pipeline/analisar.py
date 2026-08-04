@@ -96,6 +96,12 @@ madura de esforço, elogie.
 <5% é base aeróbica sólida pra distância (celebre nomeando a métrica); 5-8% é normal em calor ou \
 volume novo; >8% sugere começo rápido demais, hidratação ou limite atual de resistência — trate \
 como dado de calibragem do longão seguinte, nunca como falha.
+- RESSALVA da deriva: ela compara METADES, então longão que termina com bloco de qualidade \
+(ritmo de prova, progressivo, strides) DILUI o número — pace muito mais rápido com FC parecida \
+derruba o custo da 2ª metade e mascara a deriva real da parte fácil. Quando o nome/plano do treino \
+indicar bloco final de qualidade, NÃO celebre o valor: leia a deriva pelos splits fáceis (1º km vs \
+o último antes do bloco) e diga que a métrica não se aplica a este formato. Ex. real: longão de \
+12 km com 2 km finais em ritmo de prova marcou +3,0% enquanto os km fáceis subiram ~15 bpm.
 
 TOM (regra inegociável do app onde a análise aparece):
 - ZERO linguagem punitiva. PROIBIDO: "falhou", "ruim", "fraco", "erro", "abaixo do esperado", \
@@ -247,7 +253,13 @@ def tipo_atividade(a):
 def deriva_cardiaca(lap_dtos):
     """Decoupling FC×pace: custo cardíaco (batimentos/metro) da 2ª metade vs a 1ª, em %.
     <5% = base aeróbica sólida pra distância; >8% = resistência/calor/hidratação no limite.
-    Só faz sentido em corrida contínua longa: ≥8 km com FC por split."""
+    Só faz sentido em corrida contínua LISA: ≥8 km com FC por split.
+
+    CUIDADO ao interpretar: em longão que termina com bloco de qualidade (ritmo de prova,
+    progressivo) o número mente pra baixo — a 2ª metade fica muito mais rápida com FC parecida,
+    o custo por metro despenca e a deriva real da parte fácil some. Não filtramos o bloco aqui
+    de propósito (exigiria adivinhar onde ele começa, e o plano já diz isso pelo nome do treino);
+    a ressalva mora no prompt da IA. Ver TODO.md, v7.25."""
     laps = [l for l in (lap_dtos or [])
             if (l.get("distance") or 0) >= 200 and l.get("averageHR")
             and (l.get("movingDuration") or l.get("duration"))]
