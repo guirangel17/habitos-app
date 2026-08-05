@@ -257,6 +257,30 @@ def agendar(workout_id, data_iso, nome=""):
     _salvar(reg)
 
 
+def desagendar(data_iso, nome):
+    """Tira UMA data do calendário do relógio, sem apagar o treino em si.
+
+    Existe porque o plano muda: quando uma data troca de treino, `rodar()` agenda o novo mas
+    não remove o antigo (agendar/criar_workout só sabem PULAR o que já existe) e o dia fica com
+    os dois no Garmin Connect. O treino continua no catálogo e no registro — só o agendamento
+    daquele dia some, então repor é só rodar `--corrida` de novo. Devolve quantos removeu.
+    """
+    reg = _registro()
+    alvos = [a for a in reg["agendamentos"] if a["data"] == data_iso and a["nome"] == nome]
+    if not alvos:
+        print(f"  nada agendado em {data_iso} para {nome!r} — nada a fazer")
+        return 0
+    removidos = 0
+    for ag in alvos:
+        if ag.get("scheduleId"):
+            garth.connectapi(f"/workout-service/schedule/{ag['scheduleId']}", method="DELETE")
+        reg["agendamentos"].remove(ag)
+        removidos += 1
+        print(f"  desagendado: {ag['data']}  {ag['nome']}")
+    _salvar(reg)
+    return removidos
+
+
 def limpar_tudo():
     """Remove agendamentos e treinos criados por estes scripts."""
     reg = _registro()

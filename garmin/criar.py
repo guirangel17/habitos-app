@@ -138,6 +138,15 @@ def main():
         print("Limpeza concluída.")
         return
 
+    # --desagendar DATA "Nome do treino": usar quando uma data troca de treino no plano.
+    # rodar() agenda o novo mas não remove o antigo — sem isso o dia fica com os dois.
+    if arg == "--desagendar":
+        if len(argv) < 3:
+            print('uso: criar.py --desagendar 2026-09-30 "Tempo Run 4km moderado"')
+            return
+        api.desagendar(argv[1], argv[2])
+        return
+
     if arg in ("--piloto",):
         print("== PILOTO: corrida ==")
         rodar([("2026-07-29", "TESTE 5km contrarrelogio")], CATALOGO)
