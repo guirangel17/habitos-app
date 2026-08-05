@@ -1,7 +1,117 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-03T19:04:58-03:00",
+ "atualizadoEm": "2026-08-05T18:51:14-03:00",
  "analises": [
+  {
+   "date": "2026-08-05",
+   "activityId": 23867645965,
+   "geradoEm": "2026-08-05T18:52:05-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Tiros 5x800m",
+    "inicio": "2026-08-05 17:40:41",
+    "distanciaKm": 6.34,
+    "duracaoMin": 40.7,
+    "paceMedio": "6:25",
+    "fcMedia": 144,
+    "fcMax": 170,
+    "cadencia": 143,
+    "elevacaoM": 12,
+    "trainingEffect": {
+     "aerobico": 3.6,
+     "anaerobico": 0.0,
+     "label": "LACTATE_THRESHOLD",
+     "carga": null
+    },
+    "vo2max": 49.0,
+    "temperaturaC": 32.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "8:02",
+      "fc": 121
+     },
+     {
+      "km": 2,
+      "pace": "6:58",
+      "fc": 135
+     },
+     {
+      "km": 3,
+      "pace": "5:22",
+      "fc": 157
+     },
+     {
+      "km": 5,
+      "pace": "5:22",
+      "fc": 152
+     },
+     {
+      "km": 6,
+      "pace": "8:44",
+      "fc": 147
+     },
+     {
+      "km": 7,
+      "pace": "5:27",
+      "fc": 157
+     },
+     {
+      "km": 8,
+      "pace": "8:52",
+      "fc": 149
+     },
+     {
+      "km": 9,
+      "pace": "5:31",
+      "fc": 154
+     },
+     {
+      "km": 10,
+      "pace": "8:50",
+      "fc": 145
+     },
+     {
+      "km": 11,
+      "pace": "5:26",
+      "fc": 157
+     }
+    ],
+    "zonasFc": {
+     "z1": 20,
+     "z2": 41,
+     "z3": 35,
+     "z4": 4,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "tiros",
+    "nome": "5 × 800 m em ritmo de 5 km — rec. 2 min ativa",
+    "paceAlvo": "400 m: 5:11–5:26 · 800 m–1 km: 5:21–5:36 · 1,5 km: 5:31–5:41",
+    "fcAlvo": "Mande pelo pace (FC atrasa no tiro); 9/10 no último",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:47",
+    "paceZ2Ha8Sem": "7:47"
+   },
+   "ia": {
+    "resumo": "Execução cirúrgica dos tiros de 800m sob calor intenso de 32°C. Você sustentou todos os cinco estímulos rigorosamente dentro da faixa planejada, demonstrando excelente controle de ritmo e ótima capacidade de recuperação cardiovascular nos intervalos.",
+    "comparacao_plano": "O objetivo era realizar os tiros de 800m entre 5:21 e 5:36/km. Você entregou exatamente essa intensidade nos splits de esforço (5:22, 5:22, 5:27, 5:31 e 5:26/km). Mesmo sob calor forte, a frequência cardíaca nos tiros estabilizou de forma muito controlada na Z3 (154-157 bpm) e as recuperações foram altamente eficientes, trazendo a FC de volta para a Z2 (abaixo de 152 bpm) antes do tiro seguinte.",
+    "pontos_fortes": [
+     "Precisão milimétrica no ritmo dos tiros, todos executados perfeitamente dentro da faixa de 5:21-5:36/km.",
+     "Excelente capacidade de recuperação cardiovascular, com a FC caindo consistentemente para a Z2 (145-149 bpm) nos intervalos, mesmo sob temperatura de 32°C.",
+     "Controle mental e de ritmo impecável, sem oscilações bruscas ou desgaste excessivo nos primeiros tiros."
+    ],
+    "pontos_atencao": [
+     "A cadência média registrada de 143 spm foi influenciada pelas caminhadas de recuperação. Durante os tiros rápidos, lembre-se de focar em passadas curtas e rápidas para manter a cadência alta e proteger a tíbia contra o impacto.",
+     "O calor de 32°C eleva o estresse térmico e a desidratação. O comportamento cardíaco foi excelente, mas a reposição hídrica e de eletrólitos pós-treino deve ser priorizada."
+    ],
+    "proxima_dica": "Para a Social Run de amanhã (5 km), o foco é puramente regenerativo: mantenha a FC estritamente na Z1 (abaixo de 133 bpm) e use os 4 strides de 100m no final apenas para soltar as pernas, buscando uma cadência leve e rápida sem fazer força.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-08-03",
    "activityId": 23841440593,
