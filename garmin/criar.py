@@ -65,9 +65,13 @@ def rodar(agenda, catalogo, forca=False):
 # Treinos cujo alvo de pace mudou na recalibragem de 29/07/2026. "Tiros 6x400m" NÃO entra:
 # só tem datas passadas (15/07, 22/07) e o workoutId é compartilhado, então atualizar
 # reescreveria aquele histórico no relógio sem nenhuma data futura para beneficiar.
+# Pela MESMA razão, "Tempo Run 4km moderado" saiu em 05/08/2026: era usado só em 30/09, data que
+# virou o TESTE de 5 km, então ele ficou com ZERO datas na AGENDA. O builder segue no catálogo
+# (documenta o plano original e volta de graça se a data for reposta) — é só a atualização de
+# pace no relógio que não faz mais sentido.
 RECALIBRADOS = [
     "Tiros 5x800m", "Tiros 6x800m", "Tiros 4x1km", "Tiros 5x1km forte", "Tiros 3x1500m",
-    "Tempo Run 4km", "Tempo Run 5km", "Tempo Run 5km taper", "Tempo Run 4km moderado",
+    "Tempo Run 4km", "Tempo Run 5km", "Tempo Run 5km taper",
     "Tempo Run 6km CHECKPOINT",
 ]
 

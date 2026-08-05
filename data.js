@@ -198,7 +198,7 @@ export const CORRIDAS = [
   ['2026-09-23', 'tempo', 'Tempo Run 6 km — checkpoint do alvo da prova'],
   ['2026-09-24', 'social', 'Social Run 6 km regenerativo'],
   ['2026-09-28', 'longo', 'LONGO 12 km — DELOAD (academia idem)'],
-  ['2026-09-30', 'tempo', 'Tempo Run 4 km moderado'],
+  ['2026-09-30', 'tiros', 'TESTE 5 km contrarrelógio — recalibra os paces de outubro'],
   ['2026-10-01', 'social', 'Social Run 7 km leve'],
   ['2026-10-05', 'longo', 'LONGO 15 km — ritmo constante'],
   ['2026-10-07', 'tiros', '4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
@@ -348,6 +348,34 @@ export const CHECKPOINTS = [
       ['🧊', 'Desaquecimento', '8–10 min muito leve.'],
     ],
     vespera: 'Hoje: jantar com carbo e sono em dia — o dado só vale se o corpo chegar inteiro.',
+  },
+  // Inserido em 05/08/2026 no lugar do "Tempo Run 4 km moderado" (a sessão de qualidade mais
+  // barata do calendário). POR QUE 30/09 e não meio de setembro, que era a ideia inicial:
+  //   · setembro não tem NENHUM tiro (o bloco acaba em 26/08 e só volta em 07/10), então a
+  //     faixa dos tiros não é exercitada no mês — o prazo real é "antes de 07/10", não "setembro";
+  //   · viagens de 18–26/08 e 31/08–04/09 furam o bloco: testar logo depois mediria a viagem,
+  //     não o preparo, e um âncora ruim é PIOR que âncora velho (travaria outubro mais lento);
+  //   · 30/09 dá 4 semanas de treino consistente (07/09 em diante) e cai em semana de DELOAD
+  //     (28/09), ou seja perna fresca — teste honesto;
+  //   · não amassa o checkpoint de 23/09, que é pinado de propósito como ensaio de ritmo de
+  //     prova e NÃO recalibra a faixa dos tiros;
+  //   · fim de setembro em BH é seco/ameno — âncora justo, ao contrário dos 30 °C de 29/07.
+  // O alvo 5:30–5:35 segue o mesmo método do teste anterior: começar ~11-16 s/km mais lento que
+  // o resultado esperado e fechar acelerando (em 29/07 largou em 5:45–5:50 e fechou em 5:34).
+  {
+    date: '2026-09-30',
+    titulo: 'TESTE 5 km contrarrelógio',
+    define: 'os paces de outubro e novembro',
+    alvo: '5:30–5:35 /km',
+    porque: 'O âncora atual (5:34/km) veio do teste de 29/07 a 30 °C e com os km do meio segurados. Os 5 × 800 de 05/08 saíram inteiros dentro da faixa (5:22–5:31) a 32 °C, com a FC em Z3, só 4% de Z4, TE anaeróbico 0,0 — e sobrando repetição. O bloco de 1 km de outubro reusa essa MESMA faixa: sem âncora nova, ele nasce folgado.',
+    passos: [
+      ['🔥', 'Aquecimento inegociável', '15 min de trote + 4 × 100 m progressivos. Contrarrelógio sem aquecer = km 1 mentiroso.'],
+      ['🐢', 'Km 1: o difícil é SEGURAR', 'Comece no 5:30–5:35 e não mais rápido, mesmo parecendo fácil — vai parecer. O teste se ganha do km 3 em diante.'],
+      ['⚙️', 'Km 2–3: firme e constante', 'Segure o ritmo. Frases curtas impossíveis — é assim mesmo.'],
+      ['📈', 'Km 4: aperta', 'Se ainda tem perna, desce 5–10 s no pace. Foi exatamente aqui que julho ficou devendo (5:47/5:49/5:45 no meio).'],
+      ['🚀', 'Último km + 400 m finais: tudo', 'Esvazia o tanque. A semana de deload existe pra você chegar inteiro nesses 400 m.'],
+    ],
+    vespera: 'Hoje: jantar com carbo e dormir 7–8h. Semana de deload — o teste é a única coisa dura da semana.',
   },
 ];
 

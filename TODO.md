@@ -196,6 +196,27 @@
   erro de sensor (era cinta XOSS X2, e o histórico tem 6:05/km a 149 bpm em 20/05) — e os 190 de
   FCmax do modelo canônico estão certos, com 188 bpm registrados em 08/03, 28/06 e no teste de 29/07.
 
+# Feito na v7.26 (ago/2026) — teste de 5 km em 30/09 pra recalibrar o bloco de outubro
+
+- ✅ **Novo checkpoint "TESTE 5 km contrarrelógio" em 30/09**, no lugar do "Tempo Run 4 km moderado"
+  (`data.js` CORRIDAS + CHECKPOINTS, `garmin/treinos_corrida.py` AGENDA). Motivo: os 5 × 800 de
+  05/08 saíram **inteiros** dentro da faixa (5:22/5:22/5:27/5:31/5:26) a **32 °C**, com FC em Z3,
+  só **4% de Z4**, TE anaeróbico **0,0**, e o atleta confirmou que aguentaria mais uma repetição —
+  ou seja, o âncora de 5:34/km (teste de 29/07, a 30 °C e com os km do meio segurados) está
+  conservador. Como o bloco de 1 km de outubro **reusa a mesma faixa** `TIRO_1K` (5:21–5:36), sem
+  âncora nova ele nasce folgado.
+- **Por que 30/09 e não meio de setembro** (a ideia inicial): setembro **não tem nenhum tiro** — o
+  bloco acaba em 26/08 e só volta em 07/10, então o prazo real é "antes de 07/10". Somando as
+  viagens de 18–26/08 e 31/08–04/09, um teste em 09 ou 16/09 mediria a viagem e não o preparo, e
+  **âncora ruim é pior que âncora velho** (travaria outubro num pace pior que o de hoje). 30/09 dá
+  4 semanas de treino consistente, cai em semana de DELOAD (perna fresca), não amassa o checkpoint
+  de 23/09 — que é pinado como ensaio de ritmo de prova e não recalibra tiro — e pega BH seca.
+- Descrição do treino no catálogo do relógio generalizada ("Define os paces de agosto" → "Árbitro
+  dos paces do bloco seguinte"), já que o mesmo `workoutId` agora serve duas datas.
+- ⏳ **Pendente pós-teste**: recalibrar `CORRIDA_GUIA.tiros`/`tempo` (data.js) e as constantes
+  `TIRO_*`/`TEMPO*` (treinos_corrida.py) pelo mesmo método de 29/07 — offsets fixos preservados,
+  só o âncora muda — e rodar `criar.py atualizar` nos nomes de `RECALIBRADOS`.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
