@@ -1,7 +1,207 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-04T20:16:26-03:00",
+ "atualizadoEm": "2026-08-06T22:33:39-03:00",
  "analises": [
+  {
+   "date": "2026-08-06",
+   "activityId": 23880227340,
+   "geradoEm": "2026-08-06T22:33:55-03:00",
+   "sessao": {
+    "minutos": 65,
+    "series": 22,
+    "volumeKg": 7648,
+    "exercicios": [
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 46
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 44
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 44
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 45
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 43
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 38
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 35
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_BULGARIAN_SPLIT_SQUAT",
+      "categoria": "LUNGE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": null,
+        "s": 97
+       },
+       {
+        "reps": 10,
+        "kg": null,
+        "s": 91
+       },
+       {
+        "reps": 9,
+        "kg": null,
+        "s": 96
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": null,
+      "deltaReps": 0
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 59.5,
+        "s": 87
+       },
+       {
+        "reps": 10,
+        "kg": 59.5,
+        "s": 43
+       },
+       {
+        "reps": 10,
+        "kg": 59.5,
+        "s": 44
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "BARBELL_STRAIGHT_LEG_DEADLIFT",
+      "categoria": "DEADLIFT",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 20.0,
+        "s": 73
+       },
+       {
+        "reps": 11,
+        "kg": 20.0,
+        "s": 51
+       },
+       {
+        "reps": 6,
+        "kg": 20.0,
+        "s": 52
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "STANDING_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 59.5,
+        "s": 40
+       },
+       {
+        "reps": 12,
+        "kg": 66.0,
+        "s": 35
+       },
+       {
+        "reps": 12,
+        "kg": 66.0,
+        "s": 75
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 6.5,
+      "deltaReps": 1
+     },
+     {
+      "nome": "SEATED_DUMBBELL_TOE_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 16,
+        "kg": 15.0,
+        "s": 340
+       },
+       {
+        "reps": 16,
+        "kg": 15.0,
+        "s": 98
+       },
+       {
+        "reps": 16,
+        "kg": 15.0,
+        "s": 86
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -2
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão consistente de membros inferiores voltada ao desenvolvimento de força e resiliência tecidual para a corrida. O treino garantiu excelente estímulo de cadeia posterior e panturrilhas, fundamentais para a fase de propulsão e amortecimento do seu ciclo de passada.",
+    "comparacao_plano": "Aderência precisa ao volume planejado, totalizando 22 séries executadas dentro da meta de ~21. No Leg Press, você superou o topo da faixa alvo (11 reps executadas vs. 8-10 planejadas), indicando que a musculatura respondeu muito bem e está pronta para novos estímulos.",
+    "pontos_fortes": [
+     "Excelente aplicação da sobrecarga progressiva na Panturrilha em Pé, subindo a carga para 66kg (+6.5kg) e sustentando as 12 repetições no topo da faixa nas duas últimas séries.",
+     "Manutenção do estímulo protetivo para o Tibial Anterior com 15kg, garantindo o fortalecimento do compartimento anterior da perna para blindar sua canela direita contra a canelite crônica.",
+     "Consistência no Búlgaro (Bulgarian Split Squat) mantendo o volume de repetições (10, 10, 9), priorizando a estabilidade lombo-pélvica e o alinhamento do joelho sem sobrecarga articular desnecessária."
+    ],
+    "pontos_atencao": [
+     "A última série do Stiff apresentou uma redução para 6 repetições após duas séries sólidas de 11. Essa queda acentuada sugere fadiga acumulada nos isquiotibiais; certifique-se de realizar uma pausa de 2 a 3 minutos antes desse set final para otimizar a recuperação dos substratos energéticos.",
+     "A Elevação Pélvica e a Cadeira Flexora repetiram exatamente os mesmos números das últimas sessões, indicando que o estímulo atual estabilizou."
+    ],
+    "proxima_dica": "No Leg Press, como você consolidou 4 séries de 11 repetições (acima da meta de 10), na próxima sessão suba a carga para 42,5kg ou 45kg (menor incremento disponível) e deixe as repetições retornarem naturalmente para a base da faixa (8 reps), aplicando perfeitamente o método de progressão dupla.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-08-04",
    "activityId": 23854815270,

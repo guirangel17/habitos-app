@@ -1,7 +1,92 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-05T18:51:14-03:00",
+ "atualizadoEm": "2026-08-06T22:33:39-03:00",
  "analises": [
+  {
+   "date": "2026-08-06",
+   "activityId": 23881423898,
+   "geradoEm": "2026-08-06T22:33:55-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-08-06 20:42:42",
+    "distanciaKm": 4.63,
+    "duracaoMin": 36.5,
+    "paceMedio": "7:53",
+    "fcMedia": 137,
+    "fcMax": 160,
+    "cadencia": 90,
+    "elevacaoM": 74,
+    "trainingEffect": {
+     "aerobico": 2.8,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 31.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:17",
+      "fc": 140
+     },
+     {
+      "km": 2,
+      "pace": "7:10",
+      "fc": 141
+     },
+     {
+      "km": 3,
+      "pace": "8:13",
+      "fc": 138
+     },
+     {
+      "km": 4,
+      "pace": "8:35",
+      "fc": 136
+     },
+     {
+      "km": 5,
+      "pace": "8:18",
+      "fc": 131
+     }
+    ],
+    "zonasFc": {
+     "z1": 35,
+     "z2": 50,
+     "z3": 15,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 5 km Z1 + 4 strides de 100 m",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:47",
+    "paceZ2Ha8Sem": "7:47"
+   },
+   "ia": {
+    "resumo": "Uma corrida de 4,63 km executada sob calor intenso de 31°C e altimetria acumulada de 74m. Você priorizou brilhantemente o controle cardiovascular, mantendo a frequência cardíaca média em 137 bpm, perfeitamente dentro da zona de recuperação ativa.",
+    "comparacao_plano": "O planejado era uma Social Run de 5 km em Z1/Z2 (teto de 152 bpm) com pace de 6:50-7:15/km. Embora o pace médio tenha sido de 7:53/km, essa desaceleração foi a decisão fisiológica correta: a combinação de calor extremo e subidas exigiu que o ritmo cedesse para que a FC permanecesse controlada (85% do tempo em Z1/Z2).",
+    "pontos_fortes": [
+     "Disciplina cardiovascular impecável: mesmo com 31°C e relevo ondulado, você respeitou o teto de 152 bpm, terminando o último quilômetro com a FC mais baixa do treino (131 bpm).",
+     "Cadência protetiva excelente: a média de 180 spm (registrada como 90 ciclos) é ideal para reduzir o tempo de contato com o solo e blindar sua tíbia contra o retorno da canelite.",
+     "Leitura madura de esforço: em vez de forçar o pace planejado no calor, você deixou o ritmo flutuar para proteger a integridade física."
+    ],
+    "pontos_atencao": [
+     "Ausência dos strides: os 4 tiros de 100m planejados para o final parecem ter sido omitidos ou diluídos. Se o desgaste pelo calor foi alto, a decisão de poupar foi acertada, mas lembre-se de que esses estímulos curtos ativam a coordenação neuromuscular sem gerar fadiga residual.",
+     "Volume final ligeiramente abaixo do alvo (4,63 km vs 5 km), reflexo provável do ajuste térmico necessário para a sessão."
+    ],
+    "proxima_dica": "Para o longão de 13 km no dia 10/08, comece os primeiros 11 km de forma muito controlada em Z1/Z2 para poupar energia para os 2 km finais em ritmo de prova. Como o treino termina com um bloco de qualidade, a métrica de deriva cardíaca geral será diluída, então monitore sua percepção de esforço na transição para o ritmo de prova.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-08-05",
    "activityId": 23867645965,

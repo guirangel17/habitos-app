@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-06T11:58:55-03:00",
+ "atualizadoEm": "2026-08-06T22:33:39-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1014,6 +1014,21 @@
    "paradoPct": 10,
    "ef": 1.083,
    "tipoPlano": "tiros"
+  },
+  {
+   "date": "2026-08-06",
+   "activityId": 23881423898,
+   "distanciaKm": 4.63,
+   "paceMedio": "7:53",
+   "paceSeg": 473,
+   "fcMedia": 137,
+   "fcMax": 160,
+   "cadencia": 90,
+   "vo2max": 48.0,
+   "teAerobico": 2.8,
+   "paradoPct": 33,
+   "ef": 0.926,
+   "tipoPlano": "social"
   }
  ],
  "forcas": [
@@ -1406,6 +1421,12 @@
    "activityId": 23854815270,
    "minutos": 42,
    "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-08-06",
+   "activityId": 23880227340,
+   "minutos": 65,
+   "nome": "QUI Pernas A"
   }
  ],
  "tendencias": {
@@ -1510,11 +1531,11 @@
   "paceZ2Atual": "6:47",
   "paceZ2Ha8Sem": "7:47",
   "vo2max": {
-   "atual": 49.0,
+   "atual": 48.0,
    "ha8Sem": 46.0
   },
   "cadencia4Sem": 154,
-  "kmPorSemana4Sem": 17.5,
+  "kmPorSemana4Sem": 18.7,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1714,7 +1735,7 @@
    },
    {
     "semana": "2026-08-03",
-    "km": 18.4
+    "km": 23.0
    }
   ],
   "longaoMes": [
