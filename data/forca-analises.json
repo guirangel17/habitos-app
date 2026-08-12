@@ -1,7 +1,125 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-06T22:33:39-03:00",
+ "atualizadoEm": "2026-08-12T19:57:08-03:00",
  "analises": [
+  {
+   "date": "2026-08-12",
+   "activityId": 23955486077,
+   "geradoEm": "2026-08-12T19:57:09-03:00",
+   "sessao": {
+    "minutos": 55,
+    "series": 13,
+    "volumeKg": 5124,
+    "exercicios": [
+     {
+      "nome": null,
+      "categoria": "PULL_UP",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 41
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "UNKNOWN",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 3
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 2
+       },
+       {
+        "reps": 11,
+        "kg": 45.0,
+        "s": 37
+       },
+       {
+        "reps": 11,
+        "kg": 52.0,
+        "s": 33
+       },
+       {
+        "reps": 11,
+        "kg": 52.0,
+        "s": 34
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 34
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 35.0,
+        "s": 59
+       },
+       {
+        "reps": 8,
+        "kg": 35.0,
+        "s": 35
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 46
+       },
+       {
+        "reps": 8,
+        "kg": 30.0,
+        "s": 38
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 38
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 39
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Uma sessão objetiva de 55 minutos focada em exercícios multiarticulares de alta demanda, totalizando 13 séries. Você adaptou o volume e a seleção de movimentos, concentrando o estímulo em puxadas pesadas e na inclusão do supino reto.",
+    "comparacao_plano": "O planejamento previa um treino focado estritamente em puxar (costas e bíceps, 18 séries). Você realizou uma sessão híbrida: executou 1 série de barra fixa, consolidou 6 séries de remada (com excelente progressão até 52kg) e inseriu 6 séries de supino reto, optando por poupar os isoladores de bíceps e ombro posterior para gerenciar o tempo.",
+    "pontos_fortes": [
+     "Excelente aplicação de sobrecarga progressiva na remada, alcançando o topo da faixa de repetições (11 reps) mesmo elevando a carga de 40kg para 52kg.",
+     "Manutenção de um volume efetivo de alta qualidade nos exercícios básicos, otimizando o tempo de treino sem comprometer a intensidade mecânica."
+    ],
+    "pontos_atencao": [
+     "A inclusão do supino reto em um dia de puxar altera a distribuição semanal de estímulos; monitore se isso não gerará fadiga residual para os treinos de corrida subsequentes.",
+     "A ausência dos isoladores de bíceps e posterior de ombro reduz o estímulo direto nos braços. Para a corrida, o fortalecimento do bíceps e braquiorradial auxilia na estabilização do movimento oscilatório dos braços."
+    ],
+    "proxima_dica": "Na remada, como você atingiu o topo da faixa com 11 repetições usando 52kg, na próxima sessão suba a carga para 55kg (menor incremento) e busque trabalhar no piso da faixa (9 repetições), aplicando a progressão dupla.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-08-06",
    "activityId": 23880227340,

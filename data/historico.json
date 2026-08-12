@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-12T14:53:04-03:00",
+ "atualizadoEm": "2026-08-12T19:57:08-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1427,6 +1427,12 @@
    "activityId": 23880227340,
    "minutos": 65,
    "nome": "QUI Pernas A"
+  },
+  {
+   "date": "2026-08-12",
+   "activityId": 23955486077,
+   "minutos": 55,
+   "nome": "Força"
   }
  ],
  "tendencias": {
