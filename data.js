@@ -179,34 +179,37 @@ export const CORRIDAS = [
   ['2026-08-10', 'longo', 'LONGO 13 km — últimos 2 km em ritmo de prova'],
   ['2026-08-12', 'tiros', '5 × 800 m ritmo de 5 km — rec. 2 min ativa'],
   ['2026-08-13', 'social', 'Social Run 5 km regenerativo'],
-  ['2026-08-17', 'longo', 'LONGO 14 km — últimos 2 km em ritmo de prova'],
-  ['2026-08-19', 'tiros', '6 × 800 m ritmo de 5 km — rec. 2 min ativa'],
-  ['2026-08-20', 'social', 'Social Run 5 km leve + 4 strides'],
-  ['2026-08-24', 'longo', 'LONGO 14 km — últimos 3 km em ritmo de prova'],
-  ['2026-08-26', 'tiros', '6 × 800 m ritmo de 5 km — rec. 2 min ativa'],
-  ['2026-08-27', 'social', 'Social Run 5 km regenerativo'],
-  ['2026-08-31', 'longo', 'LONGO 10 km — DELOAD (academia: metade das séries)'],
-  ['2026-09-02', 'tempo', 'Tempo Run 4 km a 5:41–5:56 — contínuo'],
-  ['2026-09-03', 'social', 'Social Run 6 km leve'],
-  ['2026-09-07', 'longo', 'LONGO 14 km (5 Z2 + 5 Z3 + 4 Z2)'],
-  ['2026-09-09', 'tempo', 'Tempo Run 5 km a 5:41–5:56'],
-  ['2026-09-10', 'social', 'Social Run 6 km regenerativo'],
-  ['2026-09-14', 'longo', 'LONGO 15 km (5 Z2 + 6 Z3 + 4 Z2)'],
-  ['2026-09-16', 'tempo', 'Tempo Run 5 km a 5:41–5:56'],
-  ['2026-09-17', 'social', 'Social Run 6 km leve + 4 strides'],
-  ['2026-09-21', 'longo', 'LONGO 15 km (4 Z2 + 7 Z3 + 4 Z2)'],
-  ['2026-09-23', 'tempo', 'Tempo Run 6 km — checkpoint do alvo da prova'],
+  // ---- Reestruturado em 13/08/2026 por FASCITE PLANTAR (diagnóstico 12/08). Ver TODO v7.27. ----
+  // Janela sem impacto de 17/08 a 04/09 (cai em cima das viagens, que já furavam o bloco),
+  // retorno gradual a partir de 07/09 e TESTE de 5 km empurrado de 30/09 para 07/10.
+  ['2026-08-17', 'leve', 'SEM CORRIDA — fascite: caminhada 30–40 min ou bike leve'],
+  ['2026-08-19', 'leve', 'Zero impacto — bike ou corrida na água funda 30 min'],
+  ['2026-08-20', 'leve', 'Zero impacto — bike/piscina + reabilitação da fáscia'],
+  ['2026-08-24', 'leve', 'Zero impacto — bike ou água funda 40 min'],
+  ['2026-08-26', 'leve', 'Zero impacto — bike/piscina + reabilitação da fáscia'],
+  ['2026-08-27', 'leve', 'Zero impacto — bike ou água funda 30 min'],
+  ['2026-08-31', 'leve', 'Zero impacto — bike/piscina + reabilitação da fáscia'],
+  ['2026-09-02', 'leve', 'Zero impacto — bike ou água funda 40 min'],
+  ['2026-09-03', 'leve', 'Zero impacto — último dia da janela sem corrida'],
+  ['2026-09-07', 'leve', 'RETORNO 5 km fácil — run/walk (5 min corre / 1 min anda) se incomodar'],
+  ['2026-09-09', 'leve', '5 km fácil — sem pace, cadência 170+'],
+  ['2026-09-10', 'social', 'Social Run 5 km regenerativo — sem strides'],
+  ['2026-09-14', 'longo', 'LONGO 8 km fácil — primeiro longo pós-fascite'],
+  ['2026-09-16', 'leve', '6 km fácil'],
+  ['2026-09-17', 'social', 'Social Run 5 km leve — sem strides'],
+  ['2026-09-21', 'longo', 'LONGO 10 km fácil'],
+  ['2026-09-23', 'tempo', 'Tempo Run 3 km a 5:46–5:56 — primeiro estímulo forte pós-fascite'],
   ['2026-09-24', 'social', 'Social Run 6 km regenerativo'],
-  ['2026-09-28', 'longo', 'LONGO 12 km — DELOAD (academia idem)'],
-  ['2026-09-30', 'tiros', 'TESTE 5 km contrarrelógio — recalibra os paces de outubro'],
-  ['2026-10-01', 'social', 'Social Run 7 km leve'],
-  ['2026-10-05', 'longo', 'LONGO 15 km — ritmo constante'],
-  ['2026-10-07', 'tiros', '4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
-  ['2026-10-08', 'social', 'Social Run 7 km regenerativo'],
-  ['2026-10-12', 'longo', 'LONGO 15 km — oscilações de relevo'],
+  ['2026-09-28', 'longo', 'LONGO 12 km'],
+  ['2026-09-30', 'tempo', 'Tempo Run 5 km — checkpoint do alvo da prova'],
+  ['2026-10-01', 'social', 'Social Run 6 km leve'],
+  ['2026-10-05', 'longo', 'LONGO 10 km — DELOAD (academia: metade das séries) — perna fresca pro teste'],
+  ['2026-10-07', 'tiros', 'TESTE 5 km contrarrelógio — recalibra os paces de outubro'],
+  ['2026-10-08', 'social', 'Social Run 6 km regenerativo'],
+  ['2026-10-12', 'longo', 'LONGO 14 km — oscilações de relevo'],
   ['2026-10-14', 'tiros', '4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
   ['2026-10-15', 'social', 'Social Run 7-8 km leve + 4 strides'],
-  ['2026-10-19', 'longo', 'LONGO 16 km — passos curtos e rápidos'],
+  ['2026-10-19', 'longo', 'LONGO 15 km — passos curtos e rápidos'],
   ['2026-10-21', 'tiros', '5 × 1 km a 5:16–5:26 — rec. 2min30 ativa'],
   ['2026-10-22', 'social', 'Social Run 7-8 km regenerativo'],
   ['2026-10-26', 'longo', 'LONGO 16 km progressivo'],
@@ -336,21 +339,28 @@ export const CHECKPOINTS = [
     vespera: 'Hoje: jantar com carbo e dormir 7–8h. E leia o plano do teste — 2 minutos que valem o mês.',
   },
   {
-    date: '2026-09-23',
-    titulo: 'Tempo Run 6 km — checkpoint do alvo',
+    date: '2026-09-30',
+    titulo: 'Tempo Run 5 km — checkpoint do alvo',
     define: 'o alvo da Pampulha',
     alvo: '6:05–6:20 /km',
     porque: 'É o teste de fogo do ritmo de prova: sustentar 6:10–6:20 confortável aqui trava a Meta A (6:15–6:25) para os 18 km.',
     passos: [
       ['🔥', 'Aquecimento', '10 min de trote leve.'],
-      ['🎯', '6 km contínuos a 6:05–6:20', 'Logo abaixo do limiar (FC ~163–170). Só frases curtas.'],
+      ['🎯', '5 km contínuos a 6:05–6:20', 'Logo abaixo do limiar (FC ~163–170). Só frases curtas. Encurtado de 6 para 5 km: é a 4ª semana de volta da fascite.'],
       ['🧠', 'A pergunta do dia', 'Está CONFORTÁVEL nesse pace? Confortável = alvo da prova travado. Sofrido = ajustamos sem drama — checkpoint existe pra isso.'],
       ['🧊', 'Desaquecimento', '8–10 min muito leve.'],
     ],
     vespera: 'Hoje: jantar com carbo e sono em dia — o dado só vale se o corpo chegar inteiro.',
   },
-  // Inserido em 05/08/2026 no lugar do "Tempo Run 4 km moderado" (a sessão de qualidade mais
-  // barata do calendário). POR QUE 30/09 e não meio de setembro, que era a ideia inicial:
+  // MOVIDO PARA 07/10 em 13/08/2026 por causa da FASCITE PLANTAR (diagnóstico 12/08). Um 5 km
+  // contrarrelógio é carga máxima de antepé — o gesto que mais estressa a fáscia — e em 30/09
+  // cairia só 3 semanas depois de voltar a correr. Em 07/10 são 4 semanas de retorno, ainda com
+  // 8 semanas de prova pela frente, e a semana de DELOAD passou para 05/10 (perna fresca
+  // preservada). Se o pé não estiver 100% em 07/10: tempo run controlado e calibra por baixo.
+  // O bloco de tiros anda 1 semana (começa em 14/10) e ainda cabem 5 sessões antes de 02/11.
+  //
+  // Histórico — inserido em 05/08/2026 no lugar do "Tempo Run 4 km moderado" (a sessão de
+  // qualidade mais barata do calendário). POR QUE 30/09 e não meio de setembro, na época:
   //   · setembro não tem NENHUM tiro (o bloco acaba em 26/08 e só volta em 07/10), então a
   //     faixa dos tiros não é exercitada no mês — o prazo real é "antes de 07/10", não "setembro";
   //   · viagens de 18–26/08 e 31/08–04/09 furam o bloco: testar logo depois mediria a viagem,
@@ -363,7 +373,7 @@ export const CHECKPOINTS = [
   // O alvo 5:30–5:35 segue o mesmo método do teste anterior: começar ~11-16 s/km mais lento que
   // o resultado esperado e fechar acelerando (em 29/07 largou em 5:45–5:50 e fechou em 5:34).
   {
-    date: '2026-09-30',
+    date: '2026-10-07',
     titulo: 'TESTE 5 km contrarrelógio',
     define: 'os paces de outubro e novembro',
     alvo: '5:30–5:35 /km',

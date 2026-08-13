@@ -217,6 +217,34 @@
   `TIRO_*`/`TEMPO*` (treinos_corrida.py) pelo mesmo método de 29/07 — offsets fixos preservados,
   só o âncora muda — e rodar `criar.py atualizar` nos nomes de `RECALIBRADOS`.
 
+# Feito na v7.27 (ago/2026) — calendário reestruturado por fascite plantar
+
+- **Contexto**: diagnóstico de fascite plantar em 12/08/2026, tratado com Betatrinta
+  intramuscular. Corticoide depot tira a dor por ~2–4 semanas **sem curar a fáscia**, então o
+  corte de treino tem que ser por calendário e não por sensação — é exatamente na janela sem dor
+  que se rompe a fáscia.
+- **Janela sem impacto: 17/08 a 04/09.** As datas viram tipo `leve` com bike / corrida na água
+  funda. O custo real é baixíssimo: 19, 20, 24, 26/08 e 31/08, 02, 03/09 **já caíam** pelas
+  viagens de 18–26/08 e 31/08–04/09. A lesão custa 1 treino de verdade — o longão de 17/08.
+- **Retorno gradual a partir de 07/09**, com o longão subindo 8 → 10 → 12 → 10 (deload) → 14 →
+  15 → 16 → 18 (a Volta Completa de 02/11 fica intacta). Setembro perde os tempo runs de 5 km:
+  o primeiro estímulo forte é um tempo de 3 km em 23/09.
+- **TESTE de 5 km: 30/09 → 07/10.** Contrarrelógio é carga máxima de antepé; em 30/09 cairia 3
+  semanas depois de voltar a correr. O DELOAD acompanha (28/09 → 05/10) pra manter perna fresca
+  no teste. O bloco de tiros anda 1 semana (14/10) e ainda cabem 5 sessões antes de 02/11.
+- **Checkpoint de ritmo de prova: 23/09 → 30/09**, e encurtado de 6 para 5 km (4ª semana de volta).
+- Reabilitação entra no lugar do volume: protocolo de alta carga (elevação de panturrilha com
+  toalha sob os dedos, 3s/2s/3s, dia sim dia não) ancorado em Pernas A (qui) e Pernas B (sáb) —
+  na viagem, versão com mochila. Alongamento de gastrocnêmio **e** sóleo, e o alongamento
+  específico da fáscia antes do primeiro passo da manhã.
+- **A prova de 06/12 não está em risco**: são 16 semanas e novembro fica inteiro.
+- ⏳ **Pendente**: `criar.py` precisa desagendar do relógio as datas de 17/08 a 04/09 e reagendar
+  o bloco novo — `garmin-criados.json` ainda aponta os treinos antigos (inclusive o TESTE em
+  30/09). Cadastrar as viagens em Ajustes → modo viagem ANTES de sair (retroativo mexe em streak
+  e jardim pra trás).
+- ⏳ **Rever se a fascite não ceder até 07/09**: o retorno inteiro escorrega 1 semana e aí o teste
+  de 5 km sai de outubro — nesse caso calibrar outubro por tempo run, sem contrarrelógio.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

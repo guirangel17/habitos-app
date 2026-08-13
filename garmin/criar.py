@@ -69,10 +69,13 @@ def rodar(agenda, catalogo, forca=False):
 # virou o TESTE de 5 km, então ele ficou com ZERO datas na AGENDA. O builder segue no catálogo
 # (documenta o plano original e volta de graça se a data for reposta) — é só a atualização de
 # pace no relógio que não faz mais sentido.
+# Revisado em 13/08/2026 (fascite plantar, TODO v7.27) pela MESMA regra do parágrafo acima:
+# saíram "Tiros 5x800m", "Tiros 6x800m", "Tempo Run 4km", "Tempo Run 5km" e
+# "Tempo Run 6km CHECKPOINT" porque o calendário novo os deixou com ZERO datas futuras —
+# atualizá-los só reescreveria histórico no relógio. Os builders seguem no catálogo.
 RECALIBRADOS = [
-    "Tiros 5x800m", "Tiros 6x800m", "Tiros 4x1km", "Tiros 5x1km forte", "Tiros 3x1500m",
-    "Tempo Run 4km", "Tempo Run 5km", "Tempo Run 5km taper",
-    "Tempo Run 6km CHECKPOINT",
+    "Tiros 4x1km", "Tiros 5x1km forte", "Tiros 3x1500m",
+    "Tempo Run 3km", "Tempo Run 5km CHECKPOINT", "Tempo Run 5km taper",
 ]
 
 
