@@ -1,7 +1,144 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-12T19:57:08-03:00",
+ "atualizadoEm": "2026-08-14T19:36:45-03:00",
  "analises": [
+  {
+   "date": "2026-08-14",
+   "activityId": 23978172714,
+   "geradoEm": "2026-08-14T19:36:47-03:00",
+   "sessao": {
+    "minutos": 35,
+    "series": 13,
+    "volumeKg": 675,
+    "exercicios": [
+     {
+      "nome": "CABLE_CROSSOVER",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 15,
+        "kg": 9.0,
+        "s": 53
+       },
+       {
+        "reps": 13,
+        "kg": 9.0,
+        "s": 46
+       },
+       {
+        "reps": 13,
+        "kg": 9.0,
+        "s": 90
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -6.0,
+      "deltaReps": 4
+     },
+     {
+      "nome": "SEATED_DUMBBELL_SHOULDER_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 46
+       },
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 37
+       },
+       {
+        "reps": 12,
+        "kg": 9.0,
+        "s": 57
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -23.5,
+      "deltaReps": 2
+     },
+     {
+      "nome": "ONE_ARM_CABLE_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 3,
+        "kg": null,
+        "s": 86
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 12
+       },
+       {
+        "reps": 12,
+        "kg": null,
+        "s": 44
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 1
+     },
+     {
+      "nome": "FACE_PULL",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 11,
+        "kg": null,
+        "s": 105
+       },
+       {
+        "reps": 9,
+        "kg": null,
+        "s": 197
+       },
+       {
+        "reps": 12,
+        "kg": null,
+        "s": 111
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 3
+     },
+     {
+      "nome": "CABLE_OVERHEAD_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 13,
+        "kg": null,
+        "s": 123
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 2
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Uma sessão Upper C focada em ombros e peitoral, executada de forma rápida e objetiva em 35 minutos. Os ajustes de carga permitiram manter a qualidade do estímulo mecânico dentro das faixas de repetições ideais para hipertrofia.",
+    "comparacao_plano": "Com 13 séries realizadas das 16 planejadas (excluindo o core), o treino priorizou os exercícios multiarticulares e isoladores de ombro. A ausência da Rosca Scott e do core reflete uma gestão inteligente de tempo e energia para preservar a recuperação sistêmica.",
+    "pontos_fortes": [
+     "Ajuste estratégico de carga no Desenvolvimento com Halteres (9kg), permitindo executar repetições limpas (11, 11, 12) que superaram a faixa alvo de 8-10, sinalizando prontidão para progressão.",
+     "Excelente controle de volume no Cable Crossover, batendo o teto de 15 repetições na primeira série com 9kg, consolidando o estímulo de tensão sob estiramento.",
+     "Progressão de repetições (reps_up) no Face Pull e na Elevação Lateral na Polia, fortalecendo o manguito rotador e a porção lateral do deltoide, cruciais para a postura na corrida."
+    ],
+    "pontos_atencao": [
+     "A redução de volume no Tríceps Francês (apenas 1 série executada) e a ausência da Rosca Scott sugerem fadiga acumulada ou restrição de tempo; priorizar esses isoladores na próxima sessão ajudará no equilíbrio de braços.",
+     "Os exercícios de core (Abdominal Polia e Pallof Press) foram pulados nesta sessão; lembre-se de que o fortalecimento do core é o pilar de estabilidade pélvica para manter a eficiência da passada nos 18k da Pampulha."
+    ],
+    "proxima_dica": "No Desenvolvimento com Halteres, como você superou o teto da faixa (8-10 reps) fazendo 11-12 reps com 9kg, suba a carga para 10kg (incremento de ~10%) na próxima sessão e busque retornar à base da faixa (8 reps) aplicando a progressão dupla.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-08-12",
    "activityId": 23955486077,
