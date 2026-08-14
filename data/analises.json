@@ -1,7 +1,97 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-06T22:33:39-03:00",
+ "atualizadoEm": "2026-08-13T23:46:47-03:00",
  "analises": [
+  {
+   "date": "2026-08-13",
+   "activityId": 23968764040,
+   "geradoEm": "2026-08-13T23:47:00-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-08-13 20:43:08",
+    "distanciaKm": 6.13,
+    "duracaoMin": 48.2,
+    "paceMedio": "7:52",
+    "fcMedia": 139,
+    "fcMax": 172,
+    "cadencia": 94,
+    "elevacaoM": 127,
+    "trainingEffect": {
+     "aerobico": 3.2,
+     "anaerobico": 0.4,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 32.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "8:04",
+      "fc": 130
+     },
+     {
+      "km": 2,
+      "pace": "8:00",
+      "fc": 149
+     },
+     {
+      "km": 3,
+      "pace": "7:39",
+      "fc": 133
+     },
+     {
+      "km": 4,
+      "pace": "7:46",
+      "fc": 147
+     },
+     {
+      "km": 5,
+      "pace": "8:18",
+      "fc": 131
+     },
+     {
+      "km": 6,
+      "pace": "7:23",
+      "fc": 145
+     }
+    ],
+    "zonasFc": {
+     "z1": 34,
+     "z2": 47,
+     "z3": 15,
+     "z4": 4,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 5 km regenerativo",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:47",
+    "paceZ2Ha8Sem": "7:45"
+   },
+   "ia": {
+    "resumo": "Uma corrida social de 6,13 km realizada sob calor intenso de 32°C e com altimetria desafiadora de 127m de ganho de elevação. Você priorizou perfeitamente o controle cardíaco em vez do ritmo, mantendo o estímulo regenerativo proposto.",
+    "comparacao_plano": "O planejado era uma corrida social de 5 km com foco em manter a FC abaixo de 152 bpm (Z1/Z2) e pace entre 6:50 e 7:15/km. Você executou 6,13 km com pace médio de 7:52/km e FC média de 139 bpm. Embora o pace tenha ficado acima da faixa teórica, a decisão foi fisiologicamente perfeita: diante dos 32°C e das ladeiras, você reduziu a velocidade para proteger a zona de esforço, passando 81% do tempo em Z1 e Z2.",
+    "pontos_fortes": [
+     "Excelente maturidade de esforço: ao enfrentar 32°C e 127m de subida, você não forçou o pace e manteve a FC média em 139 bpm, respeitando rigorosamente a proposta regenerativa.",
+     "Controle de ritmo inicial impecível, abrindo o primeiro quilômetro a 8:04/km com FC de 130 bpm, mostrando excelente gestão de ansiedade.",
+     "Cadéncia média registrada de 94 (equivalente a 188 spm se duplicada), um padrão biomecânico excelente que minimiza o tempo de contato com o solo e protege sua tíbia contra sobrecargas."
+    ],
+    "pontos_atencao": [
+     "O volume total (6,13 km) superou em 22% o planejado (5 km). Em treinos regenerativos, especialmente sob calor extremo, é importante limitar a distância para não acumular fadiga residual.",
+     "O pico de FC de 172 bpm (Z4) indica que alguma subida do percurso exigiu um esforço excessivo. Nessas oscilações de relevo, reduza ainda mais a passada ou caminhe para evitar picos cardíacos."
+    ],
+    "proxima_dica": "Para o dia 17/08, o foco é total na recuperação da fascite: realize estritamente a caminhada de 30 a 40 minutos ou bike leve sem carga, mantendo o esforço em Z1 para oxigenar os tecidos sem gerar impacto estrutural no pé.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-08-06",
    "activityId": 23881423898,
