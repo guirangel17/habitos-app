@@ -1,18 +1,6 @@
 {
- "atualizadoEm": "2026-08-15T22:58:19-03:00",
+ "atualizadoEm": "2026-08-16T07:36:45-03:00",
  "janelas": [
-  {
-   "quando": "2026-08-15T06:00",
-   "temp": 18,
-   "chuvaPct": 0,
-   "umidade": 85
-  },
-  {
-   "quando": "2026-08-15T19:00",
-   "temp": 22,
-   "chuvaPct": 64,
-   "umidade": 62
-  },
   {
    "quando": "2026-08-16T06:00",
    "temp": 17,
@@ -21,9 +9,21 @@
   },
   {
    "quando": "2026-08-16T19:00",
-   "temp": 22,
-   "chuvaPct": 7,
-   "umidade": 61
+   "temp": 21,
+   "chuvaPct": 4,
+   "umidade": 63
+  },
+  {
+   "quando": "2026-08-17T06:00",
+   "temp": 16,
+   "chuvaPct": 0,
+   "umidade": 91
+  },
+  {
+   "quando": "2026-08-17T19:00",
+   "temp": 21,
+   "chuvaPct": 0,
+   "umidade": 54
   }
  ]
 }
