@@ -1,10 +1,10 @@
 {
- "ultimaExecucao": "2026-08-22T19:34:53-03:00",
+ "ultimaExecucao": "2026-08-22T19:55:39-03:00",
  "status": "ok",
  "mensagem": "",
  "ultimaAnalise": "2026-08-13",
  "pendentes": 0,
- "ultimoSucesso": "2026-08-22T19:34:53-03:00",
+ "ultimoSucesso": "2026-08-22T19:55:39-03:00",
  "modeloIA": "gemini-3.5-flash",
  "pushErro": "WebPushException: Push failed: 410 Gone Response body:push subscription has unsubscribed or expired. , Response push subscription has unsubscribed or expired. "
 }
