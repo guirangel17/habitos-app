@@ -1,7 +1,91 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-13T23:46:47-03:00",
+ "atualizadoEm": "2026-09-07T18:31:53-03:00",
  "analises": [
+  {
+   "date": "2026-09-07",
+   "activityId": 24276911567,
+   "geradoEm": "2026-09-07T18:32:03-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Retorno 5km facil",
+    "inicio": "2026-09-07 17:47:23",
+    "distanciaKm": 5.03,
+    "duracaoMin": 36.7,
+    "paceMedio": "7:18",
+    "fcMedia": 139,
+    "fcMax": 151,
+    "cadencia": 154,
+    "elevacaoM": 13,
+    "trainingEffect": {
+     "aerobico": 2.6,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 28.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:08",
+      "fc": 129
+     },
+     {
+      "km": 2,
+      "pace": "7:22",
+      "fc": 140
+     },
+     {
+      "km": 3,
+      "pace": "7:28",
+      "fc": 140
+     },
+     {
+      "km": 4,
+      "pace": "7:19",
+      "fc": 142
+     },
+     {
+      "km": 5,
+      "pace": "7:17",
+      "fc": 145
+     }
+    ],
+    "zonasFc": {
+     "z1": 7,
+     "z2": 93,
+     "z3": 0,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "leve",
+    "nome": "RETORNO 5 km em run/walk (5 min corre / 1 min anda) — regra das 24h: o placar é a dor do PRIMEIRO PASSO de amanhã de manhã, não a de hoje",
+    "paceAlvo": "6:50–7:15 /km ou mais leve",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:51",
+    "paceZ2Ha8Sem": "6:56"
+   },
+   "ia": {
+    "resumo": "Excelente retorno aos treinos após 25 dias de pausa para tratamento da fascite plantar. Guilherme completou os 5 km de forma muito consciente, mantendo o esforço estritamente sob controle mesmo sob o calor de 28°C de Belo Horizonte.",
+    "comparacao_plano": "A execução foi perfeita dentro do objetivo de proteção: o pace médio de 7:18/km (totalmente adequado para o bloco de retorno, considerando que o pace de Z2 de 6:51 do histórico é de agosto e está desatualizado) manteve a FC média em 139 bpm (Z2), sem ultrapassar o teto de 152 bpm em nenhum momento.",
+    "pontos_fortes": [
+     "Disciplina impecável no controle de intensidade, mantendo 93% do tempo na Z2 mesmo com a temperatura de 28°C que naturalmente eleva a frequência cardíaca.",
+     "Gestão da ansiedade no início da atividade, com o primeiro quilômetro rodado de forma muito controlada (7:08/km com FC a 129 bpm), evitando picos de impacto na fáscia ainda fria."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 154 spm está abaixo do ideal de 165+ spm. Passos mais lentos tendem a ser mais longos (overstriding), o que aumenta a força de reação do solo e o estresse mecânico sobre a fáscia plantar em recuperação.",
+     "A deriva cardíaca não se aplica a esta distância, mas o discreto aumento de FC nos quilômetros finais (de 129 para 145 bpm) é uma resposta fisiológica normal de desacondicionamento temporário e calor, muito bem administrada pela redução do ritmo."
+    ],
+    "proxima_dica": "Aplique a Regra das 24h: a decisão para o treino de 09/09 depende exclusivamente da dor no primeiro passo ao levantar da cama amanhã. Se houver qualquer sensibilidade no pé, repita o formato run/walk (5 min corre / 1 min anda) e concentre-se em encurtar a passada para buscar uma cadência mais próxima de 165 spm, deixando o pace livre.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-08-13",
    "activityId": 23968764040,
