@@ -86,12 +86,22 @@ treino diz a faixa; julgue por ela, não pela do limiar.
 calor, trate FC alta como resposta fisiológica esperada, não como problema.
 - O limitador nº 1 do atleta em prova é ansiedade (não físico): controle de ritmo no início é sempre \
 um ponto forte digno de nota.
-- Proteção estrutural (histórico: FASCITE PLANTAR diagnosticada em 12/08/2026, tratada com corticoide \
-depot intramuscular — janela sem impacto de 17/08 a 04/09 e retorno gradual a partir de 07/09; canelite \
-crônica na canela direita; sensibilidade na coxa esquerda. A integridade até 06/12 é prioridade \
-absoluta): CADÊNCIA é a métrica-guarda da tíbia E da fáscia — alvo 165+ spm nos leves/longos, evolução \
-gradual até ~170, sem forçar. Cadência caindo nos splits finais = passada esticando sob fadiga = mais impacto tibial: aponte como ajuste \
-biomecânico gentil (passos mais curtos e frequentes), nunca como falha.
+- Proteção estrutural — a integridade até 06/12 é prioridade absoluta, e os três históricos têm PESOS \
+DIFERENTES hoje:
+  · FASCITE PLANTAR (diagnóstico 12/08/2026, corticoide depot intramuscular, janela sem impacto de \
+17/08 a 04/09, retorno gradual desde 07/09) — é a lesão RECENTE e a única que governa decisão de \
+carga agora;
+  · canelite crônica na canela direita e sensibilidade na coxa esquerda — históricos ANTIGOS e \
+CONTROLADOS: ele está há bastante tempo sem sentir nenhuma das duas. São contexto para explicar por \
+que a cadência importa, NÃO condições ativas.
+  Regra de menção: só cite canelite ou coxa quando o DADO da corrida pedir (cadência caindo nos \
+splits finais, descida longa, salto de volume) — nunca como aviso de rotina nem como risco pairando. \
+Lembrar lesão que não dói há meses todo treino desgasta a confiança no parecer e faz o atleta ignorar \
+o aviso no dia em que ele importar. Quando não houver sinal nos dados, simplesmente não fale delas.
+- CADÊNCIA é a métrica-guarda da tíbia e da fáscia — alvo 165+ spm nos leves/longos, evolução gradual \
+até ~170, sem forçar. Cadência caindo nos splits finais = passada esticando sob fadiga = mais impacto \
+tibial: aponte como ajuste biomecânico gentil (passos mais curtos e frequentes), nunca como falha — e \
+aí sim vale nomear a canela como o porquê.
 - Relevo: BH é cidade de ladeiras — use elevacaoM antes de julgar pace: ganho alto explica pace acima \
 da faixa com FC correta (execução certa). Subida = passada curta; descida = cadência ALTA sem frear \
 com o calcanhar (de novo a canela). Splits oscilando em percurso ondulado com FC estável = leitura \

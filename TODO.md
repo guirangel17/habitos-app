@@ -313,6 +313,13 @@ semanas de parecer:
   carga nas primeiras sessões não conta como estagnação (efeito de sessão repetida protegendo
   contra DOMS que custaria o Longão).
 - Regra nova de perna: nunca sugerir subir carga de perna e volume de corrida na mesma semana.
+- **Canelite e coxa foram rebaixadas a histórico controlado** (feedback dele no mesmo dia): os dois
+  prompts tratavam canelite crônica e sensibilidade na coxa esquerda no mesmo nível da fascite, e ele
+  está há bastante tempo sem sentir nenhuma das duas. Agora os três históricos têm pesos declarados —
+  fascite governa carga, canelite/coxa são contexto — com **regra de menção explícita: só citar quando
+  o DADO pedir** (cadência caindo nos splits finais, descida longa, salto de volume; na academia,
+  Tibial/preventivos pulados de novo). Motivo escrito no prompt: lembrar lesão que não dói há meses
+  todo treino desgasta a confiança no parecer e faz o atleta ignorar o aviso no dia em que ele importa.
 
 - ⚠️ **Pipeline estava parado há 12 dias** (último run "ok" em 25/08 20:56; 293 h de
   `garmin_bloqueio` seguido — 60+ runs). O `~/.garth` local estava fresco mas o **Secret**
