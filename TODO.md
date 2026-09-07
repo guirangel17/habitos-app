@@ -313,6 +313,20 @@ semanas de parecer:
   carga nas primeiras sessões não conta como estagnação (efeito de sessão repetida protegendo
   contra DOMS que custaria o Longão).
 - Regra nova de perna: nunca sugerir subir carga de perna e volume de corrida na mesma semana.
+- **Cadência virou leitura por pace, não número fixo** (achado no 1º parecer real, 07/09). A regra
+  antiga era "alvo 165+ spm nos leves/longos", e a IA usou isso pra chamar os **154 spm a 7:18/km**
+  de overstriding com risco pra fáscia. Está errado nos dois sentidos: cadência escala com a
+  velocidade, e o passo daquele dia foi de **0,89 m — MAIS CURTO** que os 0,93 m do 5 km leve de
+  08/07 a 6:48/km. Na curva dele, 154 a 7:18 é exatamente o normal (em 22/06, a 7:11, foram 153).
+  Agora o prompt recebe **`cadencia_de_referencia`** (pura, 5 testes): a cadência que ele teve em
+  corridas LIMPAS de pace parecido (±15 s/km), com piso de 120 spm e `paradoPct` < 8 pra descartar
+  social run com caminhada na média — é de lá que vêm os 90-94 spm bizarros do histórico. Dentro da
+  faixa = não comente. A ordem de julgamento ficou explícita: (1) referência do pace, (2)
+  comprimento de passo, que é o que define overstriding, (3) cadência CAINDO nos splits finais com
+  pace estável, que é o único alerta real de fadiga, (4) o 165+ como meta de longo prazo medida
+  entre meses, nunca como nota de uma corrida. Motivo escrito no prompt: cobrar 165 num
+  regenerativo é ruído que ensina o atleta a ignorar o aviso. `cadencia` também passou a viajar em
+  `ultimas_do_mesmo_tipo`.
 - **Canelite e coxa foram rebaixadas a histórico controlado** (feedback dele no mesmo dia): os dois
   prompts tratavam canelite crônica e sensibilidade na coxa esquerda no mesmo nível da fascite, e ele
   está há bastante tempo sem sentir nenhuma das duas. Agora os três históricos têm pesos declarados —

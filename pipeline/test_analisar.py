@@ -10,7 +10,8 @@ from datetime import datetime, timedelta, timezone
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias, compactar_atividade,
     compactar_forca, corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace,
-    contexto_de_retorno, modelo_indisponivel, pace_seg, proxima_corrida, resolver_push_erro, resumir_splits,
+    cadencia_de_referencia, contexto_de_retorno, modelo_indisponivel, pace_seg, proxima_corrida,
+    resolver_push_erro, resumir_splits,
     tipo_atividade, trocar_de_modelo, validar_ia, zonas_de_pontos,
 )
 
@@ -467,6 +468,42 @@ class TestContextoDeRetorno(unittest.TestCase):
         # a 2ª do dia não pode virar "0 dias de layoff" a partir dela mesma
         ctx = contexto_de_retorno("2026-08-13", self.COMPACTAS + [{"date": "2026-08-13", "distanciaKm": 5.0}])
         self.assertEqual(ctx["dias_desde_ultima_corrida"], 7)
+
+
+class TestCadenciaDeReferencia(unittest.TestCase):
+    """v7.28 — cadência escala com o pace; alvo fixo de 165 acusa falso em corrida lenta."""
+
+    LIMPAS = [
+        # pace_seg: 7:18=438 · 7:11=431 · 6:48=408 · 5:34=334
+        {"date": "2026-06-22", "activityId": 1, "paceSeg": 431, "paceMedio": "7:11", "cadencia": 153, "paradoPct": 1},
+        {"date": "2026-07-08", "activityId": 2, "paceSeg": 408, "paceMedio": "6:48", "cadencia": 159, "paradoPct": 2},
+        {"date": "2026-07-29", "activityId": 3, "paceSeg": 334, "paceMedio": "5:34", "cadencia": 169, "paradoPct": 0},
+        # social run com 33% parado: a média mistura caminhada e cai pra 90 — lixo, tem que sair
+        {"date": "2026-08-06", "activityId": 4, "paceSeg": 473, "paceMedio": "7:53", "cadencia": 90, "paradoPct": 33},
+    ]
+
+    def test_so_compara_com_pace_parecido(self):
+        # 7:18/km (438) puxa a de 7:11 (431), não a de 6:48 nem a do teste de 5 km
+        r = cadencia_de_referencia(438, self.LIMPAS)
+        self.assertEqual(r["cadencia_tipica_neste_pace"], "153 spm")
+        self.assertEqual(r["amostra"], 1)
+
+    def test_pace_rapido_puxa_cadencia_alta(self):
+        self.assertEqual(cadencia_de_referencia(334, self.LIMPAS)["cadencia_tipica_neste_pace"], "169 spm")
+
+    def test_descarta_corrida_suja(self):
+        # 7:53 só tem a social com 33% parado (cadência 90) — sem referência é melhor que referência errada
+        self.assertIsNone(cadencia_de_referencia(473, self.LIMPAS))
+
+    def test_faixa_quando_ha_varias(self):
+        extra = self.LIMPAS + [{"date": "2026-06-15", "activityId": 5, "paceSeg": 425, "paceMedio": "7:05",
+                                "cadencia": 158, "paradoPct": 0}]
+        r = cadencia_de_referencia(431, extra)
+        self.assertEqual(r["cadencia_tipica_neste_pace"], "153-158 spm")
+        self.assertEqual(r["amostra"], 2)
+
+    def test_sem_historico(self):
+        self.assertIsNone(cadencia_de_referencia(438, []))
 
 
 class TestDiasDesdeBaseline(unittest.TestCase):

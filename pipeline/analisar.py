@@ -98,10 +98,23 @@ que a cadência importa, NÃO condições ativas.
 splits finais, descida longa, salto de volume) — nunca como aviso de rotina nem como risco pairando. \
 Lembrar lesão que não dói há meses todo treino desgasta a confiança no parecer e faz o atleta ignorar \
 o aviso no dia em que ele importar. Quando não houver sinal nos dados, simplesmente não fale delas.
-- CADÊNCIA é a métrica-guarda da tíbia e da fáscia — alvo 165+ spm nos leves/longos, evolução gradual \
-até ~170, sem forçar. Cadência caindo nos splits finais = passada esticando sob fadiga = mais impacto \
-tibial: aponte como ajuste biomecânico gentil (passos mais curtos e frequentes), nunca como falha — e \
-aí sim vale nomear a canela como o porquê.
+- CADÊNCIA é a métrica-guarda da tíbia e da fáscia, mas ela ESCALA COM A VELOCIDADE: correndo mais \
+rápido o passo fica mais longo E mais frequente. Um alvo fixo tipo "165+" comparado contra uma \
+corrida lenta acusa falso sempre. Como julgar, nesta ordem:
+  1. Use `cadencia_de_referencia` do contexto: é a cadência que ELE teve nas corridas limpas de pace \
+parecido (±15 s/km). Dentro dessa faixa = cadência NORMAL dele para o dia — não comente. Não existindo \
+referência (amostra vazia), não invente julgamento: fique calado sobre cadência.
+  2. O que realmente importa é o COMPRIMENTO DE PASSO, não o spm: passo_m = (distanciaKm × 1000) ÷ \
+(cadencia × duracaoMin). Overstriding é passo MAIS LONGO que o normal dele naquele pace — e isso pode \
+acontecer com cadência alta. Nunca chame cadência baixa de overstriding sem checar o passo: em 07/09, \
+154 spm a 7:18/km deu passo de 0,89 m, MAIS CURTO que os 0,93 m do 5 km leve de 08/07 a 6:48/km — \
+chamar aquilo de overstriding foi erro de leitura.
+  3. O sinal de alerta de verdade é DENTRO da corrida: cadência caindo nos splits finais com o pace \
+estável ou piorando = passada esticando sob fadiga = mais impacto tibial. Aí sim aponte, como ajuste \
+biomecânico gentil (passos mais curtos e frequentes), nunca como falha, e aí vale nomear a canela.
+  4. O alvo de 165+ spm nos leves/longos é meta de LONGO PRAZO e só se mede comparando paces \
+equivalentes ao longo dos meses — nunca como nota de uma corrida isolada, e jamais num dia em que ele \
+correu devagar de propósito. Cobrar 165 num regenerativo é ruído que ensina o atleta a ignorar o aviso.
 - Relevo: BH é cidade de ladeiras — use elevacaoM antes de julgar pace: ganho alto explica pace acima \
 da faixa com FC correta (execução certa). Subida = passada curta; descida = cadência ALTA sem frear \
 com o calcanhar (de novo a canela). Splits oscilando em percurso ondulado com FC estável = leitura \
@@ -599,6 +612,29 @@ def contexto_de_retorno(date, compactas):
     return {'dias_desde_ultima_corrida': dias, 'km_ultimas_2_semanas': km}
 
 
+def cadencia_de_referencia(pace_seg, compactas, tolerancia=15):
+    """Cadência que ELE costuma ter em corridas de pace parecido — a régua honesta.
+
+    Cadência escala com a velocidade, então um alvo fixo ("165+ spm") comparado contra
+    uma corrida lenta acusa falso sempre: em 07/09 a IA chamou 154 spm a 7:18/km de
+    overstriding num dia em que o passo (0,89 m) foi MAIS CURTO que o normal dele.
+    Só corridas LIMPAS entram — social run com 30% de tempo parado mistura caminhada
+    na média e derruba a cadência artificialmente (o histórico tem valores de 90-94 spm
+    por isso). O piso de 120 spm descarta esses registros sem depender só do paradoPct.
+    """
+    amostra = [c for c in compactas or []
+               if c.get("paceSeg") and abs(c["paceSeg"] - pace_seg) <= tolerancia
+               and (c.get("paradoPct") or 0) < 8 and (c.get("cadencia") or 0) >= 120]
+    if not amostra:
+        return None
+    cads = sorted(c["cadencia"] for c in amostra)
+    return {
+        "cadencia_tipica_neste_pace": f"{cads[0]}-{cads[-1]} spm" if cads[0] != cads[-1] else f"{cads[0]} spm",
+        "amostra": len(cads),
+        "corridas": [{"date": c["date"], "pace": c["paceMedio"], "cadencia": c["cadencia"]} for c in amostra[-3:]],
+    }
+
+
 def analisar_uma(a, detalhe, splits, deriva, zonas, plano_dia, guia, hist_ctx, prox, chave):
     date = (a.get("startTimeLocal") or "")[:10]
     dur = a.get("movingDuration") or a.get("duration")
@@ -835,12 +871,17 @@ def main():
                         plano_dia = dict(plano_dia, observacao="segunda corrida do dia — o treino planejado já foi coberto pela anterior; trate como volume extra e avalie o custo de recuperação")
                     guia = guias.get(plano_dia["tipo"]) if plano_dia else None
                     mesmo_tipo = [c for c in compactas if plano_dia and c.get("tipoPlano") == plano_dia["tipo"] and c["activityId"] != aid][-3:]
+                    atual_compacta = next((c for c in compactas if c["activityId"] == aid), None)
                     hist_ctx = {
-                        "ultimas_do_mesmo_tipo": [{"date": c["date"], "pace": c["paceMedio"], "fcMedia": c["fcMedia"], "km": c["distanciaKm"]} for c in mesmo_tipo],
+                        "ultimas_do_mesmo_tipo": [{"date": c["date"], "pace": c["paceMedio"], "fcMedia": c["fcMedia"], "km": c["distanciaKm"], "cadencia": c["cadencia"]} for c in mesmo_tipo],
                         "pace_z2": {"hoje": tend["paceZ2Atual"], "ha_8_semanas": tend["paceZ2Ha8Sem"]},
                         "vo2max": tend["vo2max"],
                         "km_por_semana_ultimas_4": tend["kmPorSemana4Sem"],
                         **contexto_de_retorno(date, compactas),
+                        "cadencia_de_referencia": cadencia_de_referencia(
+                            (atual_compacta or {}).get("paceSeg") or 0,
+                            [c for c in compactas if c["activityId"] != aid],
+                        ) if (atual_compacta or {}).get("paceSeg") else None,
                     }
                     prox = proxima_corrida(date, corridas_plano)
                     if prox:
