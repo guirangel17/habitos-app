@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from analisar import (
     TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias, compactar_atividade,
     compactar_forca, corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace,
-    modelo_indisponivel, pace_seg, proxima_corrida, resolver_push_erro, resumir_splits,
+    contexto_de_retorno, modelo_indisponivel, pace_seg, proxima_corrida, resolver_push_erro, resumir_splits,
     tipo_atividade, trocar_de_modelo, validar_ia, zonas_de_pontos,
 )
 
@@ -428,6 +428,62 @@ class TestTrocarDeModelo(unittest.TestCase):
         # 500/503 é do lado deles — trocar de modelo não resolve e degradaria à toa
         self.assertIsNone(trocar_de_modelo(503, "", 2))
         self.assertIsNone(trocar_de_modelo(500, "", 3))
+
+
+class TestContextoDeRetorno(unittest.TestCase):
+    """v7.28 — a régua honesta depois de um layoff (o resto do histórico é média móvel)."""
+
+    COMPACTAS = [
+        {"date": "2026-08-03", "distanciaKm": 12.0},
+        {"date": "2026-08-06", "distanciaKm": 4.6},
+        {"date": "2026-08-13", "distanciaKm": 6.1},
+    ]
+
+    def test_layoff_longo(self):
+        # a corrida de volta: 25 dias parado e ZERO km nas 2 semanas anteriores
+        ctx = contexto_de_retorno("2026-09-07", self.COMPACTAS)
+        self.assertEqual(ctx["dias_desde_ultima_corrida"], 25)
+        self.assertEqual(ctx["km_ultimas_2_semanas"], 0)
+
+    def test_semana_normal(self):
+        ctx = contexto_de_retorno("2026-08-13", self.COMPACTAS)
+        self.assertEqual(ctx["dias_desde_ultima_corrida"], 7)
+        self.assertEqual(ctx["km_ultimas_2_semanas"], 16.6)  # 12,0 + 4,6
+
+    def test_janela_pega_14_dias_cheios_e_ignora_o_futuro(self):
+        # a janela é [date-14, date): 14 dias cheios, sem contar a própria corrida do dia
+        self.assertEqual(contexto_de_retorno("2026-08-17", self.COMPACTAS)["km_ultimas_2_semanas"], 22.7)
+        # um dia depois, 03/08 sai da janela
+        self.assertEqual(contexto_de_retorno("2026-08-18", self.COMPACTAS)["km_ultimas_2_semanas"], 10.7)
+        # corridas posteriores à data analisada nunca entram
+        self.assertEqual(contexto_de_retorno("2026-08-06", self.COMPACTAS)["km_ultimas_2_semanas"], 12.0)
+
+    def test_primeira_corrida_da_historia_nao_explode(self):
+        ctx = contexto_de_retorno("2026-09-07", [])
+        self.assertIsNone(ctx["dias_desde_ultima_corrida"])
+        self.assertEqual(ctx["km_ultimas_2_semanas"], 0)
+
+    def test_duas_corridas_no_mesmo_dia(self):
+        # a 2ª do dia não pode virar "0 dias de layoff" a partir dela mesma
+        ctx = contexto_de_retorno("2026-08-13", self.COMPACTAS + [{"date": "2026-08-13", "distanciaKm": 5.0}])
+        self.assertEqual(ctx["dias_desde_ultima_corrida"], 7)
+
+
+class TestDiasDesdeBaseline(unittest.TestCase):
+    """v7.28 — sem isto a IA lê re-entrada de layoff como queda a corrigir."""
+
+    def test_semana_normal_e_layoff(self):
+        self.assertEqual(forca.dias_desde_baseline("2026-09-08", "2026-09-01"), 7)
+        self.assertEqual(forca.dias_desde_baseline("2026-09-08", "2026-08-04"), 35)
+
+    def test_sem_baseline(self):
+        self.assertIsNone(forca.dias_desde_baseline("2026-09-08", None))
+
+    def test_digest_carrega_o_campo(self):
+        d = forca.digest_forca({"minutos": 40}, None, "Fase: RE-ENTRADA", False, [], [], 35)
+        self.assertEqual(d["dias_desde_a_sessao_anterior_deste_treino"], 35)
+        # compatibilidade: a chamada sem o argumento continua válida
+        self.assertIsNone(forca.digest_forca({}, None, None, False, [], [])["dias_desde_a_sessao_anterior_deste_treino"])
 
 
 if __name__ == "__main__":

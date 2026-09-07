@@ -191,18 +191,18 @@ export const CORRIDAS = [
   ['2026-08-31', 'leve', 'Zero impacto — bike/piscina + reabilitação da fáscia'],
   ['2026-09-02', 'leve', 'Zero impacto — bike ou água funda 40 min'],
   ['2026-09-03', 'leve', 'Zero impacto — último dia da janela sem corrida'],
-  ['2026-09-07', 'leve', 'RETORNO 5 km fácil — run/walk (5 min corre / 1 min anda) se incomodar'],
-  ['2026-09-09', 'leve', '5 km fácil — sem pace, cadência 170+'],
+  ['2026-09-07', 'leve', 'RETORNO 5 km em run/walk (5 min corre / 1 min anda) — regra das 24h: o placar é a dor do PRIMEIRO PASSO de amanhã de manhã, não a de hoje'],
+  ['2026-09-09', 'leve', '5 km fácil contínuo — sem pace, cadência 170+ (volta pro run/walk se a manhã de terça acordou pior)'],
   ['2026-09-10', 'social', 'Social Run 5 km regenerativo — sem strides'],
   ['2026-09-14', 'longo', 'LONGO 8 km fácil — primeiro longo pós-fascite'],
   ['2026-09-16', 'leve', '6 km fácil'],
   ['2026-09-17', 'social', 'Social Run 5 km leve — sem strides'],
   ['2026-09-21', 'longo', 'LONGO 10 km fácil'],
   ['2026-09-23', 'tempo', 'Tempo Run 3 km a 5:46–5:56 — primeiro estímulo forte pós-fascite'],
-  ['2026-09-24', 'social', 'Social Run 6 km regenerativo'],
+  ['2026-09-24', 'social', 'Social Run 6 km regenerativo + 4 strides de 100 m — 1ª exposição gradual ao antepé rápido'],
   ['2026-09-28', 'longo', 'LONGO 12 km'],
-  ['2026-09-30', 'tempo', 'Tempo Run 5 km — checkpoint do alvo da prova'],
-  ['2026-10-01', 'social', 'Social Run 6 km leve'],
+  ['2026-09-30', 'tempo', 'Tempo Run 5 km a 6:05–6:20 — checkpoint do RITMO DE PROVA (não é limiar: ignore a faixa 5:41–5:56 do guia de tempo)'],
+  ['2026-10-01', 'social', 'Social Run 6 km leve + 6 strides de 100 m — última ponte antes do teste de 07/10'],
   ['2026-10-05', 'longo', 'LONGO 10 km — DELOAD (academia: metade das séries) — perna fresca pro teste'],
   ['2026-10-07', 'tiros', 'TESTE 5 km contrarrelógio — recalibra os paces de outubro'],
   ['2026-10-08', 'social', 'Social Run 6 km regenerativo'],
@@ -289,8 +289,12 @@ export const GYM_TREINOS = {
 export const GYM_FASE_POR_MES = {
   7: 'Fase: Hipertrofia (8-12 reps).',
   8: 'Fase: Hipertrofia (8-12 reps). Deload na semana de 31/08: mesmas cargas, metade das séries.',
-  9: 'Fase: Força Máxima — compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2; isoladores 10-12. Deload na semana de 28/09.',
-  10: 'Fase: Manutenção + Potência — compostos 3 × 3-5 pesado (volume −40%) + pliometria leve 2×/sem (40-60 contatos).',
+  // RE-ENTRADA (v7.28): força máxima não pode ser a 1ª semana de volta de ~3 semanas sem treinar
+  // (12/08 a 06/09). 80-87% de um 1RM velho é carga que ele não tem hoje, e a DOMS da 1ª sessão
+  // pesada de perna cairia justo no Longão de segunda. Duas semanas de re-entrada e o bloco de
+  // força máxima começa em 21/09 — sem custo nenhum pro plano, que só cobra força em outubro.
+  9: 'Fase: RE-ENTRADA nas semanas de 07/09 e 14/09 — mesmos exercícios, ~70-75% da carga de agosto, 8-10 reps, RIR 3, sem falha e sem sessão até a exaustão. De 21/09 em diante: Força Máxima — compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2; isoladores 10-12. Deload na semana de 05/10 (o do plano de corrida, que andou junto com o teste de 5 km).',
+  10: 'Fase: Manutenção + Potência — compostos 3 × 3-5 pesado (volume −40%) + pliometria leve 2×/sem (40-60 contatos). Semana de 05/10 é DELOAD (metade das séries) — perna fresca pro teste de 07/10. Pliometria só depois do teste, e nunca em dia de tiro.',
   11: 'Fase: Polimento — 1-2 sessões curtas e pesadas, sem falha, sem DOMS. Última sessão pesada de perna: 23-24/11.',
   12: 'Semana da prova: ZERO perna. Upper leve até quarta 02/12 no máximo.',
 };
@@ -379,13 +383,14 @@ export const CHECKPOINTS = [
     alvo: '5:30–5:35 /km',
     porque: 'O âncora atual (5:34/km) veio do teste de 29/07 a 30 °C e com os km do meio segurados. Os 5 × 800 de 05/08 saíram inteiros dentro da faixa (5:22–5:31) a 32 °C, com a FC em Z3, só 4% de Z4, TE anaeróbico 0,0 — e sobrando repetição. O bloco de 1 km de outubro reusa essa MESMA faixa: sem âncora nova, ele nasce folgado.',
     passos: [
+      ['🦶', 'Antes de tudo: o pé decide', 'Contrarrelógio é a carga máxima de antepé do calendário. Alguma manhã desta semana acordou com dor no primeiro passo? Vira tempo run controlado a 6:05–6:20 e outubro calibra por baixo — âncora conservador custa segundos, fáscia rompida custa a prova.'],
       ['🔥', 'Aquecimento inegociável', '15 min de trote + 4 × 100 m progressivos. Contrarrelógio sem aquecer = km 1 mentiroso.'],
       ['🐢', 'Km 1: o difícil é SEGURAR', 'Comece no 5:30–5:35 e não mais rápido, mesmo parecendo fácil — vai parecer. O teste se ganha do km 3 em diante.'],
       ['⚙️', 'Km 2–3: firme e constante', 'Segure o ritmo. Frases curtas impossíveis — é assim mesmo.'],
       ['📈', 'Km 4: aperta', 'Se ainda tem perna, desce 5–10 s no pace. Foi exatamente aqui que julho ficou devendo (5:47/5:49/5:45 no meio).'],
       ['🚀', 'Último km + 400 m finais: tudo', 'Esvazia o tanque. A semana de deload existe pra você chegar inteiro nesses 400 m.'],
     ],
-    vespera: 'Hoje: jantar com carbo e dormir 7–8h. Semana de deload — o teste é a única coisa dura da semana.',
+    vespera: 'Hoje: jantar com carbo e dormir 7–8h. Semana de deload — o teste é a única coisa dura da semana. E confira o pé: a dor do primeiro passo da manhã é o critério de ir ou não ir.',
   },
 ];
 

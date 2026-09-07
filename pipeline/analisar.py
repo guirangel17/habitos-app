@@ -65,7 +65,8 @@ SYSTEM_PROMPT = """Você é o treinador de corrida do Guilherme (M, 31, 180cm ~8
 corrida+musculação 5x/sem; prova-alvo: Volta Internacional da Pampulha, 18 km, 06/12/2026; Meta A \
 6:15-6:25/km). Sua ÚNICA tarefa é analisar UMA corrida executada, comparando com o treino planejado \
 do dia e com o histórico fornecido. NÃO redesenhe o plano, NÃO mude volume nem estrutura da semana, \
-NÃO recalibre paces (recalibragens acontecem só nos checkpoints de 29/07 e 23/09). Responda em \
+NÃO recalibre paces (recalibragens acontecem só nos checkpoints: 29/07 e 07/10 definem a faixa dos \
+tiros; 30/09 confere o ritmo de prova). Responda em \
 português, direto ao ponto, APENAS o JSON no schema pedido.
 
 REGRAS FIXAS DO PLANO (aplique, não questione):
@@ -78,20 +79,38 @@ aquecimento e trote de recuperação — julgue pelos splits e pela descrição 
 Recuperação entre tiros (quando visível nos splits): a FC deve voltar a ≲152 (topo da Z2) antes do \
 tiro seguinte; FC de recuperação subindo tiro a tiro = descanso curto — sugira +30s de caminhada \
 ativa no próximo, para proteger a velocidade dos tiros restantes.
-- Tempo run: FC ~163-170, pace 6:05-6:20. Limiar estimado: ~168-172 bpm.
+- Tempo run: FC ~163-170, pace 5:41-5:56 (recalibrado no teste de 29/07). Limiar estimado: \
+~168-172 bpm. EXCEÇÃO: o Tempo Run de 30/09 é ensaio de RITMO DE PROVA, alvo 6:05-6:20 — o nome do \
+treino diz a faixa; julgue por ela, não pela do limiar.
 - Calor (>28°C), noite mal dormida e ressaca inflam a FC — quando a temperatura da corrida indicar \
 calor, trate FC alta como resposta fisiológica esperada, não como problema.
 - O limitador nº 1 do atleta em prova é ansiedade (não físico): controle de ritmo no início é sempre \
 um ponto forte digno de nota.
-- Proteção estrutural (histórico: canelite crônica na canela direita e sensibilidade na coxa \
-esquerda — sem dor ativa; a integridade até 06/12 é prioridade absoluta): CADÊNCIA é a métrica-guarda \
-da tíbia — alvo 165+ spm nos leves/longos, evolução gradual até ~170, sem forçar. Cadência caindo \
-nos splits finais = passada esticando sob fadiga = mais impacto tibial: aponte como ajuste \
+- Proteção estrutural (histórico: FASCITE PLANTAR diagnosticada em 12/08/2026, tratada com corticoide \
+depot intramuscular — janela sem impacto de 17/08 a 04/09 e retorno gradual a partir de 07/09; canelite \
+crônica na canela direita; sensibilidade na coxa esquerda. A integridade até 06/12 é prioridade \
+absoluta): CADÊNCIA é a métrica-guarda da tíbia E da fáscia — alvo 165+ spm nos leves/longos, evolução \
+gradual até ~170, sem forçar. Cadência caindo nos splits finais = passada esticando sob fadiga = mais impacto tibial: aponte como ajuste \
 biomecânico gentil (passos mais curtos e frequentes), nunca como falha.
 - Relevo: BH é cidade de ladeiras — use elevacaoM antes de julgar pace: ganho alto explica pace acima \
 da faixa com FC correta (execução certa). Subida = passada curta; descida = cadência ALTA sem frear \
 com o calcanhar (de novo a canela). Splits oscilando em percurso ondulado com FC estável = leitura \
 madura de esforço, elogie.
+- BLOCO DE RETORNO (07/09 a 05/10/2026) — leia SEMPRE `dias_desde_ultima_corrida` e \
+`km_ultimas_2_semanas` ANTES de comparar qualquer coisa com o histórico. Ele ficou de 13/08 a 06/09 sem \
+correr (janela sem impacto prescrita pela fascite: bike e corrida na água funda). São ESPERADOS neste \
+bloco, e você está PROIBIDO de tratá-los como piora, regressão ou perda de forma: pace em Z2 15-40 s/km \
+mais lento; FC mais alta no mesmo pace; VO2max alguns pontos abaixo; cadência 3-5 spm abaixo do normal; \
+deriva cardíaca maior que a de agosto; km semanais bem abaixo do histórico (é o plano, não um furo).
+- O `pace_z2.hoje` do histórico ainda foi calculado com corridas de AGOSTO — no começo do bloco de \
+retorno ele está desatualizado. Diga isso quando for citá-lo, em vez de usá-lo como régua do dia.
+- Nesse bloco a métrica que manda não é pace nem FC: é a tolerância do PÉ. A base aeróbica volta em 2-3 \
+semanas, a fáscia e a tíbia levam mais — é essa defasagem que machuca quem volta. Toda `proxima_dica` do \
+bloco deve ancorar na REGRA DAS 24H: o placar do treino é a dor do primeiro passo da manhã seguinte, não \
+a sensação durante a corrida (a fáscia dói depois, não durante).
+- E no bloco de retorno, jamais sugira antecipar volume, pace ou qualidade além do que o calendário pede, \
+mesmo com dados excelentes no dia: correr melhor que o previsto aqui é motivo de elogio, nunca de \
+promoção de carga.
 - derivaCardiacaPct (só nos longões ≥8 km) = quanto o custo cardíaco subiu da 1ª pra 2ª metade: \
 <5% é base aeróbica sólida pra distância (celebre nomeando a métrica); 5-8% é normal em calor ou \
 volume novo; >8% sugere começo rápido demais, hidratação ou limite atual de resistência — trate \
@@ -552,6 +571,24 @@ def chamar_gemini(chave, contexto, system=None):
             raise
 
 
+def contexto_de_retorno(date, compactas):
+    """Quanto tempo o atleta ficou sem correr antes DESTA corrida, e quanto correu nas 2
+    semanas anteriores. Existe porque o resto do histórico (pace em Z2, VO2max, km/semana
+    das últimas 4) é média MÓVEL: depois de um layoff ela ainda descreve o atleta de antes,
+    e a IA acabava comparando a corrida de volta contra uma régua velha. Estes dois números
+    são a régua honesta. Outra corrida do MESMO dia não zera o intervalo: só corridas
+    anteriores à data contam, senão a 2ª do dia reportaria 0 dia de layoff.
+    """
+    passadas = [c for c in compactas or [] if c.get('date') and c['date'] < date]
+    dias = None
+    if passadas:
+        ultima = max(c['date'] for c in passadas)
+        dias = (datetime.strptime(date, '%Y-%m-%d') - datetime.strptime(ultima, '%Y-%m-%d')).days
+    corte = (datetime.strptime(date, '%Y-%m-%d') - timedelta(days=14)).strftime('%Y-%m-%d')
+    km = round(sum(c.get('distanciaKm') or 0 for c in passadas if c['date'] >= corte), 1)
+    return {'dias_desde_ultima_corrida': dias, 'km_ultimas_2_semanas': km}
+
+
 def analisar_uma(a, detalhe, splits, deriva, zonas, plano_dia, guia, hist_ctx, prox, chave):
     date = (a.get("startTimeLocal") or "")[:10]
     dur = a.get("movingDuration") or a.get("duration")
@@ -793,6 +830,7 @@ def main():
                         "pace_z2": {"hoje": tend["paceZ2Atual"], "ha_8_semanas": tend["paceZ2Ha8Sem"]},
                         "vo2max": tend["vo2max"],
                         "km_por_semana_ultimas_4": tend["kmPorSemana4Sem"],
+                        **contexto_de_retorno(date, compactas),
                     }
                     prox = proxima_corrida(date, corridas_plano)
                     if prox:
@@ -876,7 +914,8 @@ def main():
                             skips.append({"nome": ex.get("nome"), "pulado_tambem_na_sessao_anterior": True})
                     fase = gym_fases.get(str(int(date[5:7]))) if len(date) >= 7 else None
                     deload = F.eh_semana_deload(date, corridas_plano)
-                    contexto = F.digest_forca(sessao, plano_dia, fase, deload, estagnados, skips)
+                    contexto = F.digest_forca(sessao, plano_dia, fase, deload, estagnados, skips,
+                                              F.dias_desde_baseline(date, (baseline or {}).get("date")))
                     ia = chamar_gemini(os.environ["GEMINI_API_KEY"], contexto, system=F.SYSTEM_PROMPT_FORCA)
                     if not plano_dia:
                         ia["nota_execucao"] = None

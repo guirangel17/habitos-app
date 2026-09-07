@@ -245,6 +245,85 @@
 - ⏳ **Rever se a fascite não ceder até 07/09**: o retorno inteiro escorrega 1 semana e aí o teste
   de 5 km sai de outubro — nesse caso calibrar outubro por tempo run, sem contrarrelógio.
 
+# Feito na v7.28 (set/2026) — auditoria do retorno + a IA passa a saber que houve layoff
+
+Revisão do calendário no 1º dia de volta (07/09), com o histórico REAL do Garmin na mão. Achado
+principal: **o retorno de setembro está bem construído e não foi mexido** — 15 → 19 → 22 → 26 km
+com longão 8 → 10 → 12 é conservador contra a base dele (weeks de 28-36 km em mai/jun e meia de
+21 km em 28/06). O risco não está onde parecia:
+
+- **Julho/agosto foi um bloco BAIXO** (média real 14,3 km/sem, pico 23 km na semana de 03/08),
+  não o platô que o plano assume. Outubro pede 32-35 km/sem — ~2,3× a média pré-lesão. Setembro
+  é seguro; **o degrau de verdade é 05/10 → 12/10 (+28%, o maior do calendário)**, com o longão
+  de 14 km (o mais longo desde 08/06) e a volta dos tiros de 1 km na mesma semana, 5 dias depois
+  de um contrarrelógio máximo. Não mexemos ainda de propósito: os dois gates que decidem isso
+  (longão de 12 km em 28/09 e o teste de 07/10) vêm antes. **Reavaliar 12/10 depois de 28/09.**
+
+Mudanças aplicadas (todas baratas, nenhuma mexe no arco até 06/12):
+
+- **07/09 vira run/walk por PADRÃO**, não como plano B ("se incomodar"). Protocolos de volta pós-
+  fascite começam em run/walk por padrão; 5 km contínuos são ~5.000 impactos seguidos na fáscia
+  logo depois de 25 dias sem correr. O custo aeróbico de fracionar é ~zero para quem já correu
+  21 km. A descrição de 09/09 carrega o critério de voltar ao contínuo.
+- **Regra das 24h visível no calendário** (07/09 e véspera/passo do teste): o placar de um treino
+  na volta da fascite é a dor do PRIMEIRO PASSO da manhã seguinte, não a sensação durante a
+  corrida — a fáscia dói depois, não durante. Era conhecimento que só existia na cabeça do
+  treinador, em lugar nenhum do app.
+- **Strides voltam antes do teste** (4 × 100 m em 24/09, 6 × 100 m em 01/10). Buraco real do
+  calendário: o último tiro foi 05/08 e o contrarrelógio de 07/10 pedia esforço supralimiar
+  depois de **9 semanas** sem nenhuma passada rápida — os dois tempo runs de setembro são
+  sublimiares. Strides dão exposição graduada de antepé com custo metabólico desprezível.
+- **Gate do pé no checkpoint de 07/10.** A regra "se o pé não estiver 100%, vira tempo run e
+  calibra por baixo" existia só como COMENTÁRIO em data.js — invisível pro app e pra IA. Virou
+  o 1º passo do checkpoint e entrou na véspera.
+- **30/09 estava com dois paces conflitantes**: o CHECKPOINT dizia 6:05–6:20 (ritmo de prova) e o
+  tipo `tempo` puxava a faixa de limiar 5:41–5:56 do CORRIDA_GUIA — que é o que o app mostrava e
+  o que a IA receberia como `paceAlvo`. O relógio já estava certo (TEMPO_CHECKPOINT). Alvo agora
+  explícito na descrição, que é o campo que chega nos três lugares.
+- **Musculação: setembro não pode abrir com Força Máxima.** `GYM_FASE_POR_MES[9]` mandava
+  4-6 reps a 80-87% na 1ª semana de volta de ~3 semanas parado — carga de um 1RM que ele não tem
+  hoje, e a DOMS da 1ª sessão pesada de perna cairia justo no Longão de segunda. Agora: re-entrada
+  em 07/09 e 14/09 (~70-75% da carga de agosto, 8-10 reps, RIR 3, sem falha), força máxima de
+  21/09 em diante. Outubro ganhou o deload de 05/10, que a v7.27 tinha movido no plano de corrida
+  e esquecido no texto de academia (dizia "semana de 28/09").
+
+**A IA não sabia de nada disso** — era o furo maior, e é o que estragaria as duas primeiras
+semanas de parecer:
+
+- `SYSTEM_PROMPT` (corrida) ainda descrevia a proteção estrutural como canelite + coxa, **sem
+  mencionar a fascite** (diagnóstico de 12/08, um mês atrás). Corrigido, com a cadência promovida
+  a métrica-guarda da fáscia também.
+- Bloco novo **BLOCO DE RETORNO (07/09 a 05/10)** no prompt: pace em Z2 15-40 s/km mais lento, FC
+  mais alta no mesmo pace, VO2max e cadência abaixo, deriva maior e km semanais baixos são
+  ESPERADOS e proibidos de virar "piora". Inclui a instrução de não promover carga mesmo com dados
+  excelentes no dia — sem isso, a `proxima_dica` de uma volta boa vira "pode subir".
+- **`contexto_de_retorno(date, compactas)`** (pura, 5 testes): `dias_desde_ultima_corrida` e
+  `km_ultimas_2_semanas` entram no `hist_ctx`. Existiam só médias MÓVEIS (`paceZ2Atual`,
+  `kmPorSemana4Sem`), que depois de um layoff ainda descrevem o atleta de antes — a IA ia comparar
+  a corrida de volta com a régua de agosto (6:47/km) e chamar de queda o que é o plano.
+- **Datas de recalibragem no prompt estavam velhas** ("29/07 e 23/09" — 23/09 deixou de ser
+  checkpoint na v7.27) e a **faixa do tempo run era a PRÉ-recalibragem de 29/07** (6:05–6:20 em
+  vez de 5:41–5:56, que o `CORRIDA_GUIA` já usava desde então). Ambas corrigidas, com a exceção
+  do checkpoint de 30/09 escrita no prompt.
+- **Musculação**: `dias_desde_a_sessao_anterior_deste_treino` entra no digest
+  (`F.dias_desde_baseline`, pura, testada). Sem ele, o baseline da 1ª terça de volta é **04/08** —
+  5 semanas atrás — e todo exercício com carga menor vira status `ajuste`, que a IA leria como
+  queda a corrigir, pedindo volta de carga na `proxima_dica`. Agora: baseline com mais de ~14 dias
+  = re-entrada planejada, tratada como deload (nota alta), sem pedir volta de carga, e repetir
+  carga nas primeiras sessões não conta como estagnação (efeito de sessão repetida protegendo
+  contra DOMS que custaria o Longão).
+- Regra nova de perna: nunca sugerir subir carga de perna e volume de corrida na mesma semana.
+
+- ⚠️ **Pipeline estava parado há 12 dias** (último run "ok" em 25/08 20:56; 293 h de
+  `garmin_bloqueio` seguido — 60+ runs). O `~/.garth` local estava fresco mas o **Secret**
+  `GARMIN_TOKEN` não, o que casa com o notebook fechado nas férias: sem renovação, todo run cai no
+  exchange bloqueado. Destravado na mão em 07/09 (`renovar-token.py` → ✅). **`pushErro` = 410 Gone**
+  desde então: a inscrição de push morreu e precisa do toggle desligado/ligado no aparelho + JSON
+  novo no Secret `PUSH_SUBSCRIPTION` (runbook da v7.16/v7.20).
+- ⏳ Segue pendente da v7.27: `criar.py` reagendar o relógio (as descrições novas de 07/09, 24/09 e
+  01/10 não mudam workout do catálogo — strides em social run são livres —, mas o bloco 17/08–04/09
+  continua desagendado só no papel).
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

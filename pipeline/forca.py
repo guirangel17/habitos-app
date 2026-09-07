@@ -186,17 +186,31 @@ def resumir_sessao(minutos, exercicios, baseline):
     }
 
 
-def digest_forca(sessao, plano_dia, fase, deload, estagnados, skips_recorrentes):
+def dias_desde_baseline(date_str, baseline_date):
+    """Distância em dias até a sessão usada como baseline (None se não há baseline).
+
+    A progressão dupla compara com a sessão anterior do MESMO dia da semana — normalmente
+    7 dias atrás. Depois de um layoff esse baseline pode ter semanas: comparar carga contra
+    ele sem dizer o intervalo faz a IA ler re-entrada consciente como queda a corrigir.
+    """
+    if not baseline_date:
+        return None
+    return (datetime.strptime(date_str, "%Y-%m-%d") - datetime.strptime(baseline_date, "%Y-%m-%d")).days
+
+
+def digest_forca(sessao, plano_dia, fase, deload, estagnados, skips_recorrentes, dias_baseline=None):
     """Contexto enxuto para o Gemini — os fatos já vêm calculados."""
     return {
         "sessao_executada": sessao,
+        "dias_desde_a_sessao_anterior_deste_treino": dias_baseline,
         "treino_planejado_do_dia": plano_dia or "nenhum treino de musculação planejado para este dia",
         "fase_do_mes": fase,
         "semana_deload": deload,
         "exercicios_estagnados_ha_3_sessoes": estagnados,
         "exercicios_pulados_em_sessoes_recentes": skips_recorrentes,
         "legenda_status": "carga_up=subiu carga · reps_up=subiu reps na faixa · igual=repetiu · "
-                          "ajuste=carga/reps menores · novo=sem comparação · pulado=0×0 de propósito",
+                          "ajuste=carga/reps menores (numa volta de layoff, isso é re-entrada planejada, não queda) · "
+                          "novo=sem comparação · pulado=0×0 de propósito",
     }
 
 
@@ -220,8 +234,23 @@ pulado recorrente merece lembrete gentil do PORQUÊ (integridade até 06/12 é p
 nunca cobrança.
 - semana_deload=true: METADE das séries É o plano — volume baixo = execução correta, nota alta. \
 PROIBIDO tratar como queda.
-- A fase_do_mes manda: setembro = força máxima (4-6 reps, carga alta — reps "caindo" é o método); \
-outubro = volume −40% planejado; novembro = polimento sem falha e sem DOMS.
+- RETORNO DE LAYOFF: leia `dias_desde_a_sessao_anterior_deste_treino` ANTES de interpretar qualquer \
+status. Ele ficou de 13/08 a 06/09/2026 sem treinar (fascite plantar diagnosticada em 12/08, tratada \
+com corticoide depot; janela sem impacto prescrita). Quando esse campo passar de ~14 dias, o baseline \
+é a sessão de um atleta descansado semanas atrás e NÃO é a régua do dia: um monte de status "ajuste" \
+com carga menor é RE-ENTRADA PLANEJADA, decisão certa de um atleta experiente — trate exatamente como \
+trata deload (execução correta, nota alta), nunca como queda, perda ou algo a recuperar. Nesses casos \
+a `proxima_dica` NÃO pode pedir volta de carga: peça no máximo o próximo degrau pequeno, e diga que a \
+carga de agosto volta sozinha em 2-3 sessões (o ganho inicial é neural, não hipertrófico). Também não \
+trate como estagnação repetir a mesma carga nas primeiras sessões de volta — é o efeito de sessão \
+repetida protegendo contra DOMS, que nesta fase custaria o Longão de segunda.
+- Perna na volta da fascite: quinta (Pernas A) e sábado (Pernas B) carregam panturrilha e pé, os \
+mesmos tecidos que a corrida está reintroduzindo. Nunca sugira subir carga de perna e volume de \
+corrida na mesma semana — se a semana já subiu de km, elogie manter a carga da perna.
+- A fase_do_mes manda, e ela JÁ contempla o retorno: setembro = RE-ENTRADA nas semanas de 07/09 e \
+14/09 (carga ~70-75% da de agosto, 8-10 reps, RIR 3, sem falha) e força máxima só a partir de 21/09 \
+(4-6 reps, carga alta — reps "caindo" é o método); outubro = volume −40% planejado, com deload na \
+semana de 05/10; novembro = polimento sem falha e sem DOMS. Leia a fase antes de sugerir carga.
 - Exercício estagnado (≥3 sessões na mesma carga×reps, já sinalizado): sugira UM microajuste construtivo \
 (microcarga, descanso maior, cadência de execução, variação) — nunca "estagnado/travado".
 - Musculação serve à corrida: NUNCA sugira treinar até a falha nem volume extra — quinta antecede o \
