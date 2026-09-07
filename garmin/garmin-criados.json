@@ -190,12 +190,6 @@
       "data": "2026-09-16"
     },
     {
-      "chave": "1624794473:2026-09-24",
-      "scheduleId": 1705464680,
-      "nome": "Social Run 6km",
-      "data": "2026-09-24"
-    },
-    {
       "chave": "1624794599:2026-10-08",
       "scheduleId": 1705464795,
       "nome": "Social Run 7km",
@@ -206,12 +200,6 @@
       "scheduleId": 1705464797,
       "nome": "Longao 15km constante",
       "data": "2026-10-12"
-    },
-    {
-      "chave": "1624794661:2026-10-14",
-      "scheduleId": 1705464800,
-      "nome": "Tiros 4x1km",
-      "data": "2026-10-14"
     },
     {
       "chave": "1624794709:2026-10-15",
@@ -250,18 +238,6 @@
       "data": "2026-10-29"
     },
     {
-      "chave": "1624794661:2026-11-04",
-      "scheduleId": 1705464873,
-      "nome": "Tiros 4x1km",
-      "data": "2026-11-04"
-    },
-    {
-      "chave": "1624794473:2026-11-05",
-      "scheduleId": 1705464884,
-      "nome": "Social Run 6km",
-      "data": "2026-11-05"
-    },
-    {
       "chave": "1624794810:2026-11-09",
       "scheduleId": 1705464892,
       "nome": "Longao 15km 10+5RP",
@@ -272,12 +248,6 @@
       "scheduleId": 1705464899,
       "nome": "Tiros 3x1500m",
       "data": "2026-11-11"
-    },
-    {
-      "chave": "1624794473:2026-11-12",
-      "scheduleId": 1705464901,
-      "nome": "Social Run 6km",
-      "data": "2026-11-12"
     },
     {
       "chave": "1624794836:2026-11-16",
@@ -292,12 +262,6 @@
       "data": "2026-11-18"
     },
     {
-      "chave": "1624794250:2026-11-19",
-      "scheduleId": 1705464951,
-      "nome": "Social Run 5km",
-      "data": "2026-11-19"
-    },
-    {
       "chave": "1624794884:2026-11-23",
       "scheduleId": 1705464969,
       "nome": "Taper 12km c/ 5km RP",
@@ -308,12 +272,6 @@
       "scheduleId": 1705464994,
       "nome": "Rodagem 4km giro",
       "data": "2026-11-25"
-    },
-    {
-      "chave": "1624794250:2026-11-26",
-      "scheduleId": 1705465007,
-      "nome": "Social Run 5km",
-      "data": "2026-11-26"
     },
     {
       "chave": "1624794934:2026-11-30",
@@ -1028,6 +986,48 @@
       "scheduleId": 1743456000,
       "nome": "Longao 15km cadencia",
       "data": "2026-10-19"
+    },
+    {
+      "chave": "1624794473:2026-09-24",
+      "scheduleId": 1770945837,
+      "nome": "Social Run 6km",
+      "data": "2026-09-24"
+    },
+    {
+      "chave": "1624794661:2026-10-14",
+      "scheduleId": 1770945849,
+      "nome": "Tiros 4x1km",
+      "data": "2026-10-14"
+    },
+    {
+      "chave": "1624794661:2026-11-04",
+      "scheduleId": 1770945881,
+      "nome": "Tiros 4x1km",
+      "data": "2026-11-04"
+    },
+    {
+      "chave": "1624794473:2026-11-05",
+      "scheduleId": 1770945889,
+      "nome": "Social Run 6km",
+      "data": "2026-11-05"
+    },
+    {
+      "chave": "1624794473:2026-11-12",
+      "scheduleId": 1770945895,
+      "nome": "Social Run 6km",
+      "data": "2026-11-12"
+    },
+    {
+      "chave": "1624794250:2026-11-19",
+      "scheduleId": 1770946000,
+      "nome": "Social Run 5km",
+      "data": "2026-11-19"
+    },
+    {
+      "chave": "1624794250:2026-11-26",
+      "scheduleId": 1770946023,
+      "nome": "Social Run 5km",
+      "data": "2026-11-26"
     }
   ]
 }

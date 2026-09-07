@@ -327,9 +327,20 @@ semanas de parecer:
   exchange bloqueado. Destravado na mão em 07/09 (`renovar-token.py` → ✅). **`pushErro` = 410 Gone**
   desde então: a inscrição de push morreu e precisa do toggle desligado/ligado no aparelho + JSON
   novo no Secret `PUSH_SUBSCRIPTION` (runbook da v7.16/v7.20).
-- ⏳ Segue pendente da v7.27: `criar.py` reagendar o relógio (as descrições novas de 07/09, 24/09 e
-  01/10 não mudam workout do catálogo — strides em social run são livres —, mas o bloco 17/08–04/09
-  continua desagendado só no papel).
+- ✅ **Auditoria do relógio (07/09)**: o calendário do Garmin de 07/09 a 06/12 está agora 100%
+  igual ao plano (130 agendamentos). O bloco 17/08–04/09 da v7.27 já tinha sido reagendado — não
+  sobrou nada velho. Mas havia **7 buracos** que nada tinha a ver com a v7.27 nem com as mudanças
+  de hoje: 24/09 Social Run 6km, 14/10 e 04/11 Tiros 4x1km, 05/11 e 12/11 Social Run 6km, 19/11 e
+  26/11 Social Run 5km. Os treinos existiam no catálogo; só os agendamentos tinham sumido do lado
+  da Garmin. **Causa estrutural**: `agendar()` faz curto-circuito na chave `workoutId:data` do
+  `garmin-criados.json`, então o registro local é a verdade sobre "já agendado" e um agendamento
+  apagado do lado da Garmin fica invisível pra sempre — rodar `--corrida` de novo pula a data.
+  Repostos removendo as entradas fantasma antes de reagendar; método de auditoria documentado no
+  `garmin/README.md`.
+- ✅ Fecha o pendente da v7.27 ("`criar.py` reagendar o relógio"): a auditoria acima mostrou que o
+  bloco 17/08–04/09 já estava correto no Garmin. E as descrições novas de 07/09, 24/09 e 01/10 NÃO
+  pedem reagendamento — não mudam workout do catálogo (strides em social run são livres, e o alvo
+  do checkpoint de 30/09 já estava certo no relógio via `TEMPO_CHECKPOINT`).
 
 # v8 — ideias futuras
 

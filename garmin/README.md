@@ -145,6 +145,23 @@ dia de prova simulada.
   setembro → manutenção em outubro → polimento em novembro), em 94 datas.
 - Registro local em `garmin-criados.json` — é ele que permite o `--limpar`.
 
+**PEGADINHA do registro (achada em 07/09/2026):** `agendar()` faz curto-circuito na chave
+`workoutId:data` do registro — se a chave existe, ele NÃO chama a API. Ou seja, **o registro é
+a verdade sobre "já está agendado", e ele pode divergir do Garmin**: agendamento apagado do
+lado de lá (no app do Connect, ou por um POST que falhou depois de gravar) fica invisível pra
+sempre, porque rodar `--corrida` de novo pula a data. Em 07/09 havia **7 buracos** assim
+(24/09 Social Run 6km · 14/10 e 04/11 Tiros 4x1km · 05/11, 12/11 Social Run 6km · 19/11, 26/11
+Social Run 5km) — os treinos existiam no catálogo, só os agendamentos tinham sumido, e o
+`--limpar`/`--corrida` nunca os traria de volta.
+
+Auditoria (a única forma confiável de saber): compare o `/calendar-service/year/2026/month/M`
+com as AGENDAs. **`month` é 0-BASED** (`month/8` = setembro) e a visão de mês **inclui os dias
+de borda dos meses vizinhos** — dedupe pelo `id` do agendamento antes de concluir qualquer
+coisa, senão o mesmo item aparece em duas consultas e vira falsa duplicata (59 falsos positivos
+em 6 meses, 13/08/2026). Para repor um buraco: remova a entrada fantasma de `agendamentos` no
+JSON e só então chame `api.agendar(wid, data, nome)` — sem tirar do registro, o curto-circuito
+ignora a chamada.
+
 Obs.: os nomes de exercícios de força usam o catálogo da Garmin quando existe
 correspondência; quando não existe (ex.: tibial anterior), o nome real vai na
 descrição do passo. Se a API rejeitar algum mapeamento, o script degrada
