@@ -1,13 +1,10 @@
 {
- "ultimaExecucao": "2026-09-07T01:44:44-03:00",
- "status": "garmin_bloqueio",
- "mensagem": "Garmin bloqueou o acesso deste runner — NÃO é o token; próximo cron tenta de novo. Detalhe: oauth exchange 429 server=cloudflare cf-ray=sim: Rate limited",
- "ultimaAnalise": null,
+ "ultimaExecucao": "2026-09-07T12:49:07-03:00",
+ "status": "ok",
+ "mensagem": "",
+ "ultimaAnalise": "2026-08-13",
  "pendentes": 0,
- "ultimoSucesso": "2026-08-25T20:56:16-03:00",
- "sustentado": true,
- "horasSemSucesso": 293,
- "ultimoAlertaTs": "2026-09-06T15:46:24-03:00",
+ "ultimoSucesso": "2026-09-07T12:49:07-03:00",
  "modeloIA": "gemini-3.5-flash",
  "pushErro": "WebPushException: Push failed: 410 Gone Response body:push subscription has unsubscribed or expired. , Response push subscription has unsubscribed or expired. "
 }

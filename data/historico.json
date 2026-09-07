@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-25T20:56:16-03:00",
+ "atualizadoEm": "2026-09-07T12:49:07-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1454,6 +1454,18 @@
    "activityId": 23978172714,
    "minutos": 35,
    "nome": "SEX Upper C + Core"
+  },
+  {
+   "date": "2026-08-27",
+   "activityId": 24140772831,
+   "minutos": 48,
+   "nome": "QUI Pernas A"
+  },
+  {
+   "date": "2026-08-28",
+   "activityId": 24153011258,
+   "minutos": 20,
+   "nome": "SEX Upper C + Core"
   }
  ],
  "tendencias": {
@@ -1556,13 +1568,13 @@
    }
   ],
   "paceZ2Atual": "6:47",
-  "paceZ2Ha8Sem": "6:57",
+  "paceZ2Ha8Sem": "6:56",
   "vo2max": {
    "atual": 48.0,
-   "ha8Sem": 46.0
+   "ha8Sem": 48.0
   },
-  "cadencia4Sem": 157,
-  "kmPorSemana4Sem": 11.6,
+  "cadencia4Sem": null,
+  "kmPorSemana4Sem": 1.5,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1714,16 +1726,8 @@
    }
   ],
   "efAtual": 1.062,
-  "efHa8Sem": 0.992,
+  "efHa8Sem": 0.977,
   "kmSemanas": [
-   {
-    "semana": "2026-06-08",
-    "km": 19.8
-   },
-   {
-    "semana": "2026-06-15",
-    "km": 10.0
-   },
    {
     "semana": "2026-06-22",
     "km": 32.8
@@ -1762,6 +1766,14 @@
    },
    {
     "semana": "2026-08-24",
+    "km": 0
+   },
+   {
+    "semana": "2026-08-31",
+    "km": 0
+   },
+   {
+    "semana": "2026-09-07",
     "km": 0
    }
   ],
