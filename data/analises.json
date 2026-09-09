@@ -1,7 +1,81 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-07T18:31:53-03:00",
+ "atualizadoEm": "2026-09-09T18:49:51-03:00",
  "analises": [
+  {
+   "date": "2026-09-09",
+   "activityId": 24302511212,
+   "geradoEm": "2026-09-09T18:50:03-03:00",
+   "garmin": {
+    "nome": "5km facil",
+    "inicio": "2026-09-09 18:12:53",
+    "distanciaKm": 3.06,
+    "duracaoMin": 23.1,
+    "paceMedio": "7:33",
+    "fcMedia": 146,
+    "fcMax": 162,
+    "cadencia": 149,
+    "elevacaoM": 0,
+    "trainingEffect": {
+     "aerobico": 3.1,
+     "anaerobico": 0.0,
+     "label": "TEMPO",
+     "carga": null
+    },
+    "vo2max": null,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:55",
+      "fc": 139
+     },
+     {
+      "km": 2,
+      "pace": "7:51",
+      "fc": 143
+     },
+     {
+      "km": 3,
+      "pace": "6:52",
+      "fc": 154
+     }
+    ],
+    "zonasFc": {
+     "z1": 26,
+     "z2": 25,
+     "z3": 49,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "leve",
+    "nome": "5 km fácil contínuo — sem pace, cadência 170+ (volta pro run/walk se a manhã de terça acordou pior)",
+    "paceAlvo": "6:50–7:15 /km ou mais leve",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:05",
+    "paceZ2Ha8Sem": "6:57"
+   },
+   "ia": {
+    "resumo": "Corrida leve de 3 km realizada sob forte calor de 30°C, com redução preventiva de volume em relação aos 5 km planejados. O ritmo foi muito bem controlado nos primeiros dois terços, com uma aceleração voluntária no quilômetro final.",
+    "comparacao_plano": "O planejado era um treino fácil de 5 km (FC ≤ 152 bpm). Foi executado um volume menor (3,06 km) com pace médio de 7:33/km e FC média de 146 bpm. A redução de volume foi uma excelente decisão de proteção estrutural para a fáscia sob o calor forte. A intensidade média respeitou o teto da Z2 (152 bpm), embora o km final tenha entrado em Z3 (154 bpm) devido ao ritmo de 6:52/km.",
+    "pontos_fortes": [
+     "Excelente controle de ritmo e paciência nos primeiros 2 km (7:55 e 7:51/km), mantendo a FC bem comportada em Z2 mesmo sob temperatura de 30°C.",
+     "Decisão madura de encurtar a sessão para 3 km, priorizando a integridade estrutural e a recuperação da fáscia plantar neste bloco de retorno."
+    ],
+    "pontos_atencao": [
+     "Aceleração acentuada no km 3 (6:52/km), que elevou a FC para 154 bpm (Z3). No bloco de retorno, manter a homogeneidade do esforço é mais seguro para evitar picos de impacto na fáscia.",
+     "A cadência média de 149 spm está perfeitamente alinhada com a sua faixa de referência para este ritmo (146-156 spm), mas o aumento de velocidade no final sem o aumento proporcional da cadência indica que a passada alongou (passo estimado de ~0,98 m no km 3 contra ~0,85 m no início), o que aumenta a força de reação do solo."
+    ],
+    "proxima_dica": "Para o Social Run de amanhã (10/09), aplique rigorosamente a Regra das 24h: avalie o pé no primeiro passo da manhã. Se estiver zerado, faça os 5 km estritamente em Z1/Z2, mantendo o ritmo confortável e constante do primeiro ao último quilômetro, sem acelerar no final.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-09-07",
    "activityId": 24276911567,

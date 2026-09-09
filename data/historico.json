@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-09T17:54:41-03:00",
+ "atualizadoEm": "2026-09-09T18:49:51-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1059,6 +1059,21 @@
    "paradoPct": 1,
    "ef": 0.985,
    "tipoPlano": "leve"
+  },
+  {
+   "date": "2026-09-09",
+   "activityId": 24302511212,
+   "distanciaKm": 3.06,
+   "paceMedio": "7:33",
+   "paceSeg": 453,
+   "fcMedia": 146,
+   "fcMax": 162,
+   "cadencia": 149,
+   "vo2max": null,
+   "teAerobico": 3.1,
+   "paradoPct": 3,
+   "ef": 0.908,
+   "tipoPlano": "leve"
   }
  ],
  "forcas": [
@@ -1481,6 +1496,12 @@
    "activityId": 24153011258,
    "minutos": 20,
    "nome": "SEX Upper C + Core"
+  },
+  {
+   "date": "2026-09-09",
+   "activityId": 24302335675,
+   "minutos": 63,
+   "nome": "Força"
   }
  ],
  "tendencias": {
@@ -1584,16 +1605,20 @@
    {
     "date": "2026-09-07",
     "seg": 438
+   },
+   {
+    "date": "2026-09-09",
+    "seg": 453
    }
   ],
-  "paceZ2Atual": "6:51",
+  "paceZ2Atual": "7:05",
   "paceZ2Ha8Sem": "6:57",
   "vo2max": {
    "atual": 48.0,
    "ha8Sem": 47.0
   },
-  "cadencia4Sem": 154,
-  "kmPorSemana4Sem": 2.8,
+  "cadencia4Sem": 152,
+  "kmPorSemana4Sem": 3.6,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1746,9 +1771,13 @@
    {
     "date": "2026-09-07",
     "ef": 0.985
+   },
+   {
+    "date": "2026-09-09",
+    "ef": 0.908
    }
   ],
-  "efAtual": 1.027,
+  "efAtual": 0.992,
   "efHa8Sem": 0.982,
   "kmSemanas": [
    {
@@ -1797,7 +1826,7 @@
    },
    {
     "semana": "2026-09-07",
-    "km": 5.0
+    "km": 8.1
    }
   ],
   "longaoMes": [

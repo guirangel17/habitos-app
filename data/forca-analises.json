@@ -1,7 +1,193 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-08-14T19:36:45-03:00",
+ "atualizadoEm": "2026-09-09T18:49:51-03:00",
  "analises": [
+  {
+   "date": "2026-09-09",
+   "activityId": 24302335675,
+   "geradoEm": "2026-09-09T18:50:03-03:00",
+   "sessao": {
+    "minutos": 63,
+    "series": 21,
+    "volumeKg": 6640,
+    "exercicios": [
+     {
+      "nome": null,
+      "categoria": "PULL_UP",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 48
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 44
+       },
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 40
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": null,
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 43
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 65
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 41
+       },
+       {
+        "reps": 7,
+        "kg": 30.0,
+        "s": 36
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": null,
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 27
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 28
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 27
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 38
+       },
+       {
+        "reps": 9,
+        "kg": 52.5,
+        "s": 36
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "UNKNOWN",
+      "series": [
+       {
+        "reps": 8,
+        "kg": 52.5,
+        "s": 37
+       },
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 54
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 32
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 31
+       },
+       {
+        "reps": 11,
+        "kg": 10.0,
+        "s": 60
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 55
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 71
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 0.5,
+      "deltaReps": -3
+     },
+     {
+      "nome": null,
+      "categoria": "SIT_UP",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 38
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": null,
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 7.0,
+        "s": 51
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Retorno consistente aos treinos de força após 28 dias de layoff, priorizando a re-entrada segura e a integridade neuromuscular. O foco foi o estímulo controlado de puxar, excelente para a postura e eficiência da corrida, sem gerar fadiga excessiva.",
+    "comparacao_plano": "Com 21 séries executadas frente às 18 planejadas, o volume foi muito bem tolerado. As cargas e repetições respeitaram perfeitamente a diretriz de re-entrada (RIR ~3), garantindo estímulo hipertrófico protetor sem atingir a falha concêntrica.",
+    "pontos_fortes": [
+     "Excelente consistência na Barra Fixa (PULL_UP), tocando o topo da faixa alvo (11, 11, 10) mesmo após o período de afastamento.",
+     "Aplicação perfeita da progressão dupla no Supino (BENCH_PRESS), onde o aumento de carga (+5kg) gerou uma queda natural e esperada de repetições, sinal de trabalho mecânico eficiente.",
+     "Adoção correta da estratégia de re-entrada, mantendo a intensidade controlada para evitar DOMS (dor muscular tardia) que comprometeria os treinos de corrida da semana."
+    ],
+    "pontos_atencao": [
+     "O registro de exercícios sob a categoria 'UNKNOWN' dificulta o acompanhamento preciso da evolução de braços e ombros.",
+     "Séries únicas como a de Elevação Lateral e Sit Up oferecem estímulo metabólico rápido, mas se beneficiarão de maior volume (2-3 séries) quando a fase de força máxima iniciar."
+    ],
+    "proxima_dica": "Na Barra Fixa (PULL_UP), como você consolidou o topo da faixa de repetições (11, 11, 10), na próxima sessão suba a carga no menor incremento disponível (~2kg a 2.5kg ou reduza a assistência na máquina) e mire retornar à base da faixa (8 a 9 reps) com segurança.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-08-14",
    "activityId": 23978172714,
