@@ -1,7 +1,96 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-09T18:49:51-03:00",
+ "atualizadoEm": "2026-09-11T01:43:42-03:00",
  "analises": [
+  {
+   "date": "2026-09-10",
+   "activityId": 24316013807,
+   "geradoEm": "2026-09-11T01:43:57-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-09-10 20:39:07",
+    "distanciaKm": 6.02,
+    "duracaoMin": 47.5,
+    "paceMedio": "7:54",
+    "fcMedia": 148,
+    "fcMax": 167,
+    "cadencia": 118,
+    "elevacaoM": 112,
+    "trainingEffect": {
+     "aerobico": 3.3,
+     "anaerobico": 0.1,
+     "label": "TEMPO",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:10",
+      "fc": 139
+     },
+     {
+      "km": 2,
+      "pace": "8:00",
+      "fc": 150
+     },
+     {
+      "km": 3,
+      "pace": "7:37",
+      "fc": 148
+     },
+     {
+      "km": 4,
+      "pace": "8:38",
+      "fc": 149
+     },
+     {
+      "km": 5,
+      "pace": "7:32",
+      "fc": 145
+     },
+     {
+      "km": 6,
+      "pace": "8:24",
+      "fc": 155
+     }
+    ],
+    "zonasFc": {
+     "z1": 8,
+     "z2": 50,
+     "z3": 42,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 5 km regenerativo — sem strides",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:05",
+    "paceZ2Ha8Sem": "6:57"
+   },
+   "ia": {
+    "resumo": "Uma corrida social de 6 km realizada sob calor intenso de 30°C e em percurso bastante ondulado com 112 m de ganho de elevação. Você priorizou corretamente o controle de esforço, mantendo a frequência cardíaca média dentro da zona segura para o momento atual.",
+    "comparacao_plano": "O planejado era uma corrida social de 5 km com foco em regeneração, buscando ritmo de 6:50-7:15/km e FC ≤ 152 bpm. Você executou 6,02 km com pace médio de 7:54/km e FC média de 148 bpm. O ritmo mais lento é a resposta fisiológica correta e esperada para o Bloco de Retorno sob condições de calor extremo e subidas.",
+    "pontos_fortes": [
+     "Excelente disciplina de esforço: mesmo enfrentando 30°C e relevo acentuado, você segurou o ritmo para manter a FC média em 148 bpm (Z2), respeitando o limite regenerativo do dia.",
+     "Gestão madura do relevo: a variação dos splits (de 7:10 a 8:38/km) mostra que você não brigou com as ladeiras de Belo Horizonte, adaptando o ritmo para controlar o estresse cardiovascular."
+    ],
+    "pontos_atencao": [
+     "O volume total excedeu o planejado em 20% (6,02 km executados contra 5 km propostos). No Bloco de Retorno, a moderação do volume é crucial para evitar a sobrecarga cumulativa na fáscia plantar.",
+     "O indicador de pace em Z2 de 7:05/km (calculado com dados de agosto) está desatualizado devido à janela sem impacto. Use a FC como guia absoluto neste período de readaptação."
+    ],
+    "proxima_dica": "Para o primeiro longão de 8 km no dia 14/09, valide a corrida de hoje pela Regra das 24h: o termômetro de sucesso é a ausência de dor ou rigidez no calcanhar ao dar o primeiro passo fora da cama amanhã de manhã. Se estiver zerado, inicie o longão de forma muito progressiva, rodando os primeiros 2 km acima de 7:30/km para lubrificar as articulações e a fáscia.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-09-09",
    "activityId": 24302511212,
