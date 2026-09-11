@@ -1,5 +1,5 @@
 {
- "atualizadoEm": "2026-09-10T16:23:46-03:00",
+ "atualizadoEm": "2026-09-10T21:05:57-03:00",
  "janelas": [
   {
    "quando": "2026-09-10T06:00",
@@ -9,21 +9,21 @@
   },
   {
    "quando": "2026-09-10T19:00",
-   "temp": 20,
-   "chuvaPct": 78,
-   "umidade": 87
+   "temp": 22,
+   "chuvaPct": 73,
+   "umidade": 78
   },
   {
    "quando": "2026-09-11T06:00",
    "temp": 18,
    "chuvaPct": 0,
-   "umidade": 88
+   "umidade": 89
   },
   {
    "quando": "2026-09-11T19:00",
    "temp": 25,
-   "chuvaPct": 2,
-   "umidade": 62
+   "chuvaPct": 0,
+   "umidade": 63
   }
  ]
 }
