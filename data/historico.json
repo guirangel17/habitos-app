@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-11T16:22:44-03:00",
+ "atualizadoEm": "2026-09-11T21:13:58-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1517,6 +1517,12 @@
    "activityId": 24302335675,
    "minutos": 63,
    "nome": "Força"
+  },
+  {
+   "date": "2026-09-11",
+   "activityId": 24326095351,
+   "minutos": 29,
+   "nome": "SEX Upper C + Core"
   }
  ],
  "tendencias": {

@@ -1,7 +1,120 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-09T18:49:51-03:00",
+ "atualizadoEm": "2026-09-11T21:13:58-03:00",
  "analises": [
+  {
+   "date": "2026-09-11",
+   "activityId": 24326095351,
+   "geradoEm": "2026-09-11T21:13:59-03:00",
+   "sessao": {
+    "minutos": 29,
+    "series": 10,
+    "volumeKg": 1453,
+    "exercicios": [
+     {
+      "nome": "CABLE_CROSSOVER",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 107
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 40
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 62
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 6.0,
+      "deltaReps": -5
+     },
+     {
+      "nome": "SEATED_DUMBBELL_SHOULDER_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 180
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 33
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 62
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -3
+     },
+     {
+      "nome": "ONE_ARM_CABLE_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 25.0,
+        "s": 40
+       },
+       {
+        "reps": 12,
+        "kg": 25.0,
+        "s": 43
+       },
+       {
+        "reps": 8,
+        "kg": 25.0,
+        "s": 35
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": null,
+      "deltaReps": 0
+     },
+     {
+      "nome": "FACE_PULL",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 4,
+        "kg": null,
+        "s": 256
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": null,
+      "deltaReps": -8
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Retorno consistente ao treino Upper C após 28 dias de reabilitação. Uma sessão compactada de 29 minutos focada na reintrodução segura de estímulos para membros superiores e ombros, respeitando perfeitamente as diretrizes da fase de re-entrada.",
+    "comparacao_plano": "Com 10 séries executadas de um total planejado de 16 + core, a sessão foi estrategicamente encurtada. Priorizou-se o trabalho de peitoral e ombros (essenciais para a postura na corrida), postergando braços e core para otimizar o tempo e gerenciar o estresse sistêmico neste retorno.",
+    "pontos_fortes": [
+     "Excelente adesão à estratégia de re-entrada: a manutenção de cargas e repetições controladas garante a adaptação neural necessária sem gerar DOMS (dor muscular tardia) excessiva, protegendo a integridade dos treinos de corrida.",
+     "Progressão de carga consolidada no Cable Crossover, sustentando o incremento de 6kg com excelente volume de repetições (9-10 reps), demonstrando que a força de base foi preservada.",
+     "Consistência no Desenvolvimento com Halteres, mantendo a carga estável de 9kg com distribuição simétrica de 9 repetições em todas as séries, ideal para a estabilização articular do complexo do ombro."
+    ],
+    "pontos_atencao": [
+     "A redução drástica do Face Pull (apenas 1 série de 4 repetições) e a ausência dos exercícios de core são perfeitamente justificáveis pela gestão de tempo, mas vale lembrar que o core forte e a cintura escapular estável são os principais protetores da sua postura nas fases finais dos treinos longos de corrida.",
+     "Na Elevação Lateral na Polia, houve uma queda de rendimento na terceira série (caindo de 12 para 8 repetições), sugerindo que um descanso ligeiramente maior entre as séries (cerca de 90 a 120 segundos) pode ajudar a manter o volume efetivo de treino elevado."
+    ],
+    "proxima_dica": "Na próxima sessão de Upper C, mantenha as cargas atuais do Desenvolvimento (9kg) e da Elevação Lateral (25kg) para consolidar a re-entrada. No Cable Crossover, o foco será progredir em repetições dentro da faixa de 10-15 antes de realizar qualquer novo incremento de carga.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-09",
    "activityId": 24302335675,
