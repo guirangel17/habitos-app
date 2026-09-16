@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-15T21:14:35-03:00",
+ "atualizadoEm": "2026-09-16T01:51:40-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1639,10 +1639,10 @@
    }
   ],
   "paceZ2Atual": "7:05",
-  "paceZ2Ha8Sem": "6:57",
+  "paceZ2Ha8Sem": "6:55",
   "vo2max": {
    "atual": 48.0,
-   "ha8Sem": 48.0
+   "ha8Sem": 49.0
   },
   "cadencia4Sem": 152,
   "kmPorSemana4Sem": 3.5,
@@ -1805,7 +1805,7 @@
    }
   ],
   "efAtual": 0.992,
-  "efHa8Sem": 0.982,
+  "efHa8Sem": 0.999,
   "kmSemanas": [
    {
     "semana": "2026-06-29",
