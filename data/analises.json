@@ -1,7 +1,97 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-11T01:43:42-03:00",
+ "atualizadoEm": "2026-09-16T19:25:54-03:00",
  "analises": [
+  {
+   "date": "2026-09-16",
+   "activityId": 24389142529,
+   "geradoEm": "2026-09-16T19:26:08-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - 6km facil",
+    "inicio": "2026-09-16 17:57:40",
+    "distanciaKm": 5.5,
+    "duracaoMin": 37.9,
+    "paceMedio": "6:53",
+    "fcMedia": 144,
+    "fcMax": 153,
+    "cadencia": 157,
+    "elevacaoM": 23,
+    "trainingEffect": {
+     "aerobico": 3.0,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 47.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:48",
+      "fc": 136
+     },
+     {
+      "km": 2,
+      "pace": "6:50",
+      "fc": 141
+     },
+     {
+      "km": 3,
+      "pace": "6:40",
+      "fc": 143
+     },
+     {
+      "km": 4,
+      "pace": "6:55",
+      "fc": 148
+     },
+     {
+      "km": 5,
+      "pace": "7:01",
+      "fc": 150
+     },
+     {
+      "km": 6,
+      "pace": "7:14",
+      "fc": 150
+     }
+    ],
+    "zonasFc": {
+     "z1": 3,
+     "z2": 96,
+     "z3": 1,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "leve",
+    "nome": "6 km fácil",
+    "paceAlvo": "6:50–7:15 /km ou mais leve",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:15",
+    "paceZ2Ha8Sem": "6:55"
+   },
+   "ia": {
+    "resumo": "Retorno consistente com uma corrida de 5,5 km em ritmo leve, realizada sob calor de 30°C. O foco no controle do esforço manteve a intensidade perfeitamente alinhada ao objetivo regenerativo do dia.",
+    "comparacao_plano": "Volume de 5,5 km muito próximo dos 6 km planejados. O pace médio de 6:53/km ficou dentro da faixa proposta (6:50–7:15/km) e a FC média de 144 bpm respeitou o teto de 152 bpm (Z2), uma resposta excelente sob calor de 30°C, especialmente considerando que o seu pace de Z2 de referência (7:15/km) ainda está desatualizado com dados de antes da pausa.",
+    "pontos_fortes": [
+     "Excelente controle de intensidade com 96% do tempo na Z2, sem deixar o calor de 30°C inflar a frequência cardíaca além do limite.",
+     "Cadência média de 157 spm perfeitamente dentro da sua zona de referência (144-164 spm) para este ritmo, mantendo o comprimento de passo seguro em 0,92 m.",
+     "Leitura madura de esforço ao desacelerar nos quilômetros finais (ajustando de 6:40 para 7:14/km) para proteger o teto cardíaco da Z2."
+    ],
+    "pontos_atencao": [
+     "O intervalo de 6 dias desde a última corrida exige monitoramento da resposta estrutural do pé nas próximas horas.",
+     "Aumento gradual da FC ao longo dos splits (de 136 para 150 bpm) mesmo com a redução do ritmo, reflexo natural do calor e do bloco de retorno."
+    ],
+    "proxima_dica": "Para a Social Run de amanhã (5 km), aplique a Regra das 24h: o verdadeiro placar deste treino é a ausência de dor no primeiro passo fora da cama amanhã de manhã. Se estiver zerado, corra de forma leve e relaxada, sem pressa.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-10",
    "activityId": 24316013807,
