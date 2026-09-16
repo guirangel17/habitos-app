@@ -356,6 +356,35 @@ semanas de parecer:
   pedem reagendamento — não mudam workout do catálogo (strides em social run são livres, e o alvo
   do checkpoint de 30/09 já estava certo no relógio via `TEMPO_CHECKPOINT`).
 
+# Feito na v7.29 (set/2026) — longão de 8 km furado: os longões andam 1 semana
+
+O longão de 8 km de 14/09 não aconteceu (fim de semana de álcool, passou mal). Ele tentou repor
+em 16/09 e fez 5,5 km a 6:55/km (FC 144, 29,5 °C) mais uma caminhada: pernas pesadas. O cardio
+não confirma perda de forma: EF de 1,00, o melhor desde a volta (0,99 / 0,91 / 0,86). A deriva
+136 → 150 com pace estável/caindo é calor + ressaca + déficit calórico, não preparo.
+
+O problema é outro: o maior treino desde 07/09 continua sendo 6 km, e 21/09 pedia 10 km
+(+66%) numa fáscia recém-curada. A decisão foi **não recuperar o treino perdido, e sim empurrar a
+progressão**:
+
+| data | antes | agora |
+|---|---|---|
+| 21/09 | 10 km | **8 km** |
+| 28/09 | 12 km | **10 km** |
+| 05/10 (deload) | 10 km | 10 km |
+| 12/10 | 14 km | **12 km** |
+| 19/10 | 15 km | **14 km** (treino novo `Longao 14km cadencia` no catálogo) |
+| 26/10 | 16 km | 16 km |
+
+- **Efeito colateral bom:** resolve o "degrau de verdade" que a v7.28 deixou para reavaliar
+  depois de 28/09. O salto 05/10 → 12/10 era 10 → 14 km e virou 10 → 12, na semana dos tiros de 1 km.
+- Nada muda em 26/10, na Volta Completa (02/11), no teste (07/10) nem na prova. O maior degrau
+  novo é 14 → 16 → 18, de 2 km por semana.
+- 23/09 (Tempo Run 3 km) ganhou o gate no texto: só se o longão de 21/09 saiu sem dor no primeiro
+  passo de 22/09; senão, 5 km fácil.
+- Relógio: 21/09, 28/09, 12/10 e 19/10 desagendados e reagendados via `criar.py`, conferidos no
+  calendário real da Garmin (deduplicado por id).
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

@@ -60,7 +60,8 @@
     "Longao 12km": 1663350579,
     "Tempo Run 5km CHECKPOINT": 1663350581,
     "Longao 14km constante": 1663350598,
-    "Longao 15km cadencia": 1663350606
+    "Longao 15km cadencia": 1663350606,
+    "Longao 14km cadencia": 1700544171
   },
   "agendamentos": [
     {
@@ -928,22 +929,10 @@
       "data": "2026-09-17"
     },
     {
-      "chave": "1663350572:2026-09-21",
-      "scheduleId": 1743455961,
-      "nome": "Longao 10km facil",
-      "data": "2026-09-21"
-    },
-    {
       "chave": "1663350576:2026-09-23",
       "scheduleId": 1743455964,
       "nome": "Tempo Run 3km",
       "data": "2026-09-23"
-    },
-    {
-      "chave": "1663350579:2026-09-28",
-      "scheduleId": 1743455967,
-      "nome": "Longao 12km",
-      "data": "2026-09-28"
     },
     {
       "chave": "1663350581:2026-09-30",
@@ -974,18 +963,6 @@
       "scheduleId": 1743455986,
       "nome": "Social Run 6km",
       "data": "2026-10-08"
-    },
-    {
-      "chave": "1663350598:2026-10-12",
-      "scheduleId": 1743455993,
-      "nome": "Longao 14km constante",
-      "data": "2026-10-12"
-    },
-    {
-      "chave": "1663350606:2026-10-19",
-      "scheduleId": 1743456000,
-      "nome": "Longao 15km cadencia",
-      "data": "2026-10-19"
     },
     {
       "chave": "1624794473:2026-09-24",
@@ -1028,6 +1005,30 @@
       "scheduleId": 1770946023,
       "nome": "Social Run 5km",
       "data": "2026-11-26"
+    },
+    {
+      "chave": "1663350562:2026-09-21",
+      "scheduleId": 1779962226,
+      "nome": "Longao 8km facil",
+      "data": "2026-09-21"
+    },
+    {
+      "chave": "1663350572:2026-09-28",
+      "scheduleId": 1779962228,
+      "nome": "Longao 10km facil",
+      "data": "2026-09-28"
+    },
+    {
+      "chave": "1663350579:2026-10-12",
+      "scheduleId": 1779962230,
+      "nome": "Longao 12km",
+      "data": "2026-10-12"
+    },
+    {
+      "chave": "1700544171:2026-10-19",
+      "scheduleId": 1779962239,
+      "nome": "Longao 14km cadencia",
+      "data": "2026-10-19"
     }
   ]
 }
