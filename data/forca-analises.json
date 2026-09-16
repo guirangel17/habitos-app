@@ -1,7 +1,178 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-11T21:13:58-03:00",
+ "atualizadoEm": "2026-09-15T21:14:35-03:00",
  "analises": [
+  {
+   "date": "2026-09-15",
+   "activityId": 24377180156,
+   "geradoEm": "2026-09-15T21:14:36-03:00",
+   "sessao": {
+    "minutos": 49,
+    "series": 18,
+    "volumeKg": 4131,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 48
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 40
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 38
+       },
+       {
+        "reps": 8,
+        "kg": 30.0,
+        "s": 38
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 48
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 35
+       },
+       {
+        "reps": 8,
+        "kg": 15.0,
+        "s": 36
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 71
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 28
+       },
+       {
+        "reps": 8,
+        "kg": 32.0,
+        "s": 41
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 30
+       },
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 33
+       },
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 100
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 81
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 76
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 223
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 10
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 64
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 54
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 6
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Excelente retorno aos treinos de empurrar após 42 dias de afastamento para recuperação da fascite plantar. Guilherme realizou uma sessão consistente, focando na reativação neuromuscular sem atingir a falha, preservando a integridade física para a corrida.",
+    "comparacao_plano": "Executou 18 séries das 19 planejadas, com cargas perfeitamente calibradas para a fase de re-entrada (~70-75% do histórico de agosto). O volume e a intensidade respeitaram a diretriz de RIR 3, garantindo estímulo hipertrófico seguro sem gerar fadiga residual excessiva.",
+    "pontos_fortes": [
+     "Consistência no Supino Reto, alcançando o topo da faixa alvo (11 repetições) nas duas primeiras séries com 30kg.",
+     "Progressão de repetições (reps_up) no Supino Inclinado e nos exercícios de tríceps, evidenciando rápida readaptação motora.",
+     "Excelente autorregulação ao realizar duas séries no Tríceps Testa e reduzir a carga na última série do Pulley, priorizando a qualidade do movimento na re-entrada."
+    ],
+    "pontos_atencao": [
+     "O ajuste de repetições no Desenvolvimento Máquina (status ajuste) é esperado e correto para este primeiro treino pós-layoff; evite forçar a subida de carga na próxima sessão.",
+     "Monitore a resposta dos tríceps nas próximas 48 horas para garantir que o volume periférico não interfira na postura dos braços durante os treinos de corrida."
+    ],
+    "proxima_dica": "No Supino Reto, como você atingiu 11 repetições com 30kg, na próxima sessão suba a carga para 32kg (menor incremento disponível) e mire em 9 repetições. A força de agosto retornará naturalmente em 2 a 3 sessões com o restabelecimento da eficiência neural.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-11",
    "activityId": 24326095351,
