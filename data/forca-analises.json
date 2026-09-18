@@ -1,7 +1,164 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-15T21:14:35-03:00",
+ "atualizadoEm": "2026-09-17T21:12:28-03:00",
  "analises": [
+  {
+   "date": "2026-09-17",
+   "activityId": 24401246482,
+   "geradoEm": "2026-09-17T21:12:30-03:00",
+   "sessao": {
+    "minutos": 36,
+    "series": 17,
+    "volumeKg": 3600,
+    "exercicios": [
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 45
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 57
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 42
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 41
+       },
+       {
+        "reps": 0,
+        "kg": 30.0,
+        "s": 2
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -10.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 37
+       },
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 38
+       },
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 41
+       },
+       {
+        "reps": 0,
+        "kg": 15.0,
+        "s": 4
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_BULGARIAN_SPLIT_SQUAT",
+      "categoria": "LUNGE",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 59.5,
+        "s": 3
+       },
+       {
+        "reps": 11,
+        "kg": 59.5,
+        "s": 63
+       },
+       {
+        "reps": 10,
+        "kg": 59.5,
+        "s": 64
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "STANDING_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 4,
+        "kg": null,
+        "s": 113
+       },
+       {
+        "reps": 18,
+        "kg": null,
+        "s": 204
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 6
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Retorno altamente estratégico e consciente aos treinos de membros inferiores após um hiato de 42 dias para tratamento de fascite plantar. O foco absoluto foi a re-entrada segura, priorizando a integridade dos tecidos e a coordenação motora sem gerar dor muscular tardia (DOMS) excessiva.",
+    "comparacao_plano": "Foram executados 4 dos 7 exercícios planejados. Houve redução planejada de carga no Leg Press (-10kg) e manutenção nos demais isoladores executados, enquanto o búlgaro, o stiff e o tibial anterior foram pulados de forma consciente para limitar o volume total de séries nesta primeira semana de estímulo.",
+    "pontos_fortes": [
+     "Excelente tomada de decisão no Leg Press: a redução de 10kg em relação ao histórico anterior foi perfeita para cumprir a diretriz de RIR 3 (repetições em reserva) e garantir uma re-entrada segura.",
+     "Gestão de volume impecável: pular o agachamento búlgaro (exercício unilateral de alta demanda excêntrica) e o stiff protegeu a fáscia plantar e os isquiotibiais de uma sobrecarga precoce nesta fase de transição.",
+     "Evolução na panturrilha em pé (+6 repetições), estimulando a capacidade elástica e o fluxo sanguíneo na região do tornozelo sem a necessidade de adicionar carga externa que pudesse irritar a sola do pé."
+    ],
+    "pontos_atencao": [
+     "Embora a Elevação Pélvica e a Cadeira Flexora constem no histórico como estagnadas, repetir exatamente as mesmas cargas nesta sessão foi a conduta ideal para reestabelecer a eficiência neuromuscular sem agredir as estruturas articulares.",
+     "À medida que a tolerância ao esforço for restabelecida nas próximas semanas, reintroduza o Tibial Anterior de forma gradual para manter o suporte preventivo contra a canelite ativa à medida que o volume da corrida crescer."
+    ],
+    "proxima_dica": "Na próxima sessão de Pernas A, mantenha as cargas atuais (Leg Press a 30kg e Elevação Pélvica a 15kg) e foque em consolidar as repetições no topo da faixa (11-12 reps). Não busque subir cargas ainda; o ganho inicial nesta fase é puramente neural e a estabilização da fáscia é a prioridade para o seu longão.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-15",
    "activityId": 24377180156,
