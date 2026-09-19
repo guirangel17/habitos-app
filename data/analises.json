@@ -1,7 +1,85 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-16T19:25:54-03:00",
+ "atualizadoEm": "2026-09-19T10:54:54-03:00",
  "analises": [
+  {
+   "date": "2026-09-19",
+   "activityId": 24420156524,
+   "geradoEm": "2026-09-19T10:55:57-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-09-19 09:51:29",
+    "distanciaKm": 5.02,
+    "duracaoMin": 38.0,
+    "paceMedio": "7:34",
+    "fcMedia": 136,
+    "fcMax": 164,
+    "cadencia": 107,
+    "elevacaoM": 98,
+    "trainingEffect": {
+     "aerobico": 3.0,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 34.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:10",
+      "fc": 131
+     },
+     {
+      "km": 2,
+      "pace": "7:25",
+      "fc": 133
+     },
+     {
+      "km": 3,
+      "pace": "8:53",
+      "fc": 138
+     },
+     {
+      "km": 4,
+      "pace": "7:18",
+      "fc": 135
+     },
+     {
+      "km": 5,
+      "pace": "7:05",
+      "fc": 140
+     }
+    ],
+    "zonasFc": {
+     "z1": 37,
+     "z2": 53,
+     "z3": 10,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": null,
+   "historico": {
+    "paceZ2Atual": "7:15",
+    "paceZ2Ha8Sem": "6:55"
+   },
+   "ia": {
+    "resumo": "Uma corrida extra e não planejada de 5 km realizada sob calor intenso de 34°C e com altimetria desafiadora (98m de ganho de elevação). O principal destaque foi o excelente controle de esforço, mantendo a intensidade predominantemente na zona de base aeróbica.",
+    "comparacao_plano": "Não havia treino de corrida planejado para este dia. Embora a intensidade tenha sido perfeitamente controlada na Z2 (FC média de 136 bpm), a adição de volume não planejado durante o bloco de retorno exige cautela, pois reduz o tempo de recuperação estrutural para o longão de 8 km programado para daqui a dois dias.",
+    "pontos_fortes": [
+     "Excelente disciplina cardiovascular: manter a FC média em 136 bpm (Z2) sob calor extremo de 34°C e relevo ondulado demonstra uma leitura de esforço madura e controle fisiológico impecável.",
+     "Gestão de ritmo inteligente no split 3 (8:53/km): a redução intencional do ritmo na provável subida mais íngreme evitou que a frequência cardíaca disparasse, protegendo o teto aeróbico do treino."
+    ],
+    "pontos_atencao": [
+     "Inconsistência no registro de cadência: a média de 107 spm está muito abaixo da sua faixa de referência para este pace (146-156 spm). Pelo ritmo dos splits, uma cadência real de 107 exigiria um comprimento de passo de ~1,30m, o que é mecanicamente improvável. Isso indica uma provável falha de leitura do sensor do relógio (braço travado ou segurando algum objeto) e não um desvio biomecânico real.",
+     "Acréscimo de carga no bloco de retorno: com a fáscia plantar ainda em fase de consolidação pós-lesão, treinos extras diminuem a janela de regeneração do tecido conectivo. A prioridade atual é a consistência do calendário planejado."
+    ],
+    "proxima_dica": "Aplique rigorosamente a regra das 24 horas: monitore o primeiro passo da manhã seguinte a este treino. Se o pé estiver totalmente livre de dores, realize o longão de 8 km na segunda-feira (21/09) com foco exclusivo em manter a FC na Z1/Z2 (teto de 152 bpm), deixando o pace ser consequência direta do terreno e da temperatura.",
+    "nota_execucao": null
+   }
+  },
   {
    "date": "2026-09-16",
    "activityId": 24389142529,
