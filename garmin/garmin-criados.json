@@ -61,7 +61,8 @@
     "Tempo Run 5km CHECKPOINT": 1663350581,
     "Longao 14km constante": 1663350598,
     "Longao 15km cadencia": 1663350606,
-    "Longao 14km cadencia": 1700544171
+    "Longao 14km cadencia": 1700544171,
+    "QUI Pernas DELOAD (semana do teste)": 1705994054
   },
   "agendamentos": [
     {
@@ -665,12 +666,6 @@
       "data": "2026-10-07"
     },
     {
-      "chave": "1624797035:2026-10-08",
-      "scheduleId": 1705467134,
-      "nome": "QUI Pernas MANUTENCAO (out)",
-      "data": "2026-10-08"
-    },
-    {
       "chave": "1624796511:2026-10-09",
       "scheduleId": 1705467139,
       "nome": "SEX Upper C + Core",
@@ -1007,12 +1002,6 @@
       "data": "2026-11-26"
     },
     {
-      "chave": "1663350562:2026-09-21",
-      "scheduleId": 1779962226,
-      "nome": "Longao 8km facil",
-      "data": "2026-09-21"
-    },
-    {
       "chave": "1663350572:2026-09-28",
       "scheduleId": 1779962228,
       "nome": "Longao 10km facil",
@@ -1029,6 +1018,18 @@
       "scheduleId": 1779962239,
       "nome": "Longao 14km cadencia",
       "data": "2026-10-19"
+    },
+    {
+      "chave": "1663350562:2026-09-22",
+      "scheduleId": 1785329733,
+      "nome": "Longao 8km facil",
+      "data": "2026-09-22"
+    },
+    {
+      "chave": "1705994054:2026-10-08",
+      "scheduleId": 1785348594,
+      "nome": "QUI Pernas DELOAD (semana do teste)",
+      "data": "2026-10-08"
     }
   ]
 }

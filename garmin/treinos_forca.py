@@ -118,6 +118,13 @@ CATALOGO_FORCA = {
         ex("Panturrilha em Pé", 4, 10, "CALF_RAISE", "STANDING_CALF_RAISE", 75),
         ex("Tibial Anterior", 3, 15, "CALF_RAISE", "SEATED_DUMBBELL_TOE_RAISE", 60),
     ], "Fase de força máxima: cargas altas, descanso completo, longe da falha"),
+    "QUI Pernas DELOAD (semana do teste)": treino_forca("QUI Pernas DELOAD (semana do teste)", [
+        ex("V-Squat ou Leg Press pesado", 3, 5, "SQUAT", "LEG_PRESS", 180),
+        ex("Elevacao Pelvica", 2, 6, "HIP_RAISE", "BARBELL_HIP_THRUST_WITH_BENCH", 180),
+        ex("Cadeira Flexora", 2, 10, "LEG_CURL", "LEG_CURL", 90),
+        ex("Panturrilha em Pe", 2, 10, "CALF_RAISE", "STANDING_CALF_RAISE", 75),
+        ex("Tibial Anterior", 2, 15, "CALF_RAISE", "SEATED_DUMBBELL_TOE_RAISE", 60),
+    ], "Metade das series — semana de deload do teste de 5 km (07/10)"),
     "QUI Pernas MANUTENCAO (out)": treino_forca("QUI Pernas MANUTENCAO (out)", [
         ex("V-Squat ou Leg Press pesado", 3, 4, "SQUAT", "LEG_PRESS", 180),
         ex("Búlgaro", 2, 8, "LUNGE", "DUMBBELL_BULGARIAN_SPLIT_SQUAT", 120),
@@ -152,12 +159,21 @@ for dt in _semanal(2, "2026-07-08", "2026-10-28"):
     AGENDA_FORCA.append((dt, "QUA Puxar"))
 for dt in _semanal(3, "2026-07-09", "2026-08-27"):
     AGENDA_FORCA.append((dt, "QUI Pernas A"))
-for dt in _semanal(3, "2026-09-03", "2026-10-01"):
-    AGENDA_FORCA.append((dt, "QUI Pernas FORCA MAX (set)"))
-for dt in _semanal(3, "2026-10-08", "2026-10-29"):
-    AGENDA_FORCA.append((dt, "QUI Pernas MANUTENCAO (out)"))
-for dt in _semanal(3, "2026-11-05", "2026-11-19"):
-    AGENDA_FORCA.append((dt, "QUI Pernas POLIMENTO (nov)"))
+# Fases do dia de perna, em UMA tabela so. Espelha GYM_PERNA_FASES em data.js, que e o que o
+# app mostra — as duas listas viviam separadas e divergiram: aqui o bloco pesado comecou em
+# 03/09 enquanto o app seguia mostrando hipertrofia (4 x 8-10), e ele viu a diferenca na quinta
+# de 17/09 (v7.30). Mexeu numa, mexa na outra. As datas de 03/09 a 17/09 ficam como foram
+# executadas de fato; o que mudou daqui pra frente e o deload de 08/10, que a agenda antiga
+# nao tinha (entrava direto em manutencao e contrariava "semana de 05/10 e DELOAD" do data.js).
+FASES_PERNA = [
+    ("2026-09-03", "2026-10-01", "QUI Pernas FORCA MAX (set)"),
+    ("2026-10-08", "2026-10-08", "QUI Pernas DELOAD (semana do teste)"),
+    ("2026-10-15", "2026-10-29", "QUI Pernas MANUTENCAO (out)"),
+    ("2026-11-05", "2026-11-19", "QUI Pernas POLIMENTO (nov)"),
+]
+for inicio, fim, nome in FASES_PERNA:
+    for dt in _semanal(3, inicio, fim):
+        AGENDA_FORCA.append((dt, nome))
 for dt in _semanal(4, "2026-07-10", "2026-11-27"):
     AGENDA_FORCA.append((dt, "SEX Upper C + Core"))
 for dt in _semanal(5, "2026-07-11", "2026-11-21"):

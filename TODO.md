@@ -385,6 +385,35 @@ progressão**:
 - Relógio: 21/09, 28/09, 12/10 e 19/10 desagendados e reagendados via `criar.py`, conferidos no
   calendário real da Garmin (deduplicado por id).
 
+# Feito na v7.30 (set/2026) — o dia de perna tinha duas verdades
+
+Ele perguntou por que as repeticoes do treino de perna caiaram na quinta de 17/09. A resposta
+curta e a periodizacao (forca maxima: menos reps, mais carga, longe da falha, pra ganhar economia
+de corrida sem DOMS entre o longao e o fim de semana). A resposta longa e que **o app e o relogio
+discordavam**: `treinos_forca.py` entrou em `QUI Pernas FORCA MAX (set)` em **03/09**, enquanto
+`GYM_FASE_POR_MES[9]` (v7.28) dizia re-entrada nas semanas de 07/09 e 14/09 e forca maxima so a
+partir de 21/09 — e `GYM_TREINOS[4]`, que e o que o sheet do app mostrava, seguia fixo na
+hipertrofia (4 × 8-10) o plano inteiro, em qualquer mes.
+
+Duas listas para a mesma quinta-feira, em arquivos diferentes, sem nada que as obrigasse a
+concordar. O relogio deu 5 × 5 a 80-87%, o app mostrou 4 × 8-10.
+
+- **`GYM_PERNA_FASES` (data.js) vira a fonte unica das fases da perna** — janelas por DATA, com os
+  exercicios de cada uma. `FASES_PERNA` no `treinos_forca.py` espelha as mesmas datas, e as duas
+  carregam o aviso de mexer nas duas.
+- **`D.gymDoDia(key)`** (pura, 6 asserts): quinta dentro de uma janela usa a fase; qualquer outro
+  dia segue em `GYM_TREINOS`. O sheet do app passa a mostrar a fase pela data — o deload e de UMA
+  quinta so, e nota por mes nao consegue representar isso.
+- **Bug achado de quebra, esse no futuro:** a agenda do relogio ia de forca maxima direto pra
+  manutencao em 08/10, contrariando o proprio data.js ("Semana de 05/10 e DELOAD, metade das
+  series"). Criado `QUI Pernas DELOAD (semana do teste)` e agendado em 08/10; manutencao comeca
+  em 15/10. Reagendado no relogio e conferido.
+- **Novembro tambem discordava**: o texto do mes dizia "ultima sessao pesada de perna: 23-24/11",
+  mas a agenda so vai ate 19/11 (e o proprio treino de polimento diz 19/11). Texto corrigido.
+
+Nao foi tocado: as quintas de 03/09 a 17/09 ficam como foram executadas de fato — 10/09 nao teve
+treino de perna e 17/09 ele fez a sessao pesada e correu bem no sabado seguinte (EF 0,97).
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

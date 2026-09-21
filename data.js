@@ -285,6 +285,42 @@ export const GYM_TREINOS = {
   ],
 };
 
+// Fases do dia de PERNA (quinta) — [inicio, fim, rotulo, exercicios]
+// FONTE ÚNICA das fases: o relógio (garmin/treinos_forca.py) monta a agenda a partir destas
+// mesmas datas, e o app monta o detalhe da quinta daqui. Até a v7.29 os dois tinham listas
+// próprias: o relógio entrou em Força Máxima em 03/09 enquanto o app seguia mostrando 4 × 8-10
+// de hipertrofia — ele viu a diferença na quinta de 17/09. Mexeu numa, mexa na outra.
+// GYM_TREINOS[4] continua valendo como base (hipertrofia, até 27/08).
+export const GYM_PERNA_FASES = [
+  ['2026-09-03', '2026-09-17', 'Força Máxima (set)', [
+    ['V-Squat ou Leg Press PESADO 80-87%', '5 × 5', 'RIR 2 — descanso 3 min'],
+    ['Elevação Pélvica pesada', '4 × 6'],
+    ['Búlgaro', '3 × 8', 'o mais transferível para corrida — não pule'],
+    ['Cadeira Flexora', '3 × 10'],
+    ['Panturrilha em Pé', '4 × 10'],
+    ['Tibial Anterior', '3 × 15'],
+  ]],
+  ['2026-10-08', '2026-10-08', 'DELOAD da semana do teste', [
+    ['V-Squat ou Leg Press pesado', '3 × 5', 'metade das séries — perna fresca'],
+    ['Elevação Pélvica', '2 × 6'],
+    ['Cadeira Flexora', '2 × 10'],
+    ['Panturrilha em Pé', '2 × 10'],
+    ['Tibial Anterior', '2 × 15'],
+  ]],
+  ['2026-10-15', '2026-10-29', 'Manutenção + Potência (out)', [
+    ['V-Squat ou Leg Press pesado', '3 × 4', 'volume −40% — o pico agora é da corrida'],
+    ['Búlgaro', '2 × 8'],
+    ['Cadeira Flexora', '2 × 10'],
+    ['Panturrilha em Pé', '3 × 10'],
+    ['Tibial Anterior', '3 × 15'],
+  ]],
+  ['2026-11-05', '2026-11-19', 'Polimento (nov)', [
+    ['Leg Press pesado curto', '3 × 5', 'força neural SEM dano — última pesada em 19/11'],
+    ['Elevação Pélvica', '2 × 8'],
+    ['Panturrilha em Pé', '3 × 10'],
+  ]],
+];
+
 // Periodização da musculação (Seção 3) — nota por mês
 export const GYM_FASE_POR_MES = {
   7: 'Fase: Hipertrofia (8-12 reps).',
@@ -293,9 +329,9 @@ export const GYM_FASE_POR_MES = {
   // (12/08 a 06/09). 80-87% de um 1RM velho é carga que ele não tem hoje, e a DOMS da 1ª sessão
   // pesada de perna cairia justo no Longão de segunda. Duas semanas de re-entrada e o bloco de
   // força máxima começa em 21/09 — sem custo nenhum pro plano, que só cobra força em outubro.
-  9: 'Fase: RE-ENTRADA nas semanas de 07/09 e 14/09 — mesmos exercícios, ~70-75% da carga de agosto, 8-10 reps, RIR 3, sem falha e sem sessão até a exaustão. De 21/09 em diante: Força Máxima — compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2; isoladores 10-12. Deload na semana de 05/10 (o do plano de corrida, que andou junto com o teste de 5 km).',
+  9: 'Fase: RE-ENTRADA nas semanas de 07/09 e 14/09 — mesmos exercícios, ~70-75% da carga de agosto, 8-10 reps, RIR 3, sem falha e sem sessão até a exaustão. De 21/09 em diante: Força Máxima (no relógio o bloco pesado começou em 03/09 — ver v7.30) — compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2; isoladores 10-12. Deload na semana de 05/10 (o do plano de corrida, que andou junto com o teste de 5 km).',
   10: 'Fase: Manutenção + Potência — compostos 3 × 3-5 pesado (volume −40%) + pliometria leve 2×/sem (40-60 contatos). Semana de 05/10 é DELOAD (metade das séries) — perna fresca pro teste de 07/10. Pliometria só depois do teste, e nunca em dia de tiro.',
-  11: 'Fase: Polimento — 1-2 sessões curtas e pesadas, sem falha, sem DOMS. Última sessão pesada de perna: 23-24/11.',
+  11: 'Fase: Polimento — 1-2 sessões curtas e pesadas, sem falha, sem DOMS. Última sessão pesada de perna: 19/11.',
   12: 'Semana da prova: ZERO perna. Upper leve até quarta 02/12 no máximo.',
 };
 

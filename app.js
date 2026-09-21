@@ -1,12 +1,12 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.29'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.30'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
   REFEICOES, MEAL_IDS, TIPO_POR_DIA_SEMANA, METAS_DIA, TREINO_POR_DIA, GATILHOS,
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
   FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
-  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_TREINOS, GYM_FASE_POR_MES, CORRIDA_GUIA, CHECKPOINTS, VIAGEM_GUIA,
+  CORRIDAS, TIPO_CORRIDA_ICONE, GYM_FASE_POR_MES, CORRIDA_GUIA, CHECKPOINTS, VIAGEM_GUIA,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -1617,8 +1617,10 @@ function sheetTreinoDetalhe(kind, plano, key) {
   const dataAnalise = D.origemAtividade(S.getState().events, key, kind);
   let box;
   if (kind === 'gym') {
-    const exercicios = plano.gym ? (GYM_TREINOS[D.parseKey(key).getDay()] || []) : [];
-    const fase = plano.gym ? GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1] : null;
+    const doDia = plano.gym ? D.gymDoDia(key) : { exercicios: [], fase: null };
+    const exercicios = doDia.exercicios;
+    // a fase da quinta vale pela data (o deload é de uma quinta só); os outros dias usam a nota do mês
+    const fase = plano.gym ? (doDia.fase ? `Fase: ${doDia.fase}.` : GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1]) : null;
     box = el(`<div><h3>🏋️ ${esc(plano.gym || 'Treino de força extra')}</h3>
       ${!plano.gym ? '<p class="detalhe-fase">Fora do plano — não substitui nenhum treino planejado.</p>' : ''}
       ${fase ? `<p class="detalhe-fase">${esc(fase)}</p>` : ''}

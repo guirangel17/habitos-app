@@ -1,5 +1,5 @@
 // Funções puras de derivação — sem DOM, sem storage. Testáveis via node.
-import { TIPO_POR_DIA_SEMANA, FIM_DEFICIT, CARGA_CARBO, PROVA, MEAL_IDS, METAS_30D, CORRIDAS, GYM_POR_DIA, MARCOS_DIAS } from './data.js';
+import { TIPO_POR_DIA_SEMANA, FIM_DEFICIT, CARGA_CARBO, PROVA, MEAL_IDS, METAS_30D, CORRIDAS, GYM_POR_DIA, GYM_TREINOS, GYM_PERNA_FASES, MARCOS_DIAS } from './data.js';
 
 export const DAY_MS = 86400000;
 
@@ -852,4 +852,17 @@ export function semanasComBalanco(events, settings, hojeKey, limite = 12, opts =
     if (b) out.push(b);
   }
   return out;
+}
+
+// Exercícios da academia do dia. A quinta (dia de perna) muda de fase ao longo do plano —
+// força máxima, deload da semana do teste, manutenção, polimento — e a fase vale pela DATA,
+// não pelo mês: o deload é de uma quinta só. Fora das janelas de GYM_PERNA_FASES, e em todo
+// outro dia da semana, vale a lista fixa de GYM_TREINOS.
+export function gymDoDia(key) {
+  const dow = parseKey(key).getDay();
+  if (dow === 4) {
+    const fase = GYM_PERNA_FASES.find((f) => key >= f[0] && key <= f[1]);
+    if (fase) return { exercicios: fase[3], fase: fase[2] };
+  }
+  return { exercicios: GYM_TREINOS[dow] || [], fase: null };
 }
