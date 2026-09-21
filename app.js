@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.30'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.31'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -1620,7 +1620,7 @@ function sheetTreinoDetalhe(kind, plano, key) {
     const doDia = plano.gym ? D.gymDoDia(key) : { exercicios: [], fase: null };
     const exercicios = doDia.exercicios;
     // a fase da quinta vale pela data (o deload é de uma quinta só); os outros dias usam a nota do mês
-    const fase = plano.gym ? (doDia.fase ? `Fase: ${doDia.fase}.` : GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1]) : null;
+    const fase = plano.gym ? (doDia.nota || GYM_FASE_POR_MES[D.parseKey(key).getMonth() + 1]) : null;
     box = el(`<div><h3>🏋️ ${esc(plano.gym || 'Treino de força extra')}</h3>
       ${!plano.gym ? '<p class="detalhe-fase">Fora do plano — não substitui nenhum treino planejado.</p>' : ''}
       ${fase ? `<p class="detalhe-fase">${esc(fase)}</p>` : ''}

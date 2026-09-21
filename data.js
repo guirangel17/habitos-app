@@ -292,7 +292,7 @@ export const GYM_TREINOS = {
 // de hipertrofia — ele viu a diferença na quinta de 17/09. Mexeu numa, mexa na outra.
 // GYM_TREINOS[4] continua valendo como base (hipertrofia, até 27/08).
 export const GYM_PERNA_FASES = [
-  ['2026-09-03', '2026-09-17', 'Força Máxima (set)', [
+  ['2026-09-03', '2026-10-01', 'Força Máxima', 'Compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2 — nunca à falha. Isoladores 10-12.', [
     ['V-Squat ou Leg Press PESADO 80-87%', '5 × 5', 'RIR 2 — descanso 3 min'],
     ['Elevação Pélvica pesada', '4 × 6'],
     ['Búlgaro', '3 × 8', 'o mais transferível para corrida — não pule'],
@@ -300,21 +300,21 @@ export const GYM_PERNA_FASES = [
     ['Panturrilha em Pé', '4 × 10'],
     ['Tibial Anterior', '3 × 15'],
   ]],
-  ['2026-10-08', '2026-10-08', 'DELOAD da semana do teste', [
+  ['2026-10-08', '2026-10-08', 'Deload da semana do teste', 'Metade das séries, mesma carga — perna fresca pro teste de 5 km de 07/10.', [
     ['V-Squat ou Leg Press pesado', '3 × 5', 'metade das séries — perna fresca'],
     ['Elevação Pélvica', '2 × 6'],
     ['Cadeira Flexora', '2 × 10'],
     ['Panturrilha em Pé', '2 × 10'],
     ['Tibial Anterior', '2 × 15'],
   ]],
-  ['2026-10-15', '2026-10-29', 'Manutenção + Potência (out)', [
+  ['2026-10-15', '2026-10-29', 'Manutenção + Potência', 'Volume −40%: o pico agora é da corrida. Pliometria leve 2×/sem (40-60 contatos), nunca em dia de tiro.', [
     ['V-Squat ou Leg Press pesado', '3 × 4', 'volume −40% — o pico agora é da corrida'],
     ['Búlgaro', '2 × 8'],
     ['Cadeira Flexora', '2 × 10'],
     ['Panturrilha em Pé', '3 × 10'],
     ['Tibial Anterior', '3 × 15'],
   ]],
-  ['2026-11-05', '2026-11-19', 'Polimento (nov)', [
+  ['2026-11-05', '2026-11-19', 'Polimento', 'Curto e pesado, sem falha e sem dor muscular. Última sessão pesada de perna: 19/11.', [
     ['Leg Press pesado curto', '3 × 5', 'força neural SEM dano — última pesada em 19/11'],
     ['Elevação Pélvica', '2 × 8'],
     ['Panturrilha em Pé', '3 × 10'],

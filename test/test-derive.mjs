@@ -465,10 +465,13 @@ ok(D.semanasComBalanco(refSem, cfg, QUI, 2).length === 2, 'histórico: limite re
 // estava em força máxima — v7.30)
 const qui = (k) => D.gymDoDia(k);
 ok(qui('2026-08-27').fase === null && qui('2026-08-27').exercicios[0][1] === '4 × 8-10', 'perna: até 27/08 é a base de hipertrofia');
-ok(qui('2026-09-17').fase === 'Força Máxima (set)' && qui('2026-09-17').exercicios[0][1] === '5 × 5', 'perna: 17/09 é força máxima, 5 × 5');
-ok(qui('2026-10-08').fase === 'DELOAD da semana do teste', 'perna: 08/10 é o deload da semana do teste');
-ok(qui('2026-10-15').fase === 'Manutenção + Potência (out)', 'perna: manutenção só a partir de 15/10');
-ok(qui('2026-11-19').fase === 'Polimento (nov)' && qui('2026-11-26').fase === null, 'perna: polimento acaba na última pesada, 19/11');
+ok(qui('2026-09-17').fase === 'Força Máxima' && qui('2026-09-17').exercicios[0][1] === '5 × 5', 'perna: 17/09 é força máxima, 5 × 5');
+ok(qui('2026-09-24').fase === 'Força Máxima' && qui('2026-10-01').fase === 'Força Máxima', 'perna: força máxima vai até 01/10, a última quinta antes do deload');
+ok(qui('2026-10-08').fase === 'Deload da semana do teste', 'perna: 08/10 é o deload da semana do teste');
+ok(qui('2026-10-15').fase === 'Manutenção + Potência', 'perna: manutenção só a partir de 15/10');
+ok(qui('2026-11-19').fase === 'Polimento' && qui('2026-11-26').fase === null, 'perna: polimento acaba na última pesada, 19/11');
+ok(D.treinoDoDia('2026-09-24').gym === 'Pernas — Força Máxima' && D.treinoDoDia('2026-08-27').gym.startsWith('Pernas A'), 'perna: o card do dia usa o nome da fase, não "Pernas A" fixo');
+ok(qui('2026-09-24').nota.includes('80-87%') && qui('2026-10-08').nota.includes('Metade das séries'), 'perna: cada fase carrega a própria prescrição');
 ok(qui('2026-09-15').fase === null && qui('2026-09-15').exercicios.length > 0, 'terça segue vindo de GYM_TREINOS');
 
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');

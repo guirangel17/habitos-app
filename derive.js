@@ -329,9 +329,12 @@ export function gatilhosPorPeriodo(events, hojeKey, dias = 28) {
 const CORRIDA_POR_DATA = new Map(CORRIDAS.map(([d, tipo, nome]) => [d, { tipo, nome }]));
 
 export function treinoDoDia(key) {
+  // na quinta o nome vem da FASE (v7.30): "Pernas A" é o nome do dia pesado de hipertrofia e
+  // ficava no card mesmo depois que a fase virou força máxima, deload ou polimento
+  const fase = gymDoDia(key).fase;
   return {
     corrida: CORRIDA_POR_DATA.get(key) || null,
-    gym: GYM_POR_DIA[parseKey(key).getDay()] || null,
+    gym: fase ? `Pernas — ${fase}` : GYM_POR_DIA[parseKey(key).getDay()] || null,
   };
 }
 
@@ -862,7 +865,7 @@ export function gymDoDia(key) {
   const dow = parseKey(key).getDay();
   if (dow === 4) {
     const fase = GYM_PERNA_FASES.find((f) => key >= f[0] && key <= f[1]);
-    if (fase) return { exercicios: fase[3], fase: fase[2] };
+    if (fase) return { exercicios: fase[4], fase: fase[2], nota: fase[3] };
   }
-  return { exercicios: GYM_TREINOS[dow] || [], fase: null };
+  return { exercicios: GYM_TREINOS[dow] || [], fase: null, nota: null };
 }

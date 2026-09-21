@@ -414,6 +414,20 @@ concordar. O relogio deu 5 × 5 a 80-87%, o app mostrou 4 × 8-10.
 Nao foi tocado: as quintas de 03/09 a 17/09 ficam como foram executadas de fato — 10/09 nao teve
 treino de perna e 17/09 ele fez a sessao pesada e correu bem no sabado seguinte (EF 0,97).
 
+# Feito na v7.31 (set/2026) — fechando a v7.30 pelo screenshot
+
+Conferido no app de verdade (headless, `?hoje=2026-09-24&detalhe=gym`) antes de dizer que estava
+pronto — e nao estava:
+
+- **Bug meu na v7.30**: a janela de forca maxima em `GYM_PERNA_FASES` acabava em 17/09 em vez de
+  01/10, entao a quinta de 24/09 caía no fallback e o app mostrava de novo 4 × 8-10. Os testes da
+  v7.30 checavam 17/09 e 15/10 e passavam por cima do buraco. Corrigido, com assert nas duas
+  bordas da janela (24/09 e 01/10). Licao: testar as BORDAS da janela, nao um ponto dentro dela.
+- **O titulo do dia tambem mentia**: `GYM_POR_DIA[4]` dizia "Pernas A - dia pesado unico" em todas
+  as quintas do plano, inclusive no polimento de novembro. `treinoDoDia` passa a usar o nome da
+  fase ("Pernas - Forca Maxima"), e o subtitulo do sheet virou a prescricao da fase em vez de
+  repetir o nome.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
