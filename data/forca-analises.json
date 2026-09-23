@@ -1,7 +1,183 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-17T21:12:28-03:00",
+ "atualizadoEm": "2026-09-22T21:26:04-03:00",
  "analises": [
+  {
+   "date": "2026-09-22",
+   "activityId": 24462385665,
+   "geradoEm": "2026-09-22T21:26:05-03:00",
+   "sessao": {
+    "minutos": 50,
+    "series": 19,
+    "volumeKg": 4236,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 44
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 38
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 36
+       },
+       {
+        "reps": 8,
+        "kg": 30.0,
+        "s": 78
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 12.5,
+        "s": 47
+       },
+       {
+        "reps": 10,
+        "kg": 12.5,
+        "s": 45
+       },
+       {
+        "reps": 10,
+        "kg": 12.5,
+        "s": 36
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -2.5,
+      "deltaReps": 1
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 42
+       },
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 35
+       },
+       {
+        "reps": 8,
+        "kg": 25.0,
+        "s": 28
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 8.0,
+        "s": 33
+       },
+       {
+        "reps": 9,
+        "kg": 8.0,
+        "s": 41
+       },
+       {
+        "reps": 8,
+        "kg": 8.0,
+        "s": 51
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -1.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 8.0,
+        "s": 143
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 99
+       },
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 50
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 8,
+        "kg": 40.0,
+        "s": 53
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 295
+       },
+       {
+        "reps": 9,
+        "kg": 20.0,
+        "s": 12
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 20.0,
+      "deltaReps": -2
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Excelente sessão de empurrar focada em re-entrada segura pós-layoff. O treino respeitou perfeitamente a margem de RIR 3 para evitar DOMS, garantindo estímulo hipertrófico nos membros superiores sem comprometer os treinos de corrida da semana.",
+    "comparacao_plano": "Executadas 19 séries em 50 minutos, batendo exatamente o volume planejado. As cargas de re-entrada no supino inclinado e elevação lateral foram ajustadas de forma inteligente (~70-75% de agosto), cumprindo à risca a diretriz de transição do mês de setembro.",
+    "pontos_fortes": [
+     "Aderência impecável à intensidade de re-entrada (RIR 3), crucial para proteger a recuperação sistêmica e evitar fadiga residual para a corrida.",
+     "Progressão de repetições (reps_up) no desenvolvimento no Smith e no Tríceps Pulley, mostrando excelente recuperação neuromuscular.",
+     "Consistência no volume total de séries (19 séries), mantendo a densidade do treino alta com 50 minutos de duração."
+    ],
+    "pontos_atencao": [
+     "O supino reto com barra (30kg) completou a 3ª sessão sem alteração de performance (estagnado em 11, 10, 9, 8 reps). Como o primeiro set já bate o topo da faixa (11 reps), precisamos de um estímulo diferente para destravar as séries seguintes.",
+     "Ajuste de carga no supino inclinado com halteres e elevação lateral executado com maestria, mantendo a integridade articular dos ombros."
+    ],
+    "proxima_dica": "No Supino Reto, para destravar a estagnação mantendo a segurança da re-entrada: aumente o tempo de descanso entre a 1ª e a 2ª série para 2 minutos e meio, ou aplique uma cadência excêntrica de 3 segundos para aumentar o tempo sob tensão sem subir a carga ainda.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-09-17",
    "activityId": 24401246482,

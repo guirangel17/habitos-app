@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-22T16:58:44-03:00",
+ "atualizadoEm": "2026-09-22T21:26:04-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1565,6 +1565,12 @@
    "activityId": 24401246482,
    "minutos": 36,
    "nome": "QUI Pernas FORCA MAX (set)"
+  },
+  {
+   "date": "2026-09-22",
+   "activityId": 24462385665,
+   "minutos": 50,
+   "nome": "TER Empurrar"
   }
  ],
  "tendencias": {
