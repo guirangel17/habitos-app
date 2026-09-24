@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-23T18:03:16-03:00",
+ "atualizadoEm": "2026-09-23T21:28:08-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1119,6 +1119,21 @@
    "paradoPct": 23,
    "ef": 0.972,
    "tipoPlano": null
+  },
+  {
+   "date": "2026-09-23",
+   "activityId": 24476068538,
+   "distanciaKm": 5.01,
+   "paceMedio": "7:46",
+   "paceSeg": 466,
+   "fcMedia": 133,
+   "fcMax": 164,
+   "cadencia": 98,
+   "vo2max": 48.0,
+   "teAerobico": 3.0,
+   "paradoPct": 27,
+   "ef": 0.968,
+   "tipoPlano": "tempo"
   }
  ],
  "forcas": [
@@ -1571,6 +1586,12 @@
    "activityId": 24462385665,
    "minutos": 50,
    "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-09-23",
+   "activityId": 24474870909,
+   "minutos": 35,
+   "nome": "QUA Puxar"
   }
  ],
  "tendencias": {
@@ -1691,7 +1712,7 @@
    "ha8Sem": 48.0
   },
   "cadencia4Sem": 153,
-  "kmPorSemana4Sem": 6.2,
+  "kmPorSemana4Sem": 7.4,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1903,7 +1924,7 @@
    },
    {
     "semana": "2026-09-21",
-    "km": 0
+    "km": 5.0
    }
   ],
   "longaoMes": [

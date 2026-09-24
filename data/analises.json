@@ -1,7 +1,91 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-19T10:54:54-03:00",
+ "atualizadoEm": "2026-09-23T21:28:08-03:00",
  "analises": [
+  {
+   "date": "2026-09-23",
+   "activityId": 24476068538,
+   "geradoEm": "2026-09-23T21:29:05-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-09-23 20:13:42",
+    "distanciaKm": 5.01,
+    "duracaoMin": 38.9,
+    "paceMedio": "7:46",
+    "fcMedia": 133,
+    "fcMax": 164,
+    "cadencia": 98,
+    "elevacaoM": 80,
+    "trainingEffect": {
+     "aerobico": 3.0,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 29.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:28",
+      "fc": 120
+     },
+     {
+      "km": 2,
+      "pace": "7:29",
+      "fc": 133
+     },
+     {
+      "km": 3,
+      "pace": "7:08",
+      "fc": 146
+     },
+     {
+      "km": 4,
+      "pace": "8:11",
+      "fc": 141
+     },
+     {
+      "km": 5,
+      "pace": "8:34",
+      "fc": 132
+     }
+    ],
+    "zonasFc": {
+     "z1": 44,
+     "z2": 44,
+     "z3": 12,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "tempo",
+    "nome": "Tempo Run 3 km a 5:46–5:56 — primeiro estímulo forte pós-fascite. Só se o longão de 21/09 saiu sem dor no primeiro passo de 22/09; senão, 5 km fácil",
+    "paceAlvo": "5:41–5:56 /km contínuo",
+    "fcAlvo": "~163–170 (logo abaixo do limiar)",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:15",
+    "paceZ2Ha8Sem": "6:55"
+   },
+   "ia": {
+    "resumo": "Você executou a opção conservadora de 5 km fáceis prevista na condicional do plano, protegendo sua estrutura. Sob calor intenso de 29°C e em percurso ondulado, a prioridade foi o controle do esforço fisiológico.",
+    "comparacao_plano": "O plano previa um Tempo Run de 3 km ou, como alternativa de segurança, 5 km fáceis. Você optou corretamente pelos 5 km fáceis (realizados 5,01 km com pace médio de 7:46/km e FC média de 133 bpm), mantendo o estímulo regenerativo em Z1/Z2.",
+    "pontos_fortes": [
+     "Tomada de decisão madura ao escolher a opção segura de 5 km fáceis, priorizando a integridade da fáscia plantar no bloco de retorno.",
+     "Excelente controle de esforço nas subidas (80m de ganho), reduzindo o ritmo nos km 4 e 5 (8:11 e 8:34/km) para manter a frequência cardíaca média em 133 bpm (Z2), mesmo sob calor de 29°C."
+    ],
+    "pontos_atencao": [
+     "A cadência registrada de 98 spm indica uma clara falha de leitura do sensor do relógio (provavelmente registrando metade do valor real), pois um ritmo de 7:46/km com essa frequência exigiria um comprimento de passo de 1,31 m, o que é incompatível com uma corrida leve.",
+     "O clima muito abafado (29°C às 20h) eleva a deriva cardíaca e a desidratação, demandando atenção extra ao consumo de água antes e depois da atividade."
+    ],
+    "proxima_dica": "Para a Social Run de 6 km com strides, aplique a Regra das 24h: só execute os 4 tiros de 100m se o primeiro passo da manhã seguinte a este treino tiver sido totalmente sem dor na fáscia. Nos strides, busque passadas rápidas e curtas em terreno plano.",
+    "nota_execucao": 10
+   }
+  },
   {
    "date": "2026-09-19",
    "activityId": 24420156524,

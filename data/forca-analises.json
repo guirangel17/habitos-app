@@ -1,7 +1,159 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-22T21:26:04-03:00",
+ "atualizadoEm": "2026-09-23T21:28:08-03:00",
  "analises": [
+  {
+   "date": "2026-09-23",
+   "activityId": 24474870909,
+   "geradoEm": "2026-09-23T21:29:05-03:00",
+   "sessao": {
+    "minutos": 35,
+    "series": 16,
+    "volumeKg": 4606,
+    "exercicios": [
+     {
+      "nome": "LAT_PULLDOWN",
+      "categoria": "PULL_UP",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 47
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 42
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 47
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 38
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SEATED_CABLE_ROW",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 52.5,
+        "s": 47
+       },
+       {
+        "reps": 11,
+        "kg": 52.5,
+        "s": 33
+       },
+       {
+        "reps": 11,
+        "kg": 52.5,
+        "s": 34
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 2
+     },
+     {
+      "nome": "CHEST_SUPPORTED_DUMBBELL_ROW",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 68
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 34
+       },
+       {
+        "reps": 8,
+        "kg": 32.0,
+        "s": 35
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "INCLINE_REVERSE_FLYE",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 5
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "STANDING_DUMBBELL_BICEPS_CURL",
+      "categoria": "CURL",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 58
+       },
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 90
+       },
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 105
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -31.0,
+      "deltaReps": 0
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Excelente retorno ao treino de Puxar após 14 dias de intervalo, priorizando uma re-entrada segura e altamente técnica. A sessão de 35 minutos entregou um ótimo estímulo tônico para os membros superiores, respeitando a integridade física necessária para a sua rotina de corrida.",
+    "comparacao_plano": "Foram executadas 16 séries das 18 planejadas, um volume excelente para o cenário de retorno. O Crucifixo Inverso foi pulado conscientemente para gestão de tempo e fadiga, e as cargas aplicadas respeitaram perfeitamente a margem de segurança (RIR ~3) estipulada para esta fase de re-entrada de setembro.",
+    "pontos_fortes": [
+     "Consistência no Lat Pulldown, sustentando a carga de 40kg e atingindo o topo da faixa (11 repetições) nas três primeiras séries.",
+     "Progressão consistente na Remada Baixa (Seated Cable Row), alcançando 3 séries de 11 repetições com 52,5kg (status reps_up), consolidando o topo da faixa de repetições.",
+     "Decisão madura de re-entrada na Rosca Direta com halteres (status ajuste para 9kg), aplicando a carga ideal para reativar o padrão motor sem gerar dores musculares tardias (DOMS) limitantes."
+    ],
+    "pontos_atencao": [
+     "O Crucifixo Inverso foi pulado de forma planejada. Caso sinta necessidade de otimizar o tempo nas próximas sessões, priorize os grandes grupos (remadas e puxadas) e mantenha essa flexibilidade.",
+     "Com a consolidação das repetições no teto da faixa (11 reps) na Remada Baixa e na Rosca Direta, seu corpo já sinaliza adaptação neural positiva após o período de afastamento."
+    ],
+    "proxima_dica": "Na próxima sessão de Puxar, suba a Rosca Direta com halteres de 9kg para 10kg de cada lado (um incremento sutil de 1kg). As repetições devem cair naturalmente para a base da faixa (8-9 reps), permitindo que a carga de agosto retorne de forma orgânica e segura em 2 a 3 sessões.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-22",
    "activityId": 24462385665,
