@@ -62,7 +62,8 @@
     "Longao 14km constante": 1663350598,
     "Longao 15km cadencia": 1663350606,
     "Longao 14km cadencia": 1700544171,
-    "QUI Pernas DELOAD (semana do teste)": 1705994054
+    "QUI Pernas DELOAD (semana do teste)": 1705994054,
+    "Tempo Run 4km CHECKPOINT": 1708552793
   },
   "agendamentos": [
     {
@@ -948,12 +949,6 @@
       "data": "2026-10-05"
     },
     {
-      "chave": "1624788697:2026-10-07",
-      "scheduleId": 1743455984,
-      "nome": "TESTE 5km contrarrelogio",
-      "data": "2026-10-07"
-    },
-    {
       "chave": "1624794473:2026-10-08",
       "scheduleId": 1743455986,
       "nome": "Social Run 6km",
@@ -1002,12 +997,6 @@
       "data": "2026-11-26"
     },
     {
-      "chave": "1663350572:2026-09-28",
-      "scheduleId": 1779962228,
-      "nome": "Longao 10km facil",
-      "data": "2026-09-28"
-    },
-    {
       "chave": "1663350579:2026-10-12",
       "scheduleId": 1779962230,
       "nome": "Longao 12km",
@@ -1030,6 +1019,18 @@
       "scheduleId": 1785348594,
       "nome": "QUI Pernas DELOAD (semana do teste)",
       "data": "2026-10-08"
+    },
+    {
+      "chave": "1663350562:2026-09-28",
+      "scheduleId": 1787817745,
+      "nome": "Longao 8km facil",
+      "data": "2026-09-28"
+    },
+    {
+      "chave": "1708552793:2026-10-07",
+      "scheduleId": 1787817751,
+      "nome": "Tempo Run 4km CHECKPOINT",
+      "data": "2026-10-07"
     }
   ]
 }

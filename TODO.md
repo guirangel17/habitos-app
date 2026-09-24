@@ -428,6 +428,34 @@ pronto — e nao estava:
   fase ("Pernas - Forca Maxima"), e o subtitulo do sheet virou a prescricao da fase em vez de
   repetir o nome.
 
+# Feito na v7.32 (set/2026) — revisao de 2 meses: o longao sumiu, o contrarrelogio sai
+
+Revisao dos ultimos 2 meses pedida em 24/09. O diagnostico nao e perda de forma:
+
+- **O motor esta la.** EF dos tres ultimos faceis: 1,01 / 0,97 / 0,97 (FC media 133 no ultimo),
+  dentro da faixa pre-lesao (0,91-1,04). A fascite nao deu sinal em 6 corridas desde 07/09.
+- **O que sumiu foi o longao.** Maior treino desde 03/08 (12 km): **6,1 km**. Os longoes de 14/09,
+  21/09 e 22/09 furaram e o tempo run de 23/09 virou social. As ultimas 4 semanas sao so sociais
+  de 5-6 km, que ainda por cima tem ~30% do tempo parado (ritmo medio 10:34 x 7:45 em movimento).
+- **Volume**: media de 8 km/sem nas ultimas 8 semanas, 11,5 nas ultimas 4. Outubro pedia 28-33.
+
+Decisoes dele (perguntado, nao assumido):
+
+- **Longao fica na segunda.** Furou 3 vezes seguidas, mas a alternativa (sabado/domingo de manha)
+  foi recusada. Entao a escada recomeca de 8 km e cada degrau vale: 28/09 8 -> 05/10 10 ->
+  12/10 12 -> 19/10 14 -> 26/10 16 -> 02/11 Volta Completa 18. Nao sobra semana de folga.
+- **O TESTE de 5 km de 07/10 saiu** e virou `Tempo Run 4km CHECKPOINT` (6:05-6:20), a mesma faixa
+  de 30/09 — duas exposicoes ao ritmo de prova valem mais que um maximo isolado depois de 7
+  semanas sem estimulo forte. O ancora de 29/07 (5:34/km) segue valendo para os tiros de outubro,
+  com a ressalva nova em 30/09: se aquele ritmo sair duro, outubro calibra 10-15 s/km mais lento.
+  Quem decide o alvo da prova passa a ser a Volta Completa de 02/11.
+- **A meta de 6:15-6:30/km foi construida sobre 30 km/sem que nao estao acontecendo.** Com o
+  volume atual o realista e 6:40-7:00 (2h00-2h06). Terminar os 18 km segue provavel (21 km em
+  28/06, 12 km em 03/08) SE a escada acontecer.
+
+Checkpoint de 07/10 reescrito no data.js (titulo, alvo, porque, passos, vespera) e reagendado no
+relogio junto com o longao de 28/09.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
