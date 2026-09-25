@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-24T17:34:45-03:00",
+ "atualizadoEm": "2026-09-24T21:31:47-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1592,6 +1592,12 @@
    "activityId": 24474870909,
    "minutos": 35,
    "nome": "QUA Puxar"
+  },
+  {
+   "date": "2026-09-24",
+   "activityId": 24487055268,
+   "minutos": 32,
+   "nome": "QUI Pernas FORCA MAX (set)"
   }
  ],
  "tendencias": {
