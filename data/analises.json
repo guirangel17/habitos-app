@@ -1,7 +1,91 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-23T21:28:08-03:00",
+ "atualizadoEm": "2026-09-25T01:59:59-03:00",
  "analises": [
+  {
+   "date": "2026-09-24",
+   "activityId": 24488286696,
+   "geradoEm": "2026-09-25T02:00:56-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-09-24 20:42:48",
+    "distanciaKm": 4.94,
+    "duracaoMin": 36.1,
+    "paceMedio": "7:19",
+    "fcMedia": 141,
+    "fcMax": 168,
+    "cadencia": 118,
+    "elevacaoM": 68,
+    "trainingEffect": {
+     "aerobico": 3.1,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 49.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:06",
+      "fc": 130
+     },
+     {
+      "km": 2,
+      "pace": "7:09",
+      "fc": 138
+     },
+     {
+      "km": 3,
+      "pace": "6:50",
+      "fc": 149
+     },
+     {
+      "km": 4,
+      "pace": "7:29",
+      "fc": 147
+     },
+     {
+      "km": 5,
+      "pace": "8:01",
+      "fc": 147
+     }
+    ],
+    "zonasFc": {
+     "z1": 25,
+     "z2": 46,
+     "z3": 28,
+     "z4": 1,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 6 km regenerativo + 4 strides de 100 m — 1ª exposição gradual ao antepé rápido",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:15",
+    "paceZ2Ha8Sem": "6:55"
+   },
+   "ia": {
+    "resumo": "Uma corrida social de 4,94 km realizada sob calor de 30°C, focada em rodagem regenerativa. O treino priorizou o controle cardiovascular em detrimento do ritmo, mantendo a intensidade estritamente dentro da zona de segurança para o seu momento de retorno.",
+    "comparacao_plano": "Você executou 4,94 km dos 6 km planejados (uma redução de volume muito prudente para quem correu no dia anterior) com pace médio de 7:19/km e FC média de 141 bpm. Embora o pace tenha ficado ligeiramente acima da faixa planejada (6:50-7:15/km), a escolha foi fisiologicamente perfeita: sob a temperatura de 30°C, você priorizou a FC bem abaixo do teto de 152 bpm (Z2), garantindo o real efeito regenerativo do treino.",
+    "pontos_fortes": [
+     "Excelente disciplina cardiovascular: mesmo no calor forte de 30°C, a FC média de 141 bpm (Z2) mostra que você não deixou o clima inflar o esforço.",
+     "Controle de ritmo inicial maduro, iniciando o primeiro quilômetro a 7:06/km sem se deixar levar pela ansiedade comum de largada.",
+     "Gestão de volume inteligente: encerrar próximo aos 5 km em um treino feito apenas 1 dia após a última corrida protege a integridade estrutural da fáscia plantar."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 118 spm resultou em um comprimento de passo estimado de 1,16 m, valor significativamente mais longo do que sua referência de 0,89 m a 0,93 m para ritmos semelhantes. Passos muito longos e lentos (overstriding) aumentam o tempo de contato com o solo e a força de impacto na fáscia. Caso essa oscilação tenha ocorrido por pausas ou dinâmica de conversa na corrida social, atente para manter os passos curtos e frequentes mesmo em ritmos lentos."
+    ],
+    "proxima_dica": "Monitore a regra das 24h: o verdadeiro placar deste treino é a ausência de dor ou rigidez no pé na manhã seguinte. Como o próximo compromisso é o longão de 8 km (seu maior volume desde o retorno), concentre-se em encurtar a passada para buscar uma cadência acima de 145 spm, minimizando o estresse mecânico na fáscia plantar.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-23",
    "activityId": 24476068538,

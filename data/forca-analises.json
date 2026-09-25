@@ -1,7 +1,81 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-23T21:28:08-03:00",
+ "atualizadoEm": "2026-09-25T01:59:59-03:00",
  "analises": [
+  {
+   "date": "2026-09-24",
+   "activityId": 24487055268,
+   "geradoEm": "2026-09-25T02:00:57-03:00",
+   "sessao": {
+    "minutos": 32,
+    "series": 6,
+    "volumeKg": 2040,
+    "exercicios": [
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 8,
+        "kg": 40.0,
+        "s": 39
+       },
+       {
+        "reps": 8,
+        "kg": 50.0,
+        "s": 35
+       },
+       {
+        "reps": 8,
+        "kg": 60.0,
+        "s": 33
+       },
+       {
+        "reps": 6,
+        "kg": 70.0,
+        "s": 21
+       },
+       {
+        "reps": 6,
+        "kg": 70.0,
+        "s": 47
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 40.0,
+      "deltaReps": -5
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 4,
+        "kg": null,
+        "s": 903
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": null,
+      "deltaReps": -7
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Guilherme realizou uma sessão altamente abreviada de pernas com foco na reintrodução gradual de carga no Leg Press e uma série de ajuste na Elevação Pélvica. O treino foi encerrado precocemente com 6 séries totais em 32 minutos, priorizando a gestão de energia durante este período de re-entrada.",
+    "comparacao_plano": "Foram executados 2 dos 7 exercícios planejados (6 séries realizadas de aproximadamente 21 planejadas). No Leg Press, houve uma progressão controlada até 70kg, enquanto os demais exercícios (Afundo, Flexora, Stiff, Panturrilha e Tibial) foram pulados de forma consciente para evitar o acúmulo excessivo de fadiga periférica.",
+    "pontos_fortes": [
+     "Excelente progressão de carga pirâmide no Leg Press, alcançando os 70kg de forma segura e ativando o padrão de extensão de joelhos e quadris sem atingir a falha.",
+     "Gestão de carga consciente ao limitar o volume total da sessão, uma decisão madura de re-entrada que protege a musculatura contra dores tardias (DOMS) severas que comprometeriam os treinos de corrida da semana."
+    ],
+    "pontos_atencao": [
+     "A Elevação Pélvica contou com apenas uma série de ajuste de 4 repetições; garanta que o posicionamento do banco e o acolchoamento da barra estejam confortáveis para permitir a extensão completa do quadril com segurança.",
+     "Os exercícios preventivos (Panturrilha e Tibial Anterior) não foram realizados nesta sessão curta; lembre-se de que, embora reduzir o volume seja correto na re-entrada, esses isoladores são os principais responsáveis por manter a canela e o joelho blindados contra o impacto da corrida."
+    ],
+    "proxima_dica": "No próximo treino de Pernas A, mantenha a carga máxima do Leg Press em 70kg tentando evoluir de 6 para 8 repetições controladas, e experimente reintroduzir apenas 1 ou 2 séries leves de Panturrilha em Pé para restabelecer o estímulo preventivo sem sobrecarregar o tendão de Aquiles.",
+    "nota_execucao": 7
+   }
+  },
   {
    "date": "2026-09-23",
    "activityId": 24474870909,
