@@ -1,7 +1,180 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-25T01:59:59-03:00",
+ "atualizadoEm": "2026-09-25T21:35:56-03:00",
  "analises": [
+  {
+   "date": "2026-09-25",
+   "activityId": 24497930146,
+   "geradoEm": "2026-09-25T21:35:57-03:00",
+   "sessao": {
+    "minutos": 28,
+    "series": 17,
+    "volumeKg": 1095,
+    "exercicios": [
+     {
+      "nome": "CABLE_CROSSOVER",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 190
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 84
+       },
+       {
+        "reps": 8,
+        "kg": 15.0,
+        "s": 73
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SEATED_DUMBBELL_SHOULDER_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 85
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 7
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 6
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": null,
+      "deltaReps": -9
+     },
+     {
+      "nome": "ONE_ARM_CABLE_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 8.0,
+        "s": 35
+       },
+       {
+        "reps": 10,
+        "kg": 8.0,
+        "s": 79
+       },
+       {
+        "reps": 9,
+        "kg": 8.0,
+        "s": 77
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -17.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "FACE_PULL",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "CABLE_OVERHEAD_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 31
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "EZ_BAR_PREACHER_CURL",
+      "categoria": "CURL",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 78
+       },
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 77
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "KNEELING_CABLE_CRUNCH",
+      "categoria": "CRUNCH",
+      "series": [
+       {
+        "reps": 8,
+        "kg": 15.0,
+        "s": 70
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão focada na re-entrada segura após 14 dias de transição. O treino priorizou a reativação neuromuscular dos membros superiores com volume reduzido e cargas controladas, ideal para evitar dores musculares limitantes e proteger a rodagem de corrida da semana.",
+    "comparacao_plano": "Com 9 séries de trabalho realizadas em 28 minutos, o volume foi reduzido em relação às ~16 séries planejadas devido ao retorno após 14 dias de intervalo. As cargas nos exercícios realizados foram ajustadas perfeitamente (como os 8kg na elevação lateral), respeitando a diretriz de re-entrada a 70-75% da capacidade.",
+    "pontos_fortes": [
+     "Execução sólida no Cable Crossover, mantendo a carga de 15kg com excelente controle de repetições (10, 9, 8) e garantindo ótimo estímulo tensional para o peitoral.",
+     "Decisão madura de reduzir a carga na Elevação Lateral para 8kg nesta re-entrada após 14 dias, protegendo a articulação do ombro e acumulando volume de forma segura."
+    ],
+    "pontos_atencao": [
+     "Omissão de alguns exercícios de empurrar (Desenvolvimento) e estabilização (Face Pull e Tríceps) reduziu o volume total para 9 séries. Essa autorregulação é válida para evitar dores musculares tardias (DOMS) excessivas que atrapalhariam a corrida, mas o retorno gradual desses estímulos é fundamental para a estabilidade do tronco."
+    ],
+    "proxima_dica": "Para a próxima sessão do Upper C, reintroduza o Desenvolvimento com Halteres de forma gradual, usando uma carga confortável de re-entrada (ex: halteres de 12kg a 14kg) para 3 séries de 8 reps com RIR 3. A força e as cargas de agosto retornarão naturalmente nas próximas 2 a 3 sessões à medida que a coordenação neuromuscular se restabelecer.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-09-24",
    "activityId": 24487055268,

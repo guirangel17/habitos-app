@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-25T17:11:39-03:00",
+ "atualizadoEm": "2026-09-25T21:35:56-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1613,6 +1613,12 @@
    "activityId": 24487055268,
    "minutos": 32,
    "nome": "QUI Pernas FORCA MAX (set)"
+  },
+  {
+   "date": "2026-09-25",
+   "activityId": 24497930146,
+   "minutos": 28,
+   "nome": "SEX Upper C + Core"
   }
  ],
  "tendencias": {
