@@ -207,12 +207,16 @@ AGENDA = [
     ("2026-10-05", "Longao 10km DELOAD"),
     ("2026-10-07", "Tempo Run 4km CHECKPOINT"),
     ("2026-10-08", "Social Run 6km"),
-    ("2026-10-12", "Longao 12km"),
-    ("2026-10-14", "Tiros 4x1km"),
-    ("2026-10-15", "Social Run 8km + strides"),
-    ("2026-10-19", "Longao 14km cadencia"),
-    ("2026-10-21", "Tiros 5x1km forte"),
-    ("2026-10-22", "Social Run 8km"),
+    # 29/09/2026 (TODO v7.34): entraram 3 provas em outubro e o feriado de 12/10. O longao de
+    # 12/10 foi para 14/10 (viagem 10-12, cansaco em 13) e o de 19/10 para 21/10 (dia seguinte
+    # a prova de 10 km). Os dois tiros que ocupavam 14/10 e 21/10 SAEM -- as provas de 18/10
+    # (10 km) e 24/10 (5 km) sao a qualidade dessas semanas. Provas nao entram nesta agenda
+    # (mesma convencao da prova de 05/07): so treino com estrutura para o relogio.
+    ("2026-10-14", "Longao 12km"),
+    ("2026-10-16", "Social Run 6km + strides"),
+    ("2026-10-19", "Rodagem 5km leve"),
+    ("2026-10-21", "Longao 14km cadencia"),
+    ("2026-10-22", "Social Run 5km"),
     ("2026-10-26", "Longao 16km progressivo"),
     ("2026-10-28", "Tiros 5x1km forte"),
     ("2026-10-29", "Social Run 8km"),

@@ -493,6 +493,38 @@ Pendente que NÃO é bug: o push segue `410 Gone` desde ~07/09 (inscrição expi
 no aparelho — Ajustes → Notificação de atividade, desligar e ligar, e colar o JSON novo no
 Secret `PUSH_SUBSCRIPTION`.
 
+# Feito na v7.34 (set/2026) — tres provas em outubro entram na escada de longoes
+
+Pedido em 29/09: mover o longao de 12/10 (feriado + viagem 10-12/10, e 13/10 e dia de cansaco
+da volta) e alocar tres provas que ele nao tinha mencionado antes.
+
+- **Longao de 12 km: 12/10 -> 14/10 (qua)**, e os 4 x 1 km que moravam nesse dia SAEM. Longao +
+  prova de 10 km na mesma semana de viagem ja sao dois esforcos; um terceiro e caminho de lesao.
+- **18/10 (dom) PROVA 10 KM** — decidido com ele: **progressiva**, primeiros 5 km no ritmo-alvo
+  (6:05–6:20, calibrado pelo tempo run de 07/10) e ultimos 5 livres. Os 5 primeiros respondem se
+  o ritmo-alvo e real; os 5 finais sao o melhor teste de forma ate 06/12. O gate do primeiro 5 km
+  e o treino em si: em 28/09 o km 1 foi o mais rapido da corrida (6:40, passada 96,5 cm, cadencia
+  155) e foi o que botou a FC em Z3 no km 4.
+- **LONGO 14: 19/10 -> 21/10 (qua)**. 19/10 virou dia seguinte de prova (regenerativo 4-5 km ou
+  folga). Os 5 x 1 km de 21/10 tambem saem — a prova de 18/10 ja foi a qualidade da semana.
+- **24/10 (sab) PROVA 5 KM** — a unica que encaixou sem mexer em nada, 2 dias antes do LONGO 16.
+- **01/11 (dom) prova de 5 km: NAO entrou.** Ele ainda nao sabe se corre, e 02/11 e a VOLTA
+  COMPLETA 18 km — a sessao mais importante do bloco. Se confirmar, a Volta Completa move para
+  04/11 (qua) e os tiros/social da semana andam junto. **Decisao ate ~25/10.**
+- Sociais encurtados nas semanas pesadas (15/10 7-8 km -> 16/10 5-6 km; 22/10 7-8 -> 5 km).
+- **LONGO 16 de 26/10 ficou CONDICIONAL**: vira 14 km se a prova de 24/10 sair no talo ou se o
+  joelho falar na semana de 19-25/10.
+
+**O alerta que fica registrado (ele foi avisado e nao cortou degrau):** o problema nao sao as
+datas, e o volume. Ultimas 4 semanas reais: 14,1 / 10,5 / 9,9 / 8,0 km. Melhor semana de 2026:
+23,0 km (semana de 03/08, pre-fascite). As semanas de outubro propostas dao ~31 / ~30 / ~32 km —
+cerca de 3x a base atual e acima de qualquer semana do ano, com um joelho que inflamou em 28/09.
+Ofereci cortar um degrau da escada (o 14 de 21/10, deixando a prova de 10 km ocupar o lugar);
+ele manteve. O condicional do 26/10 e a valvula que sobrou.
+
+Provas NAO entram em garmin/treinos_corrida.py (mesma convencao da prova de 05/07): aquela
+agenda so leva treino com estrutura para o relogio.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
