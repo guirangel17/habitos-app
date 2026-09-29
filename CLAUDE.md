@@ -261,6 +261,20 @@ Terminou a corrida → GitHub Actions busca no Garmin, o Gemini analisa e o app 
   FCmax 190 → Z1 <133 · Z2 133–152 · Z3 153–165 · Z4 166–177 · Z5 178+ (const `ZONAS_FC` no
   analisar.py, espelha plano-hibrido-pampulha.md). Calculadas da série temporal de FC
   (endpoint `details`); **lat/lon são descartados na leitura e NUNCA entram nos JSONs**.
+- **Falha da IA (v7.33)**: `codigo_da_falha()` traduz a exceção da chamada no "code" que as
+  decisões do módulo entendem. O pulo do gato: o timeout de LEITURA sobe como `TimeoutError`
+  CRU, não como `URLError` (que só embrulha falha de CONEXÃO) — ficava fora do `except` de
+  `chamar_gemini`, e por isso um hiccup de 90 s do Gemini derrubava o run sem gastar nenhuma
+  das 3 tentativas nem acionar o fallback de modelo (que depende de código HTTP). Timeout agora
+  segue a régua da quota em `trocar_de_modelo` (insiste 1x, depois cai pro `MODELO_FALLBACK`),
+  mas **sem** os 30 s de `sleep` do 429 — a tentativa já gastou `TIMEOUT_GEMINI` s. E o status
+  deixou de mentir: `status_das_falhas()` separa `gemini_timeout` de `gemini_quota` de `erro`
+  (antes QUALQUER falha virava `gemini_quota` e os Ajustes mandavam conferir uma chave que
+  estava boa). Rótulo novo tem que existir nos TRÊS lugares do app.js: `ROTULO_PIPE`, o guia
+  de problemas e o mapa `rot` da linha de status. **Cuidado ao mexer**: as pernas Garmin e IA
+  moram no mesmo `try` por atividade, então rótulo de IA só sai de uma `FalhaIA` (que
+  `chamar_gemini` levanta ao desistir, carregando `code` e a exceção original) — classificar
+  pelo `.code` solto faria um 429 do Garmin virar `gemini_quota`.
 - **Modelo (v7.24)**: `MODELO_GEMINI` vem da env `GEMINI_MODELO` (input `modelo` do workflow), padrão
   `gemini-3.5-flash`, com **fallback automático** pro `gemini-2.5-flash` (`MODELO_FALLBACK`). As duas
   funções que decidem são puras e testadas: `modelo_indisponivel` (403/404 sim; 400 só quando a

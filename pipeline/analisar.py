@@ -58,6 +58,7 @@ ALERTA_REPETE_H = 12       # no máximo 1 push de aviso a cada Nh enquanto o blo
 # run: análise com modelo anterior é infinitamente melhor que "o app não analisou meu treino".
 MODELO_GEMINI = os.environ.get("GEMINI_MODELO") or "gemini-3.5-flash"
 MODELO_FALLBACK = "gemini-2.5-flash"
+TIMEOUT_GEMINI = 90    # s por tentativa; estourar troca pro fallback (ver trocar_de_modelo)
 _MODELO = {"atual": MODELO_GEMINI, "trocou": None}  # estado do run (o app lê no status)
 BRT = timezone(timedelta(hours=-3))
 
@@ -529,6 +530,12 @@ def garmin_get(path, **params):
     return garth.connectapi(path)
 
 
+# "code" das falhas do Gemini é o status HTTP; timeout não tem status, então usa esta
+# sentinela para passar pelas mesmas decisões (trocar de modelo, repetir) sem virar None
+# — None é "erro que não sabemos classificar" e não pode ganhar retry.
+COD_TIMEOUT = "timeout"
+
+
 def modelo_indisponivel(code, detalhe=""):
     """O erro é 'esse modelo não serve pra esta chave' (troque de modelo) ou outra coisa
     (não troque)? 404 = não existe · 403 = sem acesso (ex.: Pro sem faturamento ativo).
@@ -542,12 +549,65 @@ def modelo_indisponivel(code, detalhe=""):
 def trocar_de_modelo(code, detalhe, tentativa, tentativas_max=3):
     """Vale desistir do modelo preferido e usar o fallback? Indisponibilidade troca na hora.
     Quota (429) só troca DEPOIS dos retries: 429 costuma passar sozinho e o modelo melhor
-    vale os 30 s de espera — mas ficar sem parecer nenhum não vale."""
+    vale os 30 s de espera — mas ficar sem parecer nenhum não vale.
+
+    Timeout segue a MESMA régua da quota, por motivo diferente: quem estoura o relógio é a
+    lentidão do modelo preferido, e insistir nele só queima outros TIMEOUT_GEMINI segundos.
+    Visto em 29/09/2026 — o gemini-3.5-flash estourou os 90 s duas vezes seguidas na mesma
+    corrida (longão de 28/09) e o 2.5-flash respondeu em segundos."""
     if modelo_indisponivel(code, detalhe):
         return "indisponível"
-    if code == 429 and tentativa >= tentativas_max - 1:
-        return "sem quota"
+    if tentativa >= tentativas_max - 1:
+        if code == 429:
+            return "sem quota"
+        if code == COD_TIMEOUT:
+            return "lento demais"
     return None
+
+
+class FalhaIA(Exception):
+    """Falha da chamada ao Gemini, com o "code" já classificado.
+
+    Existe para o main não ter que adivinhar de onde veio a exceção: as pernas Garmin e IA
+    moram no MESMO try por atividade, e sem isto um 429 do Garmin seria rotulado como
+    "gemini_quota" — a metade do bug de 29/09/2026 que este fix veio consertar."""
+
+    def __init__(self, code, original):
+        super().__init__(str(original))
+        self.code = code
+        self.original = original
+
+
+def codigo_da_falha(e):
+    """Exceção da chamada ao Gemini → o "code" que as decisões deste módulo entendem.
+
+    O timeout de LEITURA da resposta sobe como TimeoutError cru, NÃO como URLError (que só
+    embrulha falha de conexão) — ficava fora do except de chamar_gemini e derrubava o run
+    inteiro sem gastar nenhuma das 3 tentativas (29/09/2026). O de conexão chega embrulhado
+    em URLError.reason, por isso os dois caminhos."""
+    if isinstance(e, TimeoutError) or isinstance(getattr(e, "reason", None), TimeoutError):
+        return COD_TIMEOUT
+    return getattr(e, "code", None)
+
+
+def status_das_falhas(motivos):
+    """Motivos das análises que falharam → status do pipeline (o card de saúde do app lê daqui).
+
+    Existe porque até 29/09/2026 QUALQUER falha virava "gemini_quota": um timeout de 90 s
+    aparecia nos Ajustes como "IA sem quota", mandando conferir uma chave que estava boa.
+    Motivos diferentes no mesmo run não têm rótulo único honesto — aí é "erro" mesmo, e
+    qualquer motivo que não seja reconhecidamente da IA também: rotular de menos é seguro,
+    rotular errado manda o usuário investigar a coisa errada."""
+    unicos = {"gemini_timeout" if m == COD_TIMEOUT else "gemini_quota" if m == 429 else "erro"
+              for m in motivos}
+    return unicos.pop() if len(unicos) == 1 else "erro"
+
+
+MSG_FALHA = {
+    "gemini_timeout": "{n} análise(s) estouraram o tempo da IA — o próximo ciclo tenta de novo",
+    "gemini_quota": "{n} análise(s) ficaram sem quota da IA — o próximo ciclo tenta de novo",
+    "erro": "{n} análise(s) falharam — o próximo ciclo tenta de novo",
+}
 
 
 def _post_gemini(modelo, chave, corpo):
@@ -557,7 +617,7 @@ def _post_gemini(modelo, chave, corpo):
         headers={"Content-Type": "application/json", "x-goog-api-key": chave},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=90) as r:
+    with urllib.request.urlopen(req, timeout=TIMEOUT_GEMINI) as r:
         return json.load(r)
 
 
@@ -573,8 +633,8 @@ def chamar_gemini(chave, contexto, system=None):
             resp = _post_gemini(modelo, chave, corpo)
             texto = resp["candidates"][0]["content"]["parts"][0]["text"]
             return validar_ia(json.loads(texto))
-        except (urllib.error.HTTPError, urllib.error.URLError) as e:
-            code = getattr(e, "code", None)
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            code = codigo_da_falha(e)
             detalhe = ""
             if hasattr(e, "read"):
                 try:
@@ -588,10 +648,11 @@ def chamar_gemini(chave, contexto, system=None):
                 _MODELO["trocou"] = f"{modelo} {motivo} ({code}) — analisando com {MODELO_FALLBACK}"
                 print(f"[aviso] {_MODELO['trocou']}", file=sys.stderr)
                 continue
-            if tentativa < 3 and code in (429, 500, 503):
-                time.sleep(30)
+            if tentativa < 3 and code in (429, 500, 503, COD_TIMEOUT):
+                if code != COD_TIMEOUT:
+                    time.sleep(30)  # timeout já gastou TIMEOUT_GEMINI s esperando; não espera de novo
                 continue
-            raise
+            raise FalhaIA(code, e) from e
 
 
 def contexto_de_retorno(date, compactas):
@@ -846,7 +907,7 @@ def main():
         novas = novas[:MAX_POR_RUN]
         print(f"{len(novas)} nova(s) para analisar")
 
-        geradas, falhas = 0, 0
+        geradas, falhas, motivos = 0, 0, []
         if novas:
             chave = os.environ["GEMINI_API_KEY"]
             ja_no_dia = {}
@@ -893,6 +954,8 @@ def main():
                     print(f"[ok] análise gerada: {date} · {a.get('activityName')} ({aid})")
                 except Exception as e:
                     falhas += 1
+                    # só falha RECONHECIDA da IA vira rótulo de IA — Garmin e bugs nossos caem em "erro"
+                    motivos.append(e.code if isinstance(e, FalhaIA) else "outro")
                     print(f"[erro] atividade {aid}: {e}", file=sys.stderr)
 
         if geradas:
@@ -902,7 +965,8 @@ def main():
         if doc["analises"]:
             status["ultimaAnalise"] = doc["analises"][0]["date"]
         if falhas and not geradas:
-            status.update(status="gemini_quota" if falhas else "erro", mensagem=f"{falhas} análise(s) falharam — o próximo cron tenta de novo")
+            nome = status_das_falhas(motivos)
+            status.update(status=nome, mensagem=MSG_FALHA[nome].format(n=falhas))
             codigo_saida = 1
 
         # ---- análise de musculação (v7.7) — NUNCA derruba a análise de corrida ----

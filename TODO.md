@@ -456,6 +456,43 @@ Decisoes dele (perguntado, nao assumido):
 Checkpoint de 07/10 reescrito no data.js (titulo, alvo, porque, passos, vespera) e reagendado no
 relogio junto com o longao de 28/09.
 
+# Feito na v7.33 (set/2026) — o timeout do Gemini que derrubava o run inteiro
+
+O longão de 28/09 ficou 3 dias sem análise. Três causas empilhadas, e a que aparecia no app
+era a errada:
+
+- **Garmin não era o problema.** O Secret `GARMIN_TOKEN` renovou às 10:30 de 29/09 e o último
+  run tinha sido às 02:46, antes disso — com OAuth2 válido o runner nem chega no exchange que
+  o Cloudflare bloqueia. Destravou no primeiro disparo, sem tocar em nada.
+- **BUG 1 — o `except` não pegava timeout.** `urlopen(timeout=90)` estourando na LEITURA da
+  resposta sobe `TimeoutError` cru; `chamar_gemini` só capturava `(HTTPError, URLError)`, então
+  a exceção escapava do laço e **nenhuma das 3 tentativas acontecia**. O fallback automático
+  pro `gemini-2.5-flash` também não, porque ele depende de um código HTTP. Resultado real:
+  `gemini-3.5-flash` estourou os 90 s duas vezes seguidas na mesma corrida e o run inteiro caiu;
+  o mesmo prompt no 2.5-flash respondeu em segundos. Fix: `codigo_da_falha()` (pura) traduz a
+  exceção no "code" que as decisões entendem — `COD_TIMEOUT` para `TimeoutError` cru E para o
+  embrulhado em `URLError.reason` (timeout de conexão) — e `trocar_de_modelo` passa a tratar
+  timeout com a mesma régua da quota: insiste uma vez, depois cai pro fallback. Timeout **não**
+  dorme os 30 s do 429 (a tentativa já gastou 90 s; dormir de novo estouraria o job de 10 min).
+- **BUG 2 — o rótulo mentia.** `main` jogava QUALQUER falha de análise em `status="gemini_quota"`
+  (o ternário `"gemini_quota" if falhas else "erro"` era código morto: o `if` de fora já garantia
+  `falhas`). Nos Ajustes aparecia "IA sem quota — conferir a GEMINI_API_KEY", mandando investigar
+  uma chave que estava boa. Fix: `status_das_falhas()` (pura) separa `gemini_timeout` de
+  `gemini_quota` de `erro`, motivos misturados no mesmo run viram `erro` (não há rótulo único
+  honesto), e cada status tem sua mensagem em `MSG_FALHA`. Rótulo novo espelhado no app nos três
+  lugares: card de saúde, guia de problemas e linha de status dos Ajustes.
+- **Buraco do próprio fix, fechado antes de subir.** As pernas Garmin e IA moram no MESMO `try`
+  por atividade, então classificar a exceção pelo `.code` deixava um 429 do **Garmin** virar
+  `gemini_quota` — o mesmo erro, de outro lado. `chamar_gemini` agora desiste levantando
+  `FalhaIA(code, original)` e o `main` só aceita rótulo de IA de quem é `FalhaIA`; Garmin e bugs
+  nossos caem em `erro`. Rotular de menos é seguro, rotular errado manda investigar a coisa errada.
+- **Testes**: 58 → 72. O que protege de verdade é `TestChamarGeminiRetentaTimeout` — se
+  `TimeoutError` sair da tupla do `except`, as 3 tentativas voltam a não acontecer e só ele pega.
+
+Pendente que NÃO é bug: o push segue `410 Gone` desde ~07/09 (inscrição expirada). Só resolve
+no aparelho — Ajustes → Notificação de atividade, desligar e ligar, e colar o JSON novo no
+Secret `PUSH_SUBSCRIPTION`.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

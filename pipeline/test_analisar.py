@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 """Testes das funções puras do pipeline (sem rede): python3 pipeline/test_analisar.py"""
+import io
+import json
 import unittest
+import urllib.error
 
 import forca
 
 from clima import extrair_janelas
 from datetime import datetime, timedelta, timezone
 
+import analisar
 from analisar import (
-    TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias, compactar_atividade,
+    COD_TIMEOUT, FalhaIA, MSG_FALHA, TIPOS_CORRIDA, ZONAS_FC, avaliar_bloqueio, calcular_tendencias,
+    chamar_gemini, codigo_da_falha, compactar_atividade,
     compactar_forca, corrida_do_dia, deriva_cardiaca, eh_corrida_z2, extrair_fc_details, fmt_pace,
     cadencia_de_referencia, contexto_de_retorno, modelo_indisponivel, pace_seg, proxima_corrida,
-    resolver_push_erro, resumir_splits,
+    resolver_push_erro, resumir_splits, status_das_falhas,
     tipo_atividade, trocar_de_modelo, validar_ia, zonas_de_pontos,
 )
 
@@ -429,6 +434,132 @@ class TestTrocarDeModelo(unittest.TestCase):
         # 500/503 é do lado deles — trocar de modelo não resolve e degradaria à toa
         self.assertIsNone(trocar_de_modelo(503, "", 2))
         self.assertIsNone(trocar_de_modelo(500, "", 3))
+
+
+class TestCodigoDaFalha(unittest.TestCase):
+    """v7.33 — o timeout que escapava do except e derrubava o run inteiro."""
+
+    def test_timeout_de_leitura_e_reconhecido(self):
+        # socket.timeout durante a leitura da resposta sobe como TimeoutError CRU
+        self.assertEqual(codigo_da_falha(TimeoutError("The read operation timed out")), COD_TIMEOUT)
+
+    def test_timeout_de_conexao_vem_embrulhado(self):
+        # falha de conexão o urllib embrulha em URLError — o timeout mora no .reason
+        self.assertEqual(codigo_da_falha(urllib.error.URLError(TimeoutError())), COD_TIMEOUT)
+
+    def test_http_preserva_o_status(self):
+        e = urllib.error.HTTPError("http://x", 429, "Too Many Requests", {}, io.BytesIO(b""))
+        self.assertEqual(codigo_da_falha(e), 429)
+        e.close()
+
+    def test_erro_de_rede_comum_nao_vira_timeout(self):
+        # sem code e sem timeout = None: "não sabemos classificar", e None não ganha retry
+        self.assertIsNone(codigo_da_falha(urllib.error.URLError("dns")))
+
+
+class TestTimeoutTrocaDeModelo(unittest.TestCase):
+    """v7.33 — timeout segue a régua da quota: insiste uma vez, depois cai pro fallback."""
+
+    def test_insiste_uma_vez_antes_de_trocar(self):
+        self.assertIsNone(trocar_de_modelo(COD_TIMEOUT, "", 1))
+        self.assertEqual(trocar_de_modelo(COD_TIMEOUT, "", 2), "lento demais")
+
+    def test_quota_continua_como_era(self):
+        self.assertIsNone(trocar_de_modelo(429, "quota", 1))
+        self.assertEqual(trocar_de_modelo(429, "quota", 2), "sem quota")
+
+    def test_ultima_tentativa_sem_code_nao_troca(self):
+        self.assertIsNone(trocar_de_modelo(None, "", 3))
+
+
+class TestChamarGeminiRetentaTimeout(unittest.TestCase):
+    """O bug de verdade era o except, não a classificação: se TimeoutError sair da tupla,
+    as 3 tentativas voltam a não acontecer e só este teste pega (29/09/2026)."""
+
+    def setUp(self):
+        self.orig_post, self.orig_modelo = analisar._post_gemini, dict(analisar._MODELO)
+        self.chamadas = []
+
+    def tearDown(self):
+        analisar._post_gemini = self.orig_post
+        analisar._MODELO.clear()
+        analisar._MODELO.update(self.orig_modelo)
+
+    def _resposta(self):
+        ia = {"resumo": "r", "comparacao_plano": "c", "pontos_fortes": ["a"],
+              "pontos_atencao": ["b"], "proxima_dica": "d", "nota_execucao": 8}
+        return {"candidates": [{"content": {"parts": [{"text": json.dumps(ia)}]}}]}
+
+    def test_timeout_repete_e_cai_pro_fallback(self):
+        def falso(modelo, chave, corpo):
+            self.chamadas.append(modelo)
+            if len(self.chamadas) < 3:
+                raise TimeoutError("The read operation timed out")
+            return self._resposta()
+        analisar._post_gemini = falso
+        analisar._MODELO.update(atual=analisar.MODELO_GEMINI, trocou=None)
+        self.assertEqual(chamar_gemini("k", {})["nota_execucao"], 8)
+        # 3 chamadas, e a última já no fallback — insistir no modelo lento só queimaria 90 s
+        self.assertEqual(len(self.chamadas), 3)
+        self.assertEqual(self.chamadas[-1], analisar.MODELO_FALLBACK)
+
+    def test_desistir_entrega_falha_rotulada_e_preserva_a_original(self):
+        def falso(modelo, chave, corpo):
+            self.chamadas.append(modelo)
+            raise TimeoutError("The read operation timed out")
+        analisar._post_gemini = falso
+        analisar._MODELO.update(atual=analisar.MODELO_GEMINI, trocou=None)
+        with self.assertRaises(FalhaIA) as ctx:
+            chamar_gemini("k", {})
+        self.assertEqual(ctx.exception.code, COD_TIMEOUT)
+        self.assertIsInstance(ctx.exception.original, TimeoutError)
+
+    def test_timeout_nao_dorme_os_30s_da_quota(self):
+        # o request já esperou TIMEOUT_GEMINI s; dormir de novo estouraria o job de 10 min
+        dormiu = []
+        orig_sleep, analisar.time.sleep = analisar.time.sleep, dormiu.append
+        try:
+            def falso(modelo, chave, corpo):
+                self.chamadas.append(modelo)
+                if len(self.chamadas) < 2:
+                    raise TimeoutError("timed out")
+                return self._resposta()
+            analisar._post_gemini = falso
+            analisar._MODELO.update(atual=analisar.MODELO_GEMINI, trocou=None)
+            chamar_gemini("k", {})
+        finally:
+            analisar.time.sleep = orig_sleep
+        self.assertEqual(dormiu, [])
+
+
+class TestStatusDasFalhas(unittest.TestCase):
+    """v7.33 — o rótulo tem que dizer a verdade: antes QUALQUER falha virava gemini_quota."""
+
+    def test_timeout_nao_se_disfarca_de_quota(self):
+        self.assertEqual(status_das_falhas([COD_TIMEOUT]), "gemini_timeout")
+        self.assertEqual(status_das_falhas([COD_TIMEOUT, COD_TIMEOUT]), "gemini_timeout")
+
+    def test_quota_de_verdade(self):
+        self.assertEqual(status_das_falhas([429]), "gemini_quota")
+
+    def test_desconhecido_e_erro(self):
+        self.assertEqual(status_das_falhas([None]), "erro")
+        self.assertEqual(status_das_falhas([500]), "erro")
+
+    def test_motivos_misturados_nao_ganham_rotulo_especifico(self):
+        self.assertEqual(status_das_falhas([COD_TIMEOUT, 429]), "erro")
+
+    def test_falha_que_nao_e_da_ia_nunca_vira_rotulo_de_ia(self):
+        # Garmin e IA moram no mesmo try por atividade: sem isto um 429 do Garmin apareceria
+        # nos Ajustes como "IA sem quota" e mandaria conferir a chave errada
+        self.assertEqual(status_das_falhas(["outro"]), "erro")
+        self.assertEqual(status_das_falhas(["outro", COD_TIMEOUT]), "erro")
+
+    def test_todo_status_tem_mensagem(self):
+        for motivos in ([COD_TIMEOUT], [429], [None], [COD_TIMEOUT, 429]):
+            nome = status_das_falhas(motivos)
+            self.assertIn(nome, MSG_FALHA)
+            self.assertIn("2", MSG_FALHA[nome].format(n=2))
 
 
 class TestContextoDeRetorno(unittest.TestCase):
