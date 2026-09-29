@@ -1,7 +1,108 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-25T01:59:59-03:00",
+ "atualizadoEm": "2026-09-29T10:49:14-03:00",
  "analises": [
+  {
+   "date": "2026-09-28",
+   "activityId": 24534645124,
+   "geradoEm": "2026-09-29T10:49:31-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte - Longao 8km facil",
+    "inicio": "2026-09-28 18:33:57",
+    "distanciaKm": 8.02,
+    "duracaoMin": 54.9,
+    "paceMedio": "6:50",
+    "fcMedia": 154,
+    "fcMax": 165,
+    "cadencia": 157,
+    "elevacaoM": 20,
+    "trainingEffect": {
+     "aerobico": 3.5,
+     "anaerobico": 0.0,
+     "label": "TEMPO",
+     "carga": null
+    },
+    "vo2max": 47.0,
+    "temperaturaC": 33.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:40",
+      "fc": 140
+     },
+     {
+      "km": 2,
+      "pace": "6:45",
+      "fc": 149
+     },
+     {
+      "km": 3,
+      "pace": "6:50",
+      "fc": 151
+     },
+     {
+      "km": 4,
+      "pace": "6:50",
+      "fc": 156
+     },
+     {
+      "km": 5,
+      "pace": "6:55",
+      "fc": 158
+     },
+     {
+      "km": 6,
+      "pace": "6:57",
+      "fc": 159
+     },
+     {
+      "km": 7,
+      "pace": "6:58",
+      "fc": 159
+     },
+     {
+      "km": 8,
+      "pace": "6:49",
+      "fc": 159
+     }
+    ],
+    "zonasFc": {
+     "z1": 2,
+     "z2": 33,
+     "z3": 65,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": 8.7
+   },
+   "plano": {
+    "tipo": "longo",
+    "nome": "LONGO 8 km fácil — o de 21/09 não aconteceu; a escada de longões recomeça aqui (maior treino desde 03/08: 6,1 km)",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm — a FC manda, não o pace",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:15",
+    "paceZ2Ha8Sem": "6:56"
+   },
+   "ia": {
+    "resumo": "Excelente retorno aos longões com 8 km em ritmo fácil, o maior volume desde a lesão. O pace foi mantido de forma consistente na faixa alvo, demonstrando boa leitura de esforço em condições de calor intenso.",
+    "comparacao_plano": "Você executou 8.02 km com pace médio de 6:50/km, perfeitamente dentro da faixa planejada (6:50–7:15/km). A FC média de 154 bpm ficou acima do teto de Z2 (152 bpm), com 65% do tempo em Z3, mas isso é uma resposta fisiológica esperada e correta para a alta temperatura de 33°C no momento da corrida. A distância foi cumprida conforme o plano, marcando um passo importante na retomada de volume.",
+    "pontos_fortes": [
+     "O pace foi exemplarmente controlado, mantendo-se estável e dentro da faixa alvo para um longão fácil, mesmo com a FC mais elevada devido ao calor.",
+     "Concluiu o maior volume de corrida desde a lesão (8 km), o que é um marco importante no seu bloco de retorno, mostrando progressão segura e consistente.",
+     "A cadência média de 157 spm está dentro da sua faixa de referência para este pace (144-164 spm), indicando uma biomecânica eficiente e protegida para o ritmo.",
+     "Apesar da deriva cardíaca, o último quilômetro foi forte (6:49/km) com FC estável, sugerindo que você tinha reserva e controlou bem o esforço ao longo da corrida."
+    ],
+    "pontos_atencao": [
+     "A deriva cardíaca de 8.7% é um pouco alta, indicando que o corpo trabalhou mais na segunda metade. Isso é esperado em dias muito quentes e ao aumentar o volume após um período de inatividade, mas é um dado a observar para a recuperação e tolerância do pé.",
+     "Apesar do pace controlado, a FC média em Z3 (154 bpm) com 65% do tempo nessa zona, mesmo com o calor, exige atenção à recuperação. Certifique-se de que o pé está respondendo bem ao aumento de carga."
+    ],
+    "proxima_dica": "Para o Tempo Run de 5 km na quarta-feira, foque na Regra das 24h: o placar real deste longão é como seu pé se sente no primeiro passo da manhã seguinte. Monitore qualquer sensibilidade e, se houver dor, ajuste o ritmo do Tempo Run para o lado mais conservador da faixa (6:20/km) ou até mais lento, priorizando a integridade da fáscia.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-24",
    "activityId": 24488286696,
