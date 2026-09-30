@@ -1,7 +1,183 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-25T21:35:56-03:00",
+ "atualizadoEm": "2026-09-29T22:16:28-03:00",
  "analises": [
+  {
+   "date": "2026-09-29",
+   "activityId": 24547797387,
+   "geradoEm": "2026-09-29T22:16:31-03:00",
+   "sessao": {
+    "minutos": 41,
+    "series": 19,
+    "volumeKg": 3470,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 35.0,
+        "s": 42
+       },
+       {
+        "reps": 9,
+        "kg": 35.0,
+        "s": 37
+       },
+       {
+        "reps": 9,
+        "kg": 35.0,
+        "s": 33
+       },
+       {
+        "reps": 7,
+        "kg": 35.0,
+        "s": 33
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 47
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 31
+       },
+       {
+        "reps": 8,
+        "kg": 15.0,
+        "s": 36
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 2.5,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 9.0,
+        "s": 32
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 141
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 126
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -23.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 4
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 45.0,
+        "s": 34
+       },
+       {
+        "reps": 11,
+        "kg": 45.0,
+        "s": 108
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 195
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 20.0,
+        "s": 40
+       },
+       {
+        "reps": 8,
+        "kg": 20.0,
+        "s": 72
+       },
+       {
+        "reps": 0,
+        "kg": 20.0,
+        "s": 3
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -20.0,
+      "deltaReps": 1
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão de empurrar muito sólida, focada na reintrodução progressiva de cargas com excelente aplicação do método de progressão dupla no supino e tríceps. O treino durou 41 minutos para 19 séries, mostrando ótima eficiência de tempo.",
+    "comparacao_plano": "Executou 19 séries totais contra as ~19 planejadas. Respeitou a diretriz de re-entrada de setembro (RIR 3, sem falha) ajustando cargas no desenvolvimento e tríceps testa, enquanto progrediu carga com segurança no supino reto (+5kg) e inclinado (+2.5kg). A elevação lateral foi pulada conscientemente para gestão de tempo e fadiga.",
+    "pontos_fortes": [
+     "Aplicação perfeita da progressão dupla no supino reto, subindo 5kg na carga de trabalho e mantendo as repetições dentro da faixa segura de re-entrada (7 a 10 reps).",
+     "Excelente controle de carga no supino inclinado com halteres, alcançando o topo da faixa (11 reps) logo na primeira série mesmo após o incremento de 2,5kg.",
+     "Gestão inteligente de volume ao pular a elevação lateral, mantendo o treino em rápidos 41 minutos sem comprometer os principais estímulos de peito e tríceps."
+    ],
+    "pontos_atencao": [
+     "No desenvolvimento no Smith, a primeira série bateu 11 repetições (topo da faixa). Como estamos na fase de re-entrada com RIR 3, vale subir levemente a carga na próxima sessão para manter a intensidade planejada sem atingir a falha.",
+     "O tríceps testa teve a última série suprimida, o que foi uma ótima decisão de autorregulação para evitar fadiga excessiva nos braços, preservando a postura na corrida."
+    ],
+    "proxima_dica": "No supino inclinado com halteres, como você bateu 11 repetições na primeira série com 15kg, suba para 16kg na próxima sessão, buscando retornar à faixa de 9 repetições com foco na fase excêntrica controlada.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-25",
    "activityId": 24497930146,

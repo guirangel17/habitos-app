@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-29T18:11:24-03:00",
+ "atualizadoEm": "2026-09-29T22:16:28-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1634,6 +1634,12 @@
    "activityId": 24497930146,
    "minutos": 28,
    "nome": "SEX Upper C + Core"
+  },
+  {
+   "date": "2026-09-29",
+   "activityId": 24547797387,
+   "minutos": 41,
+   "nome": "TER Empurrar"
   }
  ],
  "tendencias": {
