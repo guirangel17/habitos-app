@@ -1,7 +1,7 @@
 {
- "ultimaExecucao": "2026-10-01T18:31:06-03:00",
- "status": "ok",
- "mensagem": "",
+ "ultimaExecucao": "2026-10-01T22:39:06-03:00",
+ "status": "erro",
+ "mensagem": "1 análise(s) falharam — o próximo ciclo tenta de novo",
  "ultimaAnalise": "2026-09-28",
  "pendentes": 0,
  "ultimoSucesso": "2026-10-01T18:31:06-03:00",
