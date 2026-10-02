@@ -1,7 +1,92 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-29T10:49:14-03:00",
+ "atualizadoEm": "2026-10-02T02:41:38-03:00",
  "analises": [
+  {
+   "date": "2026-10-01",
+   "activityId": 24573126320,
+   "geradoEm": "2026-10-02T02:43:30-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-10-01 20:38:30",
+    "distanciaKm": 5.05,
+    "duracaoMin": 40.2,
+    "paceMedio": "7:57",
+    "fcMedia": 135,
+    "fcMax": 162,
+    "cadencia": 98,
+    "elevacaoM": 79,
+    "trainingEffect": {
+     "aerobico": 2.9,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 31.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:23",
+      "fc": 128
+     },
+     {
+      "km": 2,
+      "pace": "7:37",
+      "fc": 136
+     },
+     {
+      "km": 3,
+      "pace": "7:38",
+      "fc": 138
+     },
+     {
+      "km": 4,
+      "pace": "7:59",
+      "fc": 143
+     },
+     {
+      "km": 5,
+      "pace": "9:00",
+      "fc": 132
+     }
+    ],
+    "zonasFc": {
+     "z1": 36,
+     "z2": 55,
+     "z3": 9,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 6 km leve + 6 strides de 100 m — mantém o antepé exposto antes do tempo run de 07/10",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "7:15",
+    "paceZ2Ha8Sem": "6:47"
+   },
+   "ia": {
+    "resumo": "Rodagem leve de 5 km realizada sob calor intenso de 31°C em Belo Horizonte. Você priorizou o controle cardiovascular em vez do pace, mantendo o esforço predominantemente em Z1 e Z2, uma decisão madura e protetiva para este bloco de retorno.",
+    "comparacao_plano": "O plano previa 6 km leves (6:50-7:15/km) mais 6 strides, mas você executou 5,05 km com pace médio de 7:57/km. Embora o ritmo tenha ficado abaixo da faixa planejada, a frequência cardíaca média de 135 bpm respeitou perfeitamente o teto de Z2 (152 bpm). O ajuste de volume e intensidade foi totalmente adequado devido à temperatura extrema de 31°C e à fase de transição pós-lesão.",
+    "pontos_fortes": [
+     "Excelente disciplina térmica: em vez de forçar o pace alvo sob 31°C, você aceitou correr mais lento para proteger o coração e a fáscia plantar.",
+     "Controle de esforço exemplar no início (Km 1 a 7:23 e FC 128), evitando o erro comum de largar forte demais sob calor.",
+     "Escuta corporal ativa no Km 5 (9:00/km com FC caindo para 132 bpm), mostrando maturidade ao caminhar ou desacelerar quando o desgaste térmico aumentou."
+    ],
+    "pontos_atencao": [
+     "O pace de referência em Z2 (7:15/km) ainda reflete sua condição pré-lesão de agosto. No bloco de retorno atual, ritmos próximos a 8:00/km sob calor são perfeitamente normais e esperados.",
+     "A redução de 6 km para 5 km e a provável omissão dos strides foram corretas para evitar sobrecarga estrutural em um dia de alto desgaste fisiológico."
+    ],
+    "proxima_dica": "Para o longão de 10 km no dia 05/10, aplique a Regra das 24h: o verdadeiro indicador de sucesso deste treino será a ausência de dor no primeiro passo ao acordar amanhã. Se o pé estiver zerado, siga para o longão mantendo o foco estrito na FC em Z1/Z2, sem se preocupar com o pace.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-28",
    "activityId": 24534645124,
