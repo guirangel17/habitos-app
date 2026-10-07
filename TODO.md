@@ -525,6 +525,39 @@ ele manteve. O condicional do 26/10 e a valvula que sobrou.
 Provas NAO entram em garmin/treinos_corrida.py (mesma convencao da prova de 05/07): aquela
 agenda so leva treino com estrutura para o relogio.
 
+# Feito na v7.35 (out/2026) — o plano mandava 80-87% sem dizer em quantas semanas
+
+Ele levantou a hipotese em 06/10 de que o gatilho do joelho nao foi a corrida, e sim o treino de
+perna de 24/09. Conferido no Garmin (`exerciseSets`), e ele estava certo:
+
+| sessao | leg press |
+|---|---|
+| 30/07 | 30 / 35 / 40 / 40 kg |
+| 06/08 | 40 / 40 / 40 / 40 kg |
+| 27/08 | 30 / 30 / 30 / 30 kg |
+| 17/09 | 30 / 30 / 30 / 30 kg |
+| **24/09** | 40 / 50 / 60 / **70** / **70 kg** |
+
+**+133% de carga em 7 dias**, e 70 kg e 75% acima do recorde do ano inteiro (40 kg). O longao de
+28/09, que eu vinha tratando como gatilho principal, foi um salto de +31% — quatro vezes menor.
+Correcao de leitura: o leg press e o outlier dominante, e mecanicamente faz mais sentido (flexao
+profunda sob carga alta comprime a articulacao femoropatelar direto). A corrida de 28/09 nao criou
+o problema, revelou um joelho ja sensibilizado. Isso tambem explica por que um social de 5 km a
+FC 135, em 01/10, provocou de novo — se a origem fosse corrida, 5 km faceis nao deveriam.
+
+**Ele seguiu o plano.** A fase 03/09-01/10 diz literalmente "V-Squat ou Leg Press PESADO 80-87% ·
+5 x 5 · RIR 2", e ele fez 5 series subindo 40->50->60->70->70. Execucao correta da instrucao. O
+defeito e do PLANO: ele nomeia uma porcentagem de 1RM sem estabelecer qual e o 1RM nem em quantas
+semanas chegar la. Depois de meses em 30-40 kg, "80-87%" aplicado ao pe da letra vira +133% num dia.
+
+Fix: **TETO DE RAMPA de +10% de carga por semana** escrito na descricao do exercicio nas TRES fases
+que pedem carga pesada — a atual (03/09-01/10), o deload de 08/10 e a de Manutencao + Potencia de
+15/10-29/10, que pedia "3 x 4 pesado" e repetiria a armadilha. O texto cita a data e os numeros de
+propósito: regra sem o caso que a gerou vira regra que alguem apaga depois.
+
+Pendente: o calendario de corrida NAO foi tocado. Ortopedista em 07/10; qualquer remanejamento de
+outubro/novembro espera o diagnostico.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

@@ -294,7 +294,7 @@ export const GYM_TREINOS = {
 // GYM_TREINOS[4] continua valendo como base (hipertrofia, até 27/08).
 export const GYM_PERNA_FASES = [
   ['2026-09-03', '2026-10-01', 'Força Máxima', 'Compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2 — nunca à falha. Isoladores 10-12.', [
-    ['V-Squat ou Leg Press PESADO 80-87%', '5 × 5', 'RIR 2 — descanso 3 min'],
+    ['V-Squat ou Leg Press PESADO 80-87%', '5 × 5', 'RIR 2 — descanso 3 min. TETO DE RAMPA: +10% de carga por semana sobre a sessão anterior, nunca mais. Em 24/09/2026 o leg press pulou de 30 kg (máximo da semana anterior) para 70 kg — +133% num dia, e 75% acima do recorde do ano — e 4 dias depois apareceu a dor femoropatelar no joelho. A porcentagem de 1RM aqui diz ONDE chegar, não em quantas semanas: partindo de 40 kg, 80-87% real leva ~8 semanas de rampa.'],
     ['Elevação Pélvica pesada', '4 × 6'],
     ['Búlgaro', '3 × 8', 'o mais transferível para corrida — não pule'],
     ['Cadeira Flexora', '3 × 10'],
@@ -302,14 +302,14 @@ export const GYM_PERNA_FASES = [
     ['Tibial Anterior', '3 × 15'],
   ]],
   ['2026-10-08', '2026-10-08', 'Deload da semana do teste', 'Metade das séries, mesma carga — perna fresca pro teste de 5 km de 07/10.', [
-    ['V-Squat ou Leg Press pesado', '3 × 5', 'metade das séries — perna fresca'],
+    ['V-Squat ou Leg Press pesado', '3 × 5', 'metade das séries — perna fresca. TETO DE RAMPA: +10% de carga por semana sobre a sessão anterior, nunca mais. Em 24/09/2026 o leg press pulou de 30 kg (máximo da semana anterior) para 70 kg — +133% num dia, e 75% acima do recorde do ano — e 4 dias depois apareceu a dor femoropatelar no joelho. A porcentagem de 1RM aqui diz ONDE chegar, não em quantas semanas: partindo de 40 kg, 80-87% real leva ~8 semanas de rampa.'],
     ['Elevação Pélvica', '2 × 6'],
     ['Cadeira Flexora', '2 × 10'],
     ['Panturrilha em Pé', '2 × 10'],
     ['Tibial Anterior', '2 × 15'],
   ]],
   ['2026-10-15', '2026-10-29', 'Manutenção + Potência', 'Volume −40%: o pico agora é da corrida. Pliometria leve 2×/sem (40-60 contatos), nunca em dia de tiro.', [
-    ['V-Squat ou Leg Press pesado', '3 × 4', 'volume −40% — o pico agora é da corrida'],
+    ['V-Squat ou Leg Press pesado', '3 × 4', 'volume −40% — o pico agora é da corrida. TETO DE RAMPA: +10% de carga por semana sobre a sessão anterior, nunca mais. Em 24/09/2026 o leg press pulou de 30 kg (máximo da semana anterior) para 70 kg — +133% num dia, e 75% acima do recorde do ano — e 4 dias depois apareceu a dor femoropatelar no joelho. A porcentagem de 1RM aqui diz ONDE chegar, não em quantas semanas: partindo de 40 kg, 80-87% real leva ~8 semanas de rampa.'],
     ['Búlgaro', '2 × 8'],
     ['Cadeira Flexora', '2 × 10'],
     ['Panturrilha em Pé', '3 × 10'],
