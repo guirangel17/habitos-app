@@ -1,7 +1,183 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-09-29T22:16:28-03:00",
+ "atualizadoEm": "2026-10-07T03:03:15-03:00",
  "analises": [
+  {
+   "date": "2026-10-06",
+   "activityId": 24632929784,
+   "geradoEm": "2026-10-07T03:03:16-03:00",
+   "sessao": {
+    "minutos": 54,
+    "series": 19,
+    "volumeKg": 4453,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 43
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 42
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 47
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 37
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -5.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 75
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 41
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 40
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 66
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 34
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 44
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 23.0,
+      "deltaReps": -2
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 34
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 83
+       },
+       {
+        "reps": 7,
+        "kg": 9.0,
+        "s": 101
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 45.0,
+        "s": 114
+       },
+       {
+        "reps": 8,
+        "kg": 45.0,
+        "s": 127
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 141
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": 0.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 20.0,
+        "s": 59
+       },
+       {
+        "reps": 9,
+        "kg": 20.0,
+        "s": 116
+       },
+       {
+        "reps": 8,
+        "kg": 20.0,
+        "s": 96
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão de empurrar muito sólida, focada no desenvolvimento de força e hipertrofia de membros superiores para dar suporte à corrida. Você manteve excelente consistência nos tempos sob tensão, completando as 19 séries planejadas em 54 minutos.",
+    "comparacao_plano": "O volume executado de 19 séries seguiu perfeitamente o planejado para o dia. No supino reto, o ajuste estratégico de carga permitiu tocar o topo da faixa de repetições (11 reps), enquanto o desenvolvimento no Smith consolidou a subida de carga com ótima manutenção de reps no piso da meta (9 reps).",
+    "pontos_fortes": [
+     "Excelente aplicação do método de progressão dupla no Smith Machine Overhead Press, sustentando 9 repetições (piso da faixa) mesmo com o incremento de carga.",
+     "Ótimo controle de esforço no Supino Reto, alcançando o topo da faixa alvo (11 repetições) nas duas primeiras séries com 30kg, sinalizando prontidão para subida de carga.",
+     "Consistência no Tríceps Testa com halteres, mantendo a carga de 20kg com repetições sólidas e seguras próximas ao topo da meta."
+    ],
+    "pontos_atencao": [
+     "No Tríceps Pressdown, a redução de repetições na segunda série com 45kg foi muito bem gerida com o ajuste para 40kg na última série, garantindo a manutenção do volume efetivo sem gerar fadiga excessiva.",
+     "Sendo a Elevação Lateral um estímulo novo nesta configuração, a queda para 7 repetições na última série indica que o desgaste acumulado nos supinos e desenvolvimento reduziu a capacidade de estabilização lateral do ombro."
+    ],
+    "proxima_dica": "No Supino Reto, como você atingiu o topo da faixa (11 reps) com 30kg, na próxima sessão aplique a progressão dupla subindo a carga para 32,5kg e mire no piso de 9 repetições.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-09-29",
    "activityId": 24547797387,
