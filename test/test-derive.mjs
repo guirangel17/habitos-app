@@ -174,8 +174,9 @@ ok(semT.gymPlan === 5 && semT.gymFeito === 1, `semana treino: academia 1/5 (veio
 ok(semT.corridaPlan === 3 && semT.corridaFeita === 1, `semana treino: corrida 1/3 (veio ${semT.corridaFeita}/${semT.corridaPlan})`);
 
 const cs = D.corridasStats(wEvs, '2026-07-16');
-// 68 desde a v7.34 (era 67): entraram as provas de 18/10 e 24/10 e saiu 1 sessão de tiros
-ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 68, `corridas: 1/6 até 16/07, 68 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
+// 69 desde a v7.36 (era 68): outubro virou janela sem impacto por ordem médica (joelho),
+// com um dia a mais de zero impacto do que havia de treino no bloco que saiu
+ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 69, `corridas: 1/6 até 16/07, 69 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
 
 // ---- v7.10: remanejamento de treino pro dia certo do plano ----
 // terça 14/07 não tem corrida planejada; o longão de segunda 13/07 ficou sem check

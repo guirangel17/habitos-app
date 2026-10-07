@@ -212,19 +212,14 @@ AGENDA = [
     # a prova de 10 km). Os dois tiros que ocupavam 14/10 e 21/10 SAEM -- as provas de 18/10
     # (10 km) e 24/10 (5 km) sao a qualidade dessas semanas. Provas nao entram nesta agenda
     # (mesma convencao da prova de 05/07): so treino com estrutura para o relogio.
-    ("2026-10-14", "Longao 12km"),
-    ("2026-10-16", "Social Run 6km + strides"),
-    ("2026-10-19", "Rodagem 5km leve"),
-    ("2026-10-21", "Longao 14km cadencia"),
+    # 07/10/2026 (TODO v7.36): ortopedista mandou PARAR de correr ate a ressonancia, mantendo
+    # so o social. Longoes, tiros e as duas provas de outubro saem do relogio. Zero impacto
+    # (bike/natacao) nao vira treino estruturado, mesma convencao da janela da fascite.
+    # O bloco de novembro so volta a ser agendado quando sair a liberacao medica.
+    ("2026-10-15", "Social Run 5km"),
     ("2026-10-22", "Social Run 5km"),
-    ("2026-10-26", "Longao 16km progressivo"),
-    ("2026-10-28", "Tiros 5x1km forte"),
-    ("2026-10-29", "Social Run 8km"),
-    ("2026-11-02", "Volta Completa 18km SIMULACAO"),
-    ("2026-11-04", "Tiros 4x1km"),
+    ("2026-10-29", "Social Run 5km"),
     ("2026-11-05", "Social Run 6km"),
-    ("2026-11-09", "Longao 15km 10+5RP"),
-    ("2026-11-11", "Tiros 3x1500m"),
     ("2026-11-12", "Social Run 6km"),
     ("2026-11-16", "Longao 14km Z2 taper"),
     ("2026-11-18", "Tempo Run 5km taper"),

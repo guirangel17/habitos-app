@@ -558,6 +558,38 @@ propósito: regra sem o caso que a gerou vira regra que alguem apaga depois.
 Pendente: o calendario de corrida NAO foi tocado. Ortopedista em 07/10; qualquer remanejamento de
 outubro/novembro espera o diagnostico.
 
+# Feito na v7.36 (out/2026) — ordem médica: corrida parada ate a ressonancia
+
+Consulta em 07/10. Hipotese do ortopedista: **sindrome da dor patelofemoral OU condromalacia
+patelar** — a ressonancia decide, e a diferenca importa (condromalacia = cartilagem comprometida,
+tratamento vira fortalecimento + infiltracao; SDPF pura = so fortalecimento). Conduta ate o exame:
+
+- **PARAR de correr.** Ele negociou e o medico liberou **apenas o social**.
+- **Perna na academia PODE, com amplitude reduzida.**
+
+Aplicado no calendario (mesma convencao da janela da fascite: `tipo: 'leve'` + "Zero impacto",
+sem treino estruturado no relogio):
+
+- Outubro inteiro virou zero impacto (bike/natacao) nas segundas e quartas, mantendo so os
+  sociais de quinta — encurtados para 4-5 km, **continuos e sem strides**. O social normal dele
+  tem ~27% do tempo parado e cada re-arranque e trabalho concentrado de quadriceps; o medico
+  liberou "o social" sem saber desse detalhe de formato.
+- **As duas provas de outubro SAIRAM**: 10 km de 18/10 e 5 km de 24/10.
+- **Volta Completa de 02/11 SUSPENSA**, com os limiares escritos na propria descricao: liberacao
+  ate ~20/10 ainda permite a escada inteira ate 06/12; ate ~03/11, versao reduzida com longao
+  maximo de 13 km; depois de ~17/11, 18 km deixa de ser decisao sensata.
+- Novembro ganhou prefixo ⏸ "depende da ressonancia" nos longoes e tiros. **Nao refiz a escada**:
+  sem a data de liberacao, qualquer versao seria chute — mesma regra que valeu na v7.27.
+- `garmin/treinos_corrida.py`: outubro saiu do relogio, sobraram os sociais.
+- Academia: nota de **amplitude reduzida** nas duas fases de perna pesada que ainda vem (deload
+  de 08/10 e Manutencao + Potencia de 15/10-29/10), ao lado do teto de rampa da v7.35. A forca
+  na articulacao femoropatelar dispara depois de ~60-70 graus de flexao — meia-amplitude com
+  carga menor vale mais que amplitude cheia dolorida.
+
+**O caminho critico agora e a RESSONANCIA, nao o joelho.** Sao 60 dias ate 06/12 e o tratamento
+so comeca quando o exame sair; cada semana de espera de autorizacao sai direto do tempo de
+reconstrucao. Se vier condromalacia, pedir o GRAU (I-IV) no laudo — muda o prognostico.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).
