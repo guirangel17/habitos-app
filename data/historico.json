@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-06T18:24:27-03:00",
+ "atualizadoEm": "2026-10-06T22:29:46-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1654,6 +1654,12 @@
    "date": "2026-09-29",
    "activityId": 24547797387,
    "minutos": 41,
+   "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-10-06",
+   "activityId": 24632929784,
+   "minutos": 54,
    "nome": "TER Empurrar"
   }
  ],
