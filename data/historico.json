@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-07T22:53:16-03:00",
+ "atualizadoEm": "2026-10-08T03:08:11-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1780,8 +1780,8 @@
    "atual": 48.0,
    "ha8Sem": 48.0
   },
-  "cadencia4Sem": 154,
-  "kmPorSemana4Sem": 10.7,
+  "cadencia4Sem": 157,
+  "kmPorSemana4Sem": 9.9,
   "efSerie": [
    {
     "date": "2026-01-12",
