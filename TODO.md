@@ -590,6 +590,49 @@ sem treino estruturado no relogio):
 so comeca quando o exame sair; cada semana de espera de autorizacao sai direto do tempo de
 reconstrucao. Se vier condromalacia, pedir o GRAU (I-IV) no laudo — muda o prognostico.
 
+# Feito na v7.37 (out/2026) — a quinta de perna virou a sessao do joelho
+
+Ele cobrou em 08/10: a v7.36 anotou rampa e amplitude nas DESCRICOES dos exercicios, mas nao
+refez a sessao. E a de 08/10 era o "Deload da semana do teste" — desenhado pra deixar perna
+fresca pro teste de 5 km de 07/10, **que ja tinha saido do calendario na v7.32**. Ou seja,
+estava obsoleto por dois motivos independentes, e o joelho so foi o segundo.
+
+Fase nova **"Joelho — amplitude reduzida"**, de 08/10 a 29/10 (absorve o deload E a manutencao
+de outubro, que tinha Bulgaro e leg press pesado). Montada so com exercicios que JA existiam no
+programa — o mapeamento pro catalogo da Garmin ja estava validado, entao nada de nome novo
+sendo rejeitado pela API:
+
+| | |
+|---|---|
+| Abducao de Quadril / Monster Walk | 3 x 15 — **primeiro de proposito** |
+| Prancha Lateral c/ Abducao | 3 x 30 s/lado |
+| Elevacao Pelvica | 3 x 10 |
+| Cadeira Flexora | 3 x 12 |
+| Leg Press AMPLITUDE PARCIAL | 3 x 10 a ~30 kg |
+| Panturrilha Sentado | 3 x 13 |
+| Tibial Anterior | 3 x 18 |
+
+A ordem e a mensagem: **gluteo medio e abdutores vem primeiro porque sao o TRATAMENTO** dos dois
+diagnosticos na mesa (SDPF e condromalacia), nao aquecimento. FORA de proposito: Bulgaro e afundo
+(flexao profunda unilateral sob carga), cadeira extensora (cadeia aberta — e o movimento que doi)
+e leg press pesado. O leg press fica em ~30 kg, o patamar estavel de jul-set, nao os 70 kg de
+24/09 que abriram isso tudo.
+
+Detalhe que entrou na nota da fase: **ele esta tomando diclofenaco (Bexai 35 mg, 12/12h, 5 dias)**,
+entao a dor esta mascarada e o limite tem que ser a amplitude combinada, nao a sensacao.
+
+Tambem alinhado: o social de 08/10 ainda dizia "6 km regenerativo" enquanto 15/10 em diante ja
+tinha virado "4-5 km continuo sem strides" na v7.36 — incoerencia de um dia so, corrigida nos
+dois lugares.
+
+Mandado pro relogio: desagendados o DELOAD de 08/10 e as tres MANUTENCAO de 15, 22 e 29/10;
+criada e agendada a sessao de joelho nas quatro datas (workoutId 1723608714), e o social de
+hoje trocado de 6 km para 5 km. Conferido pelo `/calendar-service` — 08/10 tem exatamente dois
+itens e nenhum duplicado.
+
+Testes de perna atualizados (os tres que travavam no deload/manutencao), mais dois novos que
+travam o que importa: gluteo medio em primeiro e ausencia de Bulgaro/afundo/extensora na fase.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

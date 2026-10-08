@@ -205,7 +205,7 @@ export const CORRIDAS = [
   ['2026-10-01', 'social', 'Social Run 6 km leve + 6 strides de 100 m — mantém o antepé exposto antes do tempo run de 07/10'],
   ['2026-10-05', 'longo', 'LONGO 10 km (academia: metade das séries) — segundo degrau da escada'],
   ['2026-10-07', 'tempo', 'Tempo Run 4 km a 6:05–6:20 — CALIBRA A PROVA DE 10 KM de 18/10: o pace que sair aqui é o que você leva para os primeiros 5 km de lá. Se sair duro, desce 10–15 s/km na prova e nos tiros de outubro'],
-  ['2026-10-08', 'social', 'Social Run 6 km regenerativo'],
+  ['2026-10-08', 'social', 'Social Run 4-5 km CONTÍNUO, sem strides — o único que o médico liberou (07/10). Contínuo importa: o formato social normal tem ~27% do tempo parado e cada re-arranque é trabalho concentrado de quadríceps'],
   // ---- Reestruturado em 07/10/2026 pelo ORTOPEDISTA (joelho). Ver TODO v7.36. ----
   // Hipótese dele: síndrome da dor patelofemoral OU condromalácia patelar — a ressonância
   // decide (a 2ª implica infiltração além do fortalecimento). Conduta até o resultado:
@@ -307,20 +307,21 @@ export const GYM_PERNA_FASES = [
     ['Panturrilha em Pé', '4 × 10'],
     ['Tibial Anterior', '3 × 15'],
   ]],
-  ['2026-10-08', '2026-10-08', 'Deload da semana do teste', 'Metade das séries, mesma carga — perna fresca pro teste de 5 km de 07/10.', [
-    ['V-Squat ou Leg Press pesado', '3 × 5', 'metade das séries — perna fresca. AMPLITUDE REDUZIDA (ordem médica, 07/10/2026): pare bem antes da flexão profunda — a força na articulação femoropatelar dispara depois de ~60-70° de joelho dobrado. Meia-amplitude com carga menor vale mais que amplitude cheia dolorida. TETO DE RAMPA: +10% de carga por semana sobre a sessão anterior, nunca mais. Em 24/09/2026 o leg press pulou de 30 kg (máximo da semana anterior) para 70 kg — +133% num dia, e 75% acima do recorde do ano — e 4 dias depois apareceu a dor femoropatelar no joelho. A porcentagem de 1RM aqui diz ONDE chegar, não em quantas semanas: partindo de 40 kg, 80-87% real leva ~8 semanas de rampa.'],
-    ['Elevação Pélvica', '2 × 6'],
-    ['Cadeira Flexora', '2 × 10'],
-    ['Panturrilha em Pé', '2 × 10'],
-    ['Tibial Anterior', '2 × 15'],
+  // 08/10/2026 (TODO v7.37): o deload existia pra deixar perna fresca pro teste de 5 km de
+  // 07/10, que saiu na v7.32 — já estava obsoleto antes do joelho. A manutenção de outubro
+  // tinha Búlgaro e leg press pesado, contraindicados. Os dois viram esta fase. Espelha
+  // CATALOGO_FORCA/FASES_PERNA em garmin/treinos_forca.py — mexeu numa, mexa na outra.
+  ['2026-10-08', '2026-10-29', 'Joelho — amplitude reduzida', 'Ordem médica de 07/10 (suspeita de síndrome patelofemoral ou condromalácia; ressonância pendente): perna PODE, com amplitude reduzida. Prioridade invertida — glúteo médio e abdutores vêm primeiro, porque são o tratamento de primeira linha dos dois diagnósticos, não acessório. Carga leve, repetições altas, NADA de dor durante. Você está tomando diclofenaco: a dor vai estar mascarada, então o limite é a amplitude combinada, não o que você sente.', [
+    ['Abdução de Quadril ou Monster Walk', '3 × 15', 'o tratamento — glúteo médio. Vem primeiro de propósito'],
+    ['Prancha Lateral com Abdução', '3 × 30 s/lado', 'glúteo médio + core'],
+    ['Elevação Pélvica', '3 × 10', 'dominante de quadril, joelho parado — zero carga na patela'],
+    ['Cadeira Flexora', '3 × 12', 'posterior, não carrega a patela'],
+    ['Leg Press AMPLITUDE PARCIAL', '3 × 10', '~30 kg (o patamar estável de julho a setembro, NÃO os 70 kg de 24/09). Pare bem antes de 60-70° de joelho dobrado: é onde a força na articulação femoropatelar dispara'],
+    ['Panturrilha Sentado', '3 × 13', 'sóleo — o músculo mais exigido na corrida'],
+    ['Tibial Anterior', '3 × 18', 'canela, e serve à fáscia'],
   ]],
-  ['2026-10-15', '2026-10-29', 'Manutenção + Potência', 'Volume −40%: o pico agora é da corrida. Pliometria leve 2×/sem (40-60 contatos), nunca em dia de tiro.', [
-    ['V-Squat ou Leg Press pesado', '3 × 4', 'volume −40% — o pico agora é da corrida. AMPLITUDE REDUZIDA (ordem médica, 07/10/2026): pare bem antes da flexão profunda — a força na articulação femoropatelar dispara depois de ~60-70° de joelho dobrado. Meia-amplitude com carga menor vale mais que amplitude cheia dolorida. TETO DE RAMPA: +10% de carga por semana sobre a sessão anterior, nunca mais. Em 24/09/2026 o leg press pulou de 30 kg (máximo da semana anterior) para 70 kg — +133% num dia, e 75% acima do recorde do ano — e 4 dias depois apareceu a dor femoropatelar no joelho. A porcentagem de 1RM aqui diz ONDE chegar, não em quantas semanas: partindo de 40 kg, 80-87% real leva ~8 semanas de rampa.'],
-    ['Búlgaro', '2 × 8'],
-    ['Cadeira Flexora', '2 × 10'],
-    ['Panturrilha em Pé', '3 × 10'],
-    ['Tibial Anterior', '3 × 15'],
-  ]],
+  // FORA desta fase, de propósito: Búlgaro e Afundo (flexão profunda unilateral sob carga),
+  // Cadeira Extensora (cadeia aberta — é exatamente o movimento que dói) e Stiff.
   ['2026-11-05', '2026-11-19', 'Polimento', 'Curto e pesado, sem falha e sem dor muscular. Última sessão pesada de perna: 19/11.', [
     ['Leg Press pesado curto', '3 × 5', 'força neural SEM dano — última pesada em 19/11'],
     ['Elevação Pélvica', '2 × 8'],

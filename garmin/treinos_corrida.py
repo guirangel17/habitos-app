@@ -206,7 +206,7 @@ AGENDA = [
     ("2026-10-01", "Social Run 6km"),
     ("2026-10-05", "Longao 10km DELOAD"),
     ("2026-10-07", "Tempo Run 4km CHECKPOINT"),
-    ("2026-10-08", "Social Run 6km"),
+    ("2026-10-08", "Social Run 5km"),
     # 29/09/2026 (TODO v7.34): entraram 3 provas em outubro e o feriado de 12/10. O longao de
     # 12/10 foi para 14/10 (viagem 10-12, cansaco em 13) e o de 19/10 para 21/10 (dia seguinte
     # a prova de 10 km). Os dois tiros que ocupavam 14/10 e 21/10 SAEM -- as provas de 18/10

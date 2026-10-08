@@ -469,11 +469,16 @@ const qui = (k) => D.gymDoDia(k);
 ok(qui('2026-08-27').fase === null && qui('2026-08-27').exercicios[0][1] === '4 × 8-10', 'perna: até 27/08 é a base de hipertrofia');
 ok(qui('2026-09-17').fase === 'Força Máxima' && qui('2026-09-17').exercicios[0][1] === '5 × 5', 'perna: 17/09 é força máxima, 5 × 5');
 ok(qui('2026-09-24').fase === 'Força Máxima' && qui('2026-10-01').fase === 'Força Máxima', 'perna: força máxima vai até 01/10, a última quinta antes do deload');
-ok(qui('2026-10-08').fase === 'Deload da semana do teste', 'perna: 08/10 é o deload da semana do teste');
-ok(qui('2026-10-15').fase === 'Manutenção + Potência', 'perna: manutenção só a partir de 15/10');
+// v7.37: o deload de 08/10 e a manutenção de outubro deram lugar à fase de joelho (ordem
+// médica de 07/10 — amplitude reduzida). O deload já estava obsoleto desde a v7.32, quando
+// o teste de 5 km de 07/10 que ele servia saiu do calendário.
+ok(qui('2026-10-08').fase === 'Joelho — amplitude reduzida', 'perna: 08/10 é a fase de joelho');
+ok(qui('2026-10-29').fase === 'Joelho — amplitude reduzida', 'perna: a fase de joelho vai até 29/10');
+ok(qui('2026-10-08').exercicios[0][0].startsWith('Abdução de Quadril'), 'perna: glúteo médio vem PRIMEIRO na fase de joelho — é o tratamento, não acessório');
+ok(!qui('2026-10-08').exercicios.some((e) => /Búlgaro|Afundo|Extensora/.test(e[0])), 'perna: fase de joelho não tem Búlgaro, afundo nem cadeira extensora');
 ok(qui('2026-11-19').fase === 'Polimento' && qui('2026-11-26').fase === null, 'perna: polimento acaba na última pesada, 19/11');
 ok(D.treinoDoDia('2026-09-24').gym === 'Pernas — Força Máxima' && D.treinoDoDia('2026-08-27').gym.startsWith('Pernas A'), 'perna: o card do dia usa o nome da fase, não "Pernas A" fixo');
-ok(qui('2026-09-24').nota.includes('80-87%') && qui('2026-10-08').nota.includes('Metade das séries'), 'perna: cada fase carrega a própria prescrição');
+ok(qui('2026-09-24').nota.includes('80-87%') && qui('2026-10-08').nota.includes('amplitude reduzida'), 'perna: cada fase carrega a própria prescrição');
 ok(qui('2026-09-15').fase === null && qui('2026-09-15').exercicios.length > 0, 'terça segue vindo de GYM_TREINOS');
 
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');

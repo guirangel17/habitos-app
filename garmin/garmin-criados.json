@@ -63,7 +63,8 @@
     "Longao 15km cadencia": 1663350606,
     "Longao 14km cadencia": 1700544171,
     "QUI Pernas DELOAD (semana do teste)": 1705994054,
-    "Tempo Run 4km CHECKPOINT": 1708552793
+    "Tempo Run 4km CHECKPOINT": 1708552793,
+    "QUI Pernas JOELHO (amplitude reduzida)": 1723608714
   },
   "agendamentos": [
     {
@@ -691,12 +692,6 @@
       "data": "2026-10-14"
     },
     {
-      "chave": "1624797035:2026-10-15",
-      "scheduleId": 1705467167,
-      "nome": "QUI Pernas MANUTENCAO (out)",
-      "data": "2026-10-15"
-    },
-    {
       "chave": "1624796511:2026-10-16",
       "scheduleId": 1705467175,
       "nome": "SEX Upper C + Core",
@@ -721,12 +716,6 @@
       "data": "2026-10-21"
     },
     {
-      "chave": "1624797035:2026-10-22",
-      "scheduleId": 1705467242,
-      "nome": "QUI Pernas MANUTENCAO (out)",
-      "data": "2026-10-22"
-    },
-    {
       "chave": "1624796511:2026-10-23",
       "scheduleId": 1705467244,
       "nome": "SEX Upper C + Core",
@@ -749,12 +738,6 @@
       "scheduleId": 1705467260,
       "nome": "QUA Puxar",
       "data": "2026-10-28"
-    },
-    {
-      "chave": "1624797035:2026-10-29",
-      "scheduleId": 1705467265,
-      "nome": "QUI Pernas MANUTENCAO (out)",
-      "data": "2026-10-29"
     },
     {
       "chave": "1624796511:2026-10-30",
@@ -949,12 +932,6 @@
       "data": "2026-10-05"
     },
     {
-      "chave": "1624794473:2026-10-08",
-      "scheduleId": 1743455986,
-      "nome": "Social Run 6km",
-      "data": "2026-10-08"
-    },
-    {
       "chave": "1624794473:2026-09-24",
       "scheduleId": 1770945837,
       "nome": "Social Run 6km",
@@ -1015,12 +992,6 @@
       "data": "2026-09-22"
     },
     {
-      "chave": "1705994054:2026-10-08",
-      "scheduleId": 1785348594,
-      "nome": "QUI Pernas DELOAD (semana do teste)",
-      "data": "2026-10-08"
-    },
-    {
       "chave": "1663350562:2026-09-28",
       "scheduleId": 1787817745,
       "nome": "Longao 8km facil",
@@ -1031,6 +1002,36 @@
       "scheduleId": 1787817751,
       "nome": "Tempo Run 4km CHECKPOINT",
       "data": "2026-10-07"
+    },
+    {
+      "chave": "1723608714:2026-10-08",
+      "scheduleId": 1802685817,
+      "nome": "QUI Pernas JOELHO (amplitude reduzida)",
+      "data": "2026-10-08"
+    },
+    {
+      "chave": "1723608714:2026-10-15",
+      "scheduleId": 1802685819,
+      "nome": "QUI Pernas JOELHO (amplitude reduzida)",
+      "data": "2026-10-15"
+    },
+    {
+      "chave": "1723608714:2026-10-22",
+      "scheduleId": 1802685825,
+      "nome": "QUI Pernas JOELHO (amplitude reduzida)",
+      "data": "2026-10-22"
+    },
+    {
+      "chave": "1723608714:2026-10-29",
+      "scheduleId": 1802685829,
+      "nome": "QUI Pernas JOELHO (amplitude reduzida)",
+      "data": "2026-10-29"
+    },
+    {
+      "chave": "1624794250:2026-10-08",
+      "scheduleId": 1802686037,
+      "nome": "Social Run 5km",
+      "data": "2026-10-08"
     }
   ]
 }

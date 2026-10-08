@@ -132,6 +132,21 @@ CATALOGO_FORCA = {
         ex("Panturrilha em Pé", 3, 10, "CALF_RAISE", "STANDING_CALF_RAISE", 75),
         ex("Tibial Anterior", 3, 15, "CALF_RAISE", "SEATED_DUMBBELL_TOE_RAISE", 60),
     ], "Pico de corrida: volume -40%. Pliometria leve 2x/sem à parte (40-60 contatos)"),
+    # Montado em 08/10/2026 (TODO v7.37) com as duas restricoes do ortopedista: perna PODE,
+    # com amplitude reduzida; corrida parada ate a ressonancia. So exercicios que ja existiam
+    # no programa — mapeamento pro catalogo da Garmin ja validado. Fora: Bulgaro e afundo
+    # (flexao profunda unilateral), cadeira extensora (cadeia aberta = o movimento que doi) e
+    # leg press pesado. Dentro, primeiro: gluteo medio e abdutores, que sao o tratamento de
+    # primeira linha dos dois diagnosticos na mesa.
+    "QUI Pernas JOELHO (amplitude reduzida)": treino_forca("QUI Pernas JOELHO (amplitude reduzida)", [
+        ex("Abdução de Quadril ou Monster Walk", 3, 15, "BANDED_EXERCISES", "LATERAL_BAND_WALKS", 60),
+        ex("Prancha Lateral c/ Abdução (30s/lado)", 3, None, "PLANK", "SIDE_PLANK", 60, tempo_s=30),
+        ex("Elevação Pélvica", 3, 10, "HIP_RAISE", "BARBELL_HIP_THRUST_WITH_BENCH", 120),
+        ex("Cadeira Flexora", 3, 12, "LEG_CURL", "LEG_CURL", 90),
+        ex("Leg Press PARCIAL ~30kg (raso, sem dor)", 3, 10, "SQUAT", "LEG_PRESS", 120),
+        ex("Panturrilha Sentado (sóleo)", 3, 13, "CALF_RAISE", "SEATED_CALF_RAISE", 60),
+        ex("Tibial Anterior", 3, 18, "CALF_RAISE", "SEATED_DUMBBELL_TOE_RAISE", 60),
+    ], "Joelho: amplitude reduzida e carga leve. Sem Bulgaro, extensora nem leg press profundo"),
     "QUI Pernas POLIMENTO (nov)": treino_forca("QUI Pernas POLIMENTO (nov)", [
         ex("Leg Press pesado curto", 3, 5, "SQUAT", "LEG_PRESS", 180),
         ex("Elevação Pélvica", 2, 8, "HIP_RAISE", "BARBELL_HIP_THRUST_WITH_BENCH", 120),
@@ -167,8 +182,11 @@ for dt in _semanal(3, "2026-07-09", "2026-08-27"):
 # nao tinha (entrava direto em manutencao e contrariava "semana de 05/10 e DELOAD" do data.js).
 FASES_PERNA = [
     ("2026-09-03", "2026-10-01", "QUI Pernas FORCA MAX (set)"),
-    ("2026-10-08", "2026-10-08", "QUI Pernas DELOAD (semana do teste)"),
-    ("2026-10-15", "2026-10-29", "QUI Pernas MANUTENCAO (out)"),
+    # 08/10/2026: o DELOAD existia para deixar perna fresca pro teste de 5 km de 07/10, que ja
+    # tinha saido na v7.32 — obsoleto por isso ANTES de o joelho entrar na conta. E a
+    # MANUTENCAO de outubro tinha Bulgaro e leg press pesado, contraindicados agora. Os dois
+    # blocos viram a sessao de joelho ate 29/10; novembro espera a ressonancia.
+    ("2026-10-08", "2026-10-29", "QUI Pernas JOELHO (amplitude reduzida)"),
     ("2026-11-05", "2026-11-19", "QUI Pernas POLIMENTO (nov)"),
 ]
 for inicio, fim, nome in FASES_PERNA:
