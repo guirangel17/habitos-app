@@ -1,7 +1,124 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-07T03:03:15-03:00",
+ "atualizadoEm": "2026-10-08T23:05:47-03:00",
  "analises": [
+  {
+   "date": "2026-10-08",
+   "activityId": 24656716951,
+   "geradoEm": "2026-10-08T23:05:48-03:00",
+   "sessao": {
+    "minutos": 13,
+    "series": 11,
+    "volumeKg": 110,
+    "exercicios": [
+     {
+      "nome": "LATERAL_BAND_WALKS",
+      "categoria": "BANDED_EXERCISES",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SIDE_PLANK",
+      "categoria": "PLANK",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 1
+       }
+      ],
+      "status": "pulado",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       },
+       {
+        "reps": 11,
+        "kg": 10.0,
+        "s": 150
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 10,
+        "kg": null,
+        "s": 335
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Retorno consciente aos treinos de perna após 14 dias de intervalo, priorizando uma reentrada extremamente leve e rápida de 13 minutos. A escolha de realizar apenas estímulos pontuais na elevação pélvica e flexora protege suas pernas contra dores musculares tardias severas, mantendo a corrida como prioridade absoluta.",
+    "comparacao_plano": "Em comparação ao planejado de Pernas A (21 séries), você executou uma versão ultra-reduzida de apenas 2 séries efetivas, pulando os compostos pesados e os preventivos. Essa redução drástica é uma decisão madura de re-entrada após duas semanas de afastamento, evitando sobrecarga nos tecidos.",
+    "pontos_fortes": [
+     "Excelente prudência ao não forçar agachamentos pesados ou Stiff logo no primeiro dia após 14 dias de pausa, blindando a integridade dos isquiotibiais e glúteos.",
+     "Estímulo neuromuscular seguro na cadeira flexora e elevação pélvica, reativando os padrões de movimento sem gerar estresse metabólico excessivo."
+    ],
+    "pontos_atencao": [
+     "Os exercícios preventivos de estabilização lateral foram pulados; mesmo em sessões curtas, eles são fundamentais para a estabilidade do quadril na corrida.",
+     "Ausência de estímulo específico para panturrilha e tibial; a reintrodução desses tecidos ao estresse deve ser gradual para acompanhar o volume de corrida."
+    ],
+    "proxima_dica": "Na próxima sessão de Pernas A, realize 2 séries leves de V-Squat (com ~70% da carga anterior) e adicione 2 séries de panturrilha em pé, progredindo o volume de forma segura e sem pressa.",
+    "nota_execucao": 8
+   }
+  },
   {
    "date": "2026-10-06",
    "activityId": 24632929784,

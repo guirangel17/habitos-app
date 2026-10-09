@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-08T18:40:47-03:00",
+ "atualizadoEm": "2026-10-08T23:05:47-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1661,6 +1661,12 @@
    "activityId": 24632929784,
    "minutos": 54,
    "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-10-08",
+   "activityId": 24656716951,
+   "minutos": 13,
+   "nome": "QUI Pernas JOELHO (amplitude red"
   }
  ],
  "tendencias": {
