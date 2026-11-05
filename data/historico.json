@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-09T03:12:02-03:00",
+ "atualizadoEm": "2026-11-05T03:50:37-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1179,6 +1179,81 @@
    "paradoPct": 27,
    "ef": 0.931,
    "tipoPlano": "social"
+  },
+  {
+   "date": "2026-10-15",
+   "activityId": 24739856993,
+   "distanciaKm": 5.19,
+   "paceMedio": "7:31",
+   "paceSeg": 451,
+   "fcMedia": 138,
+   "fcMax": 161,
+   "cadencia": 87,
+   "vo2max": 48.0,
+   "teAerobico": 3.1,
+   "paradoPct": 34,
+   "ef": 0.964,
+   "tipoPlano": "social"
+  },
+  {
+   "date": "2026-10-22",
+   "activityId": 24820414465,
+   "distanciaKm": 5.1,
+   "paceMedio": "8:12",
+   "paceSeg": 492,
+   "fcMedia": 131,
+   "fcMax": 155,
+   "cadencia": 94,
+   "vo2max": 49.0,
+   "teAerobico": 2.7,
+   "paradoPct": 23,
+   "ef": 0.932,
+   "tipoPlano": "social"
+  },
+  {
+   "date": "2026-10-24",
+   "activityId": 24840529578,
+   "distanciaKm": 5.03,
+   "paceMedio": "7:20",
+   "paceSeg": 440,
+   "fcMedia": 154,
+   "fcMax": 173,
+   "cadencia": 149,
+   "vo2max": 48.0,
+   "teAerobico": 3.2,
+   "paradoPct": 0,
+   "ef": 0.885,
+   "tipoPlano": "leve"
+  },
+  {
+   "date": "2026-10-28",
+   "activityId": 24888352659,
+   "distanciaKm": 5.32,
+   "paceMedio": "7:41",
+   "paceSeg": 461,
+   "fcMedia": 143,
+   "fcMax": 165,
+   "cadencia": 101,
+   "vo2max": 48.0,
+   "teAerobico": 3.2,
+   "paradoPct": 27,
+   "ef": 0.911,
+   "tipoPlano": "leve"
+  },
+  {
+   "date": "2026-11-01",
+   "activityId": 24927307575,
+   "distanciaKm": 5.05,
+   "paceMedio": "6:55",
+   "paceSeg": 415,
+   "fcMedia": 149,
+   "fcMax": 168,
+   "cadencia": 158,
+   "vo2max": 47.0,
+   "teAerobico": 3.3,
+   "paradoPct": 0,
+   "ef": 0.97,
+   "tipoPlano": null
   }
  ],
  "forcas": [
@@ -1667,6 +1742,36 @@
    "activityId": 24656716951,
    "minutos": 13,
    "nome": "QUI Pernas JOELHO (amplitude red"
+  },
+  {
+   "date": "2026-10-16",
+   "activityId": 24749476927,
+   "minutos": 57,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-10-17",
+   "activityId": 24757929229,
+   "minutos": 17,
+   "nome": "SAB Pernas B preventivo"
+  },
+  {
+   "date": "2026-10-20",
+   "activityId": 24796246237,
+   "minutos": 48,
+   "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-10-23",
+   "activityId": 24829377062,
+   "minutos": 27,
+   "nome": "SEX Upper C + Core"
+  },
+  {
+   "date": "2026-11-03",
+   "activityId": 24957485929,
+   "minutos": 52,
+   "nome": "TER Empurrar"
   }
  ],
  "tendencias": {
@@ -1778,16 +1883,20 @@
    {
     "date": "2026-09-16",
     "seg": 413
+   },
+   {
+    "date": "2026-11-01",
+    "seg": 415
    }
   ],
-  "paceZ2Atual": "7:15",
-  "paceZ2Ha8Sem": "6:47",
+  "paceZ2Atual": "7:07",
+  "paceZ2Ha8Sem": "7:05",
   "vo2max": {
-   "atual": 48.0,
+   "atual": 47.0,
    "ha8Sem": 48.0
   },
-  "cadencia4Sem": 157,
-  "kmPorSemana4Sem": 8.4,
+  "cadencia4Sem": 154,
+  "kmPorSemana4Sem": 6.4,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -1952,27 +2061,19 @@
    {
     "date": "2026-09-28",
     "ef": 0.95
+   },
+   {
+    "date": "2026-10-24",
+    "ef": 0.885
+   },
+   {
+    "date": "2026-11-01",
+    "ef": 0.97
    }
   ],
-  "efAtual": 0.956,
-  "efHa8Sem": 1.062,
+  "efAtual": 0.935,
+  "efHa8Sem": 0.992,
   "kmSemanas": [
-   {
-    "semana": "2026-07-20",
-    "km": 12.4
-   },
-   {
-    "semana": "2026-07-27",
-    "km": 17.4
-   },
-   {
-    "semana": "2026-08-03",
-    "km": 23.0
-   },
-   {
-    "semana": "2026-08-10",
-    "km": 6.1
-   },
    {
     "semana": "2026-08-17",
     "km": 0
@@ -2003,6 +2104,22 @@
    },
    {
     "semana": "2026-10-05",
+    "km": 0
+   },
+   {
+    "semana": "2026-10-12",
+    "km": 5.2
+   },
+   {
+    "semana": "2026-10-19",
+    "km": 10.1
+   },
+   {
+    "semana": "2026-10-26",
+    "km": 10.4
+   },
+   {
+    "semana": "2026-11-02",
     "km": 0
    }
   ],
@@ -2054,24 +2171,15 @@
    },
    {
     "mes": "2026-10",
+    "km": 5.32,
+    "date": "2026-10-28"
+   },
+   {
+    "mes": "2026-11",
     "km": 5.05,
-    "date": "2026-10-01"
+    "date": "2026-11-01"
    }
   ],
-  "projecao18k": {
-   "base": {
-    "date": "2026-07-29",
-    "km": 5.03,
-    "pace": "5:34"
-   },
-   "otimista": {
-    "tempo": "1h48",
-    "pace": "6:01"
-   },
-   "conservador": {
-    "tempo": "1h54",
-    "pace": "6:19"
-   }
-  }
+  "projecao18k": null
  }
 }

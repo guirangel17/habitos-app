@@ -1,7 +1,154 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-08T23:05:47-03:00",
+ "atualizadoEm": "2026-11-05T03:50:37-03:00",
  "analises": [
+  {
+   "date": "2026-11-03",
+   "activityId": 24957485929,
+   "geradoEm": "2026-11-05T03:50:55-03:00",
+   "sessao": {
+    "minutos": 52,
+    "series": 15,
+    "volumeKg": 3420,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 43
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 41
+       },
+       {
+        "reps": 9,
+        "kg": 35.0,
+        "s": 49
+       },
+       {
+        "reps": 8,
+        "kg": 35.0,
+        "s": 41
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": -2
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 57
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 41
+       },
+       {
+        "reps": 9,
+        "kg": 15.0,
+        "s": 37
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 144
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 32
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 33
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 2
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 9.0,
+        "s": 628
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 112
+       },
+       {
+        "reps": 9,
+        "kg": 9.0,
+        "s": 112
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 35.0,
+        "s": 26
+       },
+       {
+        "reps": 8,
+        "kg": 35.0,
+        "s": 101
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -10.0,
+      "deltaReps": -1
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão de Empurrar focada em re-entrada neuro-muscular após 28 dias de intervalo, perfeitamente alinhada com a fase de polimento. O ajuste no volume total (15 séries executadas contra 19 planejadas) foi uma decisão técnica precisa para estimular hipertrofia e força sem gerar DOMS que comprometa os treinos de corrida.",
+    "comparacao_plano": "Foram executadas 15 séries em 52 minutos versus 19 séries planejadas. A omissão consciente do Tríceps Testa e o encerramento do treino com 15 séries ajustaram perfeitamente o volume ao momento de polimento e retorno após 28 dias.",
+    "pontos_fortes": [
+     "Aplicação bem-sucedida da progressão dupla no Supino Reto, subindo a carga para 35kg nas duas últimas séries mantendo a faixa efetiva de repetições (9 e 8 reps)",
+     "Evolução de repetições no Desenvolvimento Smith (+2 reps na primeira série com 32kg), sinalizando excelente retenção de força neural",
+     "Gestão de volume ideal para o período pré-prova, prevenindo fadiga residual desnecessária"
+    ],
+    "pontos_atencao": [
+     "Redução natural na carga do Tríceps Pulley (-10kg), um padrão esperado de re-adaptação neuromuscular após quase um mês sem a execução deste padrão específico",
+     "Intervalos mais longos registrados em séries de ombro/tríceps (ex: Smith e Elevação Lateral), compreensíveis pela fase de ajuste de carga"
+    ],
+    "proxima_dica": "No Supino Reto, estabilize a carga de 35kg em todas as 4 séries na próxima sessão, buscando consolidar o piso de 8-9 repetições sem chegar à falha.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-10-08",
    "activityId": 24656716951,

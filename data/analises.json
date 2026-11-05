@@ -1,7 +1,86 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-10-02T02:41:38-03:00",
+ "atualizadoEm": "2026-11-05T03:50:37-03:00",
  "analises": [
+  {
+   "date": "2026-11-01",
+   "activityId": 24927307575,
+   "geradoEm": "2026-11-05T03:50:55-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-11-01 08:01:51",
+    "distanciaKm": 5.05,
+    "duracaoMin": 34.9,
+    "paceMedio": "6:55",
+    "fcMedia": 149,
+    "fcMax": 168,
+    "cadencia": 158,
+    "elevacaoM": 75,
+    "trainingEffect": {
+     "aerobico": 3.3,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 47.0,
+    "temperaturaC": 31.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:54",
+      "fc": 137
+     },
+     {
+      "km": 2,
+      "pace": "6:36",
+      "fc": 148
+     },
+     {
+      "km": 3,
+      "pace": "7:03",
+      "fc": 154
+     },
+     {
+      "km": 4,
+      "pace": "7:17",
+      "fc": 157
+     },
+     {
+      "km": 5,
+      "pace": "6:47",
+      "fc": 149
+     }
+    ],
+    "zonasFc": {
+     "z1": 4,
+     "z2": 58,
+     "z3": 36,
+     "z4": 2,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": null,
+   "historico": {
+    "paceZ2Atual": "7:07",
+    "paceZ2Ha8Sem": "7:05"
+   },
+   "ia": {
+    "resumo": "Rodagem de 5,05 km a 6:55/km realizada sob forte calor (31°C) e relevo ondulado (+75m de ganho altimétrico). A corrida manteve caráter majoritariamente aeróbico, com FC média de 149 bpm (Z2) e cadência estável de 158 spm.",
+    "comparacao_plano": "Não havia treino de corrida programado para este dia na planilha. Como atividade extra, a intensidade média permaneceu dentro de Z2 (149 bpm), contudo a combinação de 31°C e 75m de altimetria levou 36% do tempo para Z3 nos km intermediários. Atividades não planejadas pedem cautela para não comprometer a regeneração tecidual.",
+    "pontos_fortes": [
+     "Início extremamente disciplinado no km 1 (6:54/km com FC 137 bpm em Z1/Z2 baixa), demonstrando ótimo controle da ansiedade nos primeiros minutos.",
+     "Cadência média de 158 spm perfeitamente alinhada com a sua referência histórica para este pace (144-162 spm).",
+     "Excelente gestão de esforço ao ajustar o ritmo nos trechos em aclive (km 4 a 7:17/km), respeitando a resposta fisiológica ao relevo."
+    ],
+    "pontos_atencao": [
+     "Elevação da FC nos km 3 e 4 (atingindo 157 bpm), uma resposta fisiológica natural e esperada frente à temperatura ambiente de 31°C e ao ganho de elevação.",
+     "Acúmulo de volume não programado: rodagens fora do plano exigem atenção para não sobrecarregar as estruturas em fase de retorno."
+    ],
+    "proxima_dica": "Aplique a regra das 24h ao acordar amanhã: observe a sensibilidade da fáscia plantar no primeiro passo fora da cama antes de qualquer nova atividade.",
+    "nota_execucao": null
+   }
+  },
   {
    "date": "2026-10-01",
    "activityId": 24573126320,
