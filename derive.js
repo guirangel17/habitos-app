@@ -1,5 +1,5 @@
 // Funções puras de derivação — sem DOM, sem storage. Testáveis via node.
-import { TIPO_POR_DIA_SEMANA, FIM_DEFICIT, CARGA_CARBO, PROVA, MEAL_IDS, METAS_30D, CORRIDAS, GYM_POR_DIA, GYM_TREINOS, GYM_PERNA_FASES, MARCOS_DIAS } from './data.js';
+import { TIPO_POR_DIA_SEMANA, FIM_DEFICIT, CARGA_CARBO, PROVA, MEAL_IDS, METAS_30D, CORRIDAS, GYM_POR_DIA, GYM_TREINOS, GYM_PERNA_FASES, MARCOS_DIAS, PROMESSA, PROMESSA_BENEFICIOS } from './data.js';
 
 export const DAY_MS = 86400000;
 
@@ -868,4 +868,62 @@ export function gymDoDia(key) {
     if (fase) return { exercicios: fase[4], fase: fase[2], nota: fase[3] };
   }
   return { exercicios: GYM_TREINOS[dow] || [], fase: null, nota: null };
+}
+
+// ---- Promessa (v7.39): N semanas sem doce, com recomeço ----
+// Mais rígida que o ehDeslize de propósito: aqui doce PLANEJADO também conta (a promessa é zero
+// doce), e qualquer doce fora das exceções (Natal) recomeça as N semanas a partir do dia seguinte.
+// Doce depois do fim da tentativa não desfaz uma promessa cumprida.
+function ehDocePromessa(e) {
+  return e.type === 'sweet' || (e.type === 'sos' && e.kind === 'doce' && e.outcome === 'gave_in');
+}
+
+export function estadoPromessa(events, hojeKey, cfg = PROMESSA, beneficios = PROMESSA_BENEFICIOS) {
+  const duracao = cfg.semanas * 7;
+  const exc = new Set(cfg.excecoes || []);
+  const slips = events.filter(ehDocePromessa)
+    .map((e) => ({ date: e.date || dateKey(new Date(e.ts)), ts: e.ts }))
+    .filter((s) => s.date >= cfg.ini && s.date <= hojeKey && !exc.has(s.date))
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.ts - b.ts));
+
+  let ini = cfg.ini;
+  let desdeTs = parseKey(cfg.ini).getTime();
+  let ultimoSlip = null;
+  const tentativas = [];
+  for (const s of slips) {
+    const fimAtual = addDays(ini, duracao - 1);
+    if (s.date > fimAtual) break; // promessa já cumprida antes desse doce
+    if (s.date >= ini) {
+      tentativas.push({ ini, fim: s.date, dias: diffDays(ini, s.date) });
+      ini = addDays(s.date, 1);
+    }
+    ultimoSlip = s.date;
+    desdeTs = Math.max(desdeTs, s.ts);
+  }
+  const fim = addDays(ini, duracao - 1);
+
+  let fase;
+  if (hojeKey < cfg.ini) fase = 'inativa';
+  else if (ultimoSlip === hojeKey) fase = 'recomeca_amanha';
+  else if (hojeKey <= fim) fase = 'ativa';
+  else if (diffDays(fim, hojeKey) <= (cfg.posFimDias ?? 0)) fase = 'cumprida';
+  else fase = 'inativa';
+
+  const dia = fase === 'ativa' ? diffDays(ini, hojeKey) + 1 : fase === 'cumprida' ? duracao : 0;
+  const dias = [];
+  for (let i = 0; i < duracao; i++) {
+    const date = addDays(ini, i);
+    const estado = exc.has(date) ? 'natal' : date < hojeKey ? 'limpo' : date === hojeKey ? 'hoje' : 'futuro';
+    dias.push({ date, estado });
+  }
+  const desbloqueados = beneficios.filter((b) => b.dia <= dia);
+  const prox = beneficios.find((b) => b.dia > dia);
+  return {
+    fase, ini, fim, dia, duracao,
+    semanaAtual: dia ? Math.min(cfg.semanas, Math.floor((dia - 1) / 7) + 1) : 0,
+    faltam: fase === 'ativa' ? diffDays(hojeKey, fim) : fase === 'recomeca_amanha' ? duracao : 0,
+    natal: dias.filter((d) => d.estado === 'natal').length,
+    desdeTs, dias, tentativas, desbloqueados,
+    proximoBeneficio: prox ? { ...prox, emDias: prox.dia - dia } : null,
+  };
 }

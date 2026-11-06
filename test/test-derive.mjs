@@ -482,5 +482,39 @@ ok(D.treinoDoDia('2026-09-24').gym === 'Pernas — Força Máxima' && D.treinoDo
 ok(qui('2026-09-24').nota.includes('80-87%') && qui('2026-10-08').nota.includes('amplitude reduzida'), 'perna: cada fase carrega a própria prescrição');
 ok(qui('2026-09-15').fase === null && qui('2026-09-15').exercicios.length > 0, 'terça segue vindo de GYM_TREINOS');
 
+// promessa (v7.39): 13 semanas sem doce, Natal liberado, deslize recomeça
+{
+  const P = (ev, hoje) => D.estadoPromessa(ev, hoje);
+  const ts = (k, h = 15) => D.parseKey(k).getTime() + h * 3600000;
+  let p = P([], '2026-11-06');
+  ok(p.fase === 'ativa' && p.dia === 12 && p.faltam === 79 && p.semanaAtual === 2, `promessa: 06/11 é o dia 12, faltam 79 (${p.dia}/${p.faltam})`);
+  ok(p.fim === '2027-01-24' && p.dias.length === 91 && p.natal === 2, 'promessa: fim 24/01, 91 células, 2 de Natal');
+  ok(p.dias[11].estado === 'hoje' && p.dias[10].estado === 'limpo' && p.dias[12].estado === 'futuro', 'promessa: grade marca limpo/hoje/futuro');
+  ok(P([], '2026-10-25').fase === 'inativa', 'promessa: antes do início fica inativa');
+  ok(P([{ type: 'sweet', date: '2026-10-25', ts: ts('2026-10-25') }], '2026-11-06').dia === 12, 'promessa: o doce de 25/10 é anterior e não conta');
+  const natal = [{ type: 'sweet', date: '2026-12-24', ts: ts('2026-12-24') }, { type: 'sweet', date: '2026-12-25', ts: ts('2026-12-25') }];
+  p = P(natal, '2026-12-26');
+  ok(p.fase === 'ativa' && p.ini === '2026-10-26' && p.tentativas.length === 0, 'promessa: doce no Natal não recomeça');
+  const desl = [{ type: 'sweet', date: '2026-11-10', ts: ts('2026-11-10') }];
+  p = P(desl, '2026-11-10');
+  ok(p.fase === 'recomeca_amanha' && p.ini === '2026-11-11' && p.faltam === 91, 'promessa: no dia do deslize, recomeça amanhã');
+  p = P(desl, '2026-11-12');
+  ok(p.fase === 'ativa' && p.ini === '2026-11-11' && p.fim === '2027-02-09' && p.dia === 2, `promessa: deslize em 10/11 → 11/11 a 09/02 (${p.fim})`);
+  ok(p.tentativas.length === 1 && p.tentativas[0].dias === 15, 'promessa: a tentativa anterior fica guardada com 15 dias');
+  ok(p.desdeTs === ts('2026-11-10'), 'promessa: contador ao vivo parte do deslize');
+  ok(P([{ type: 'sweet', date: '2026-11-10', ts: ts('2026-11-10'), planejado: true }], '2026-11-12').ini === '2026-11-11', 'promessa: doce PLANEJADO também recomeça');
+  ok(P([{ type: 'sos', kind: 'doce', outcome: 'gave_in', date: '2026-11-10', ts: ts('2026-11-10') }], '2026-11-12').ini === '2026-11-11', 'promessa: SOS cedido recomeça');
+  ok(P([{ type: 'sos', kind: 'doce', outcome: 'surfed', date: '2026-11-10', ts: ts('2026-11-10') }], '2026-11-12').ini === '2026-10-26', 'promessa: onda surfada não recomeça');
+  const dois = [{ type: 'sweet', date: '2026-11-10', ts: ts('2026-11-10', 12) }, { type: 'sweet', date: '2026-11-10', ts: ts('2026-11-10', 20) }];
+  p = P(dois, '2026-11-12');
+  ok(p.tentativas.length === 1 && p.desdeTs === ts('2026-11-10', 20), 'promessa: dois doces no mesmo dia = um recomeço, contador do último');
+  ok(P([], '2027-01-24').fase === 'ativa' && P([], '2027-01-24').dia === 91, 'promessa: 24/01 é o dia 91');
+  p = P([{ type: 'sweet', date: '2027-01-25', ts: ts('2027-01-25') }], '2027-01-25');
+  ok(p.fase === 'cumprida' && p.desbloqueados.length === 11, 'promessa: 25/01 cumprida, doce depois do fim não desfaz');
+  ok(P([], '2027-01-27').fase === 'cumprida' && P([], '2027-01-28').fase === 'inativa', 'promessa: celebra 3 dias e sai da Hoje');
+  p = P([], '2026-11-06');
+  ok(p.desbloqueados.length === 4 && p.proximoBeneficio.dia === 14 && p.proximoBeneficio.emDias === 2, 'promessa: no dia 12, 4 benefícios e o próximo em 2d');
+}
+
 console.log(falhas ? `\n${falhas} FALHA(S)` : '\nTODOS OS TESTES PASSARAM');
 process.exit(falhas ? 1 : 0);

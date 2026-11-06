@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.38'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.39'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -7,6 +7,7 @@ import {
   SOS_SCRIPTS, RESSACA_PASSOS, PROVA, FIM_DEFICIT, METAS_30D,
   FRASE_IDENTIDADE, AJUSTES_AMBIENTE, HORARIOS_SAIDA,
   CORRIDAS, TIPO_CORRIDA_ICONE, GYM_FASE_POR_MES, CORRIDA_GUIA, CHECKPOINTS, VIAGEM_GUIA,
+  PROMESSA, PROMESSA_BENEFICIOS,
 } from './data.js';
 import * as D from './derive.js';
 import * as S from './store.js';
@@ -319,7 +320,9 @@ function renderHoje(root) {
   // ---- aviso never-miss-twice (só quando acionável) ----
   const cDeliv = D.contadorResiliente(st.events, 'delivery', key, st.settings.startKey, viagensCfg());
   const cDoce = D.contadorResiliente(st.events, 'sweet', key, st.settings.startKey, viagensCfg());
+  const prom = promessaAtual(st, key);
   for (const [nome, c] of [['iFood', cDeliv], ['doce', cDoce]]) {
+    if (nome === 'doce' && prom) continue; // durante a promessa, o card dela já responde ao deslize
     if (c.amassado) {
       root.append(el(`<div class="card aviso-nmt"><b>Contador de ${nome} amassado — não quebrado.</b>
         Um ponto fora da curva. A próxima refeição volta ao script — nunca duas vezes seguidas.</div>`));
@@ -332,6 +335,11 @@ function renderHoje(root) {
     }
   }
 
+  // ---- PROMESSA (v7.39): enquanto ativa, ocupa o lugar do Tempo limpo (anéis a 1 toque no overlay) ----
+  if (prom) {
+    root.append(cardPromessa(prom, key));
+    iniciarTickPromessa(prom);
+  } else {
   // ---- TEMPO LIMPO ao vivo: os dois anéis no dashboard (toque → jardim + detalhes) ----
   const cardTempo = el(`<button class="card card-tempo">
     <h2>Tempo limpo <small>· toque para abrir o jardim →</small></h2>
@@ -360,6 +368,7 @@ function renderHoje(root) {
   cardTempo.onclick = contadoresOverlay;
   root.append(cardTempo);
   iniciarTickHoje();
+  }
 
   // ---- o objetivo sempre à vista: strip da prova ----
   const iniPlano = st.settings.startKey || key;
@@ -612,9 +621,10 @@ function sheetEvento(tipo, key) {
   box.append(chipsGatilho((g) => { gatilho = g; }));
   const btn = el('<button class="acao-primaria">Registrar</button>');
   btn.onclick = () => {
+    const naPromessa = tipo === 'sweet' && !!promessaVigente();
     const e = S.addEvent({ type: tipo, date: key, ...(gatilho ? { trigger: gatilho } : {}) });
     fecharSheet();
-    snackbar('Registrado. A próxima refeição volta ao script.', () => S.removeEvent(e.id));
+    snackbar(naPromessa ? msgRecomecoPromessa() : 'Registrado. A próxima refeição volta ao script.', () => S.removeEvent(e.id));
   };
   box.append(btn);
   abrirSheet(box);
@@ -627,7 +637,7 @@ function sheetRegistrar(key) {
     <div class="opcoes">
       <button class="opcao" id="r-peso">⚖️ Peso / cintura</button>
       <button class="opcao" id="r-delivery">🛵 Pedi delivery</button>
-      <button class="opcao" id="r-sweet">🍫 Doce<small>já aconteceu (registrar) — ou planejar um da semana</small></button>
+      <button class="opcao" id="r-sweet">🍫 Doce<small>${promessaVigente() ? (ehNatal(key) ? '🎄 Natal liberado — registrar o doce de hoje' : 'já aconteceu (registrar)') : 'já aconteceu (registrar) — ou planejar um da semana'}</small></button>
       <button class="opcao" id="r-noite">🍻 Noite fora<small>vou sair (contrato) ou já saí (registrar)</small></button>
     </div>
     <button class="acao-secundaria" id="r-sos">Bateu a vontade AGORA e ainda não cedeu? → Abrir SOS</button></div>`);
@@ -654,7 +664,41 @@ function sheetNoiteFora(key) {
 // duas rotas, como a noite fora: pré-decisão (doce planejado, v7.9) ou registro após o fato.
 // A pré-decisão é a única porta do "planejado" — registrar depois nunca vira planejado
 // (sem racionalização retroativa; o valor do pré-compromisso é decidir ANTES da vontade).
+// resposta ao deslize na promessa: factual, sem culpa — o que recomeça e o que fica
+function msgRecomecoPromessa() {
+  const depois = promessaAtual();
+  if (!depois || depois.fase !== 'recomeca_amanha') return 'Registrado. A próxima refeição volta ao script.';
+  const feitos = depois.tentativas[depois.tentativas.length - 1].dias;
+  return `Registrado, sem culpa. A promessa recomeça amanhã — ${PROMESSA.semanas} semanas novas, fim ${fmtData(depois.fim)}. ${feitos ? `Os ${feitos} dias que você fez ficam no histórico.` : ''}`.trim();
+}
+
 function sheetDoce(key) {
+  const prom = promessaVigente();
+  if (prom && ehNatal(key)) {
+    // Natal: a exceção da promessa. Grava como planejado (pré-decidido) → não reseta anel nem jardim
+    const box = el(`<div><h3>🎄 Natal liberado</h3>
+      <p style="font-size:.82rem;color:var(--ink-2);margin-bottom:12px">Hoje é a exceção que você mesmo escolheu — aproveita de verdade. Registrar é opcional: vira dado do consumo, não reseta nada.</p>
+      <button class="acao-primaria" id="ok">🍰 Registrar o doce de Natal</button></div>`);
+    box.querySelector('#ok').onclick = () => {
+      const e = S.addEvent({ type: 'sweet', date: key, planejado: true });
+      fecharSheet();
+      snackbar(`Doce de Natal registrado. A promessa segue intacta — dia ${prom.dia} de ${prom.duracao}.`, () => S.removeEvent(e.id));
+    };
+    abrirSheet(box);
+    return;
+  }
+  if (prom) {
+    const box = el(`<div><h3>Doce</h3>
+      <p class="linha-promessa">🤝 Promessa ativa — ${prom.fase === 'ativa' ? `dia ${prom.dia} de ${prom.duracao}` : 'recomeça amanhã'}. Doce planejado fica pausado até ${fmtData(prom.fim)} (o Natal é a exceção).</p>
+      <div class="opcoes">
+        <button class="opcao" id="ja">🍫 Já aconteceu — registrar<small>Sem culpa — vira dado. A promessa recomeça no dia seguinte, com ${PROMESSA.semanas} semanas novas.</small></button>
+        <button class="opcao" id="sos">🌊 Ainda não comi — a vontade bateu agora<small>SOS doce: 10 min de onda antes de decidir.</small></button>
+      </div></div>`);
+    box.querySelector('#ja').onclick = () => sheetEvento('sweet', key);
+    box.querySelector('#sos').onclick = () => { fecharSheet(); sosScript('doce'); };
+    abrirSheet(box);
+    return;
+  }
   const box = el(`<div><h3>Doce</h3>
     <div class="opcoes">
       <button class="opcao" id="plano">📝 Planejar um doce — sem quebrar nada<small>Decida ANTES: doce planejado não é deslize — não reseta anel nem jardim.</small></button>
@@ -920,6 +964,14 @@ function abrirSOS() {
 }
 function fecharSOS() { clearInterval(sosTimer); $('.sos-tela')?.remove(); }
 
+// no SOS doce, a promessa vira o lembrete do que está em jogo — o próximo benefício nomeado
+function linhaPromessaSOS() {
+  const p = promessaAtual();
+  if (!p || p.fase !== 'ativa' || ehNatal(hojeKey())) return '';
+  const pb = p.proximoBeneficio;
+  return `<p class="linha-promessa">🤝 Dia ${p.dia} de ${p.duracao} da promessa${pb ? ` · em ${pb.emDias}d: ${pb.icone} ${esc(pb.titulo.toLowerCase())}` : ''}</p>`;
+}
+
 function sosScript(kind, passoInicial = 0) {
   const script = SOS_SCRIPTS[kind];
   let passo = Math.min(passoInicial, SOS_SCRIPTS[kind].passos.length - 1);
@@ -928,6 +980,7 @@ function sosScript(kind, passoInicial = 0) {
     <button class="fechar">✕</button>
     <h2>${esc(script.titulo)}</h2>
     <p class="nomeacao">${esc(script.nomeacao)}</p>
+    ${kind === 'doce' ? linhaPromessaSOS() : ''}
     <div class="sos-passo" id="corpo"></div>
   </div>`);
   tela.querySelector('.fechar').onclick = fecharSOS;
@@ -963,10 +1016,14 @@ function sosScript(kind, passoInicial = 0) {
 
   const desfecho = (k, outcome) => {
     let gatilho = null;
+    const prom = k === 'doce' && !ehNatal(hojeKey()) ? promessaVigente() : null;
+    const txtProm = !prom || prom.fase !== 'ativa' ? ''
+      : outcome === 'surfed' ? `<p class="linha-promessa">🤝 A promessa segue: dia ${prom.dia} de ${prom.duracao}.</p>`
+      : `<p class="linha-promessa">🤝 A promessa recomeça amanhã, com ${PROMESSA.semanas} semanas novas — os ${prom.dia - 1} dias que você fez ficam no histórico.</p>`;
     corpo.innerHTML = `<div class="num-passo">${outcome === 'surfed' ? 'ONDA SURFADA' : 'REGISTRADO — SEM CULPA'}</div>
       <h3>${outcome === 'surfed' ? 'A onda passou. +1 pra conta.' : 'O protocolo permite — foi de propósito, não no piloto automático.'}</h3>
       <p>${outcome === 'surfed' ? 'Quase nenhum craving sobrevive a 10 minutos + água. Você acabou de provar.' : 'Um ponto fora da curva. A próxima refeição volta ao script — nunca duas seguidas.'}</p>
-      <div id="chips"></div><div id="fim"></div>`;
+      ${txtProm}<div id="chips"></div><div id="fim"></div>`;
     corpo.querySelector('#chips').append(chipsGatilho((g) => { gatilho = g; }));
     const btn = el('<button class="acao-primaria">Fechar</button>');
     btn.onclick = () => {
@@ -1904,6 +1961,259 @@ function contadoresOverlay() {
       a.box.querySelector('.anel-marco').textContent =
         `próximo marco: ${marco.alvo} dias — faltam ${Math.floor(faltam)}d ${Math.floor((faltam % 1) * 24)}h`;
     }
+  };
+  tick();
+  contadorTimer = setInterval(tick, 1000);
+}
+
+// ================================================================
+// PROMESSA (v7.39) — 13 semanas sem doce. Momentânea: liga/desliga pelas datas de PROMESSA
+// (data.js). Ocupa o lugar do card Tempo limpo na Hoje enquanto ativa — os anéis seguem a 1
+// toque pelo overlay. Regra pura em D.estadoPromessa (doce planejado também conta; Natal não).
+// ================================================================
+function promessaAtual(st = S.getState(), key = hojeKey()) {
+  if (params.get('promessa') === '0') return null; // dev: ver a Hoje sem a promessa
+  const p = D.estadoPromessa(st.events, key);
+  return p.fase === 'inativa' ? null : p;
+}
+const promessaVigente = () => { const p = promessaAtual(); return p && p.fase !== 'cumprida' ? p : null; };
+// relógio do contador ao vivo: com ?hoje= simulado, agora() não tem segundos — soma os reais
+const agoraVivo = () => (params.get('hoje') ? agora().getTime() + new Date().getSeconds() * 1000 : Date.now());
+const hms = (t) => `${String(t.horas).padStart(2, '0')}:${String(t.min).padStart(2, '0')}:${String(t.seg).padStart(2, '0')}`;
+const fmtDataAno = (k) => `${fmtData(k)}/${k.slice(0, 4)}`;
+const ehNatal = (key) => PROMESSA.excecoes.includes(key);
+// dias já vividos (completos) de uma semana da promessa — a semana da vez conta só até ontem
+const feitosNaSemana = (p, s) => (p.fase === 'cumprida' ? 7 : Math.max(0, Math.min(7, p.dia - 1 - s * 7)));
+
+// barra das N semanas: feitas cheias, a da vez parcial pelo dia, futuras vazias
+function barraSemanasPromessa(p) {
+  let out = '';
+  for (let s = 0; s < PROMESSA.semanas; s++) {
+    const atual = p.fase === 'ativa' && p.semanaAtual === s + 1;
+    out += `<span class="${atual ? 'atual' : ''}"><i style="width:${Math.round((feitosNaSemana(p, s) / 7) * 100)}%"></i></span>`;
+  }
+  return `<div class="pr-semanas" aria-hidden="true">${out}</div>`;
+}
+
+function cardPromessa(p, key) {
+  const CIRC = 2 * Math.PI * 52;
+  const frac = p.fase === 'cumprida' ? 1 : p.fase === 'ativa' ? p.dia / p.duracao : 0;
+  let linhas;
+  if (p.fase === 'cumprida') {
+    linhas = `<p class="pr-titulo"><b>Promessa cumprida ✓</b></p>
+      <p>${PROMESSA.semanas} semanas · ${p.duracao - p.natal} dias sem doce</p>
+      <p class="pr-prox">os ${p.desbloqueados.length} benefícios da lista destravados — é seu</p>`;
+  } else if (p.fase === 'recomeca_amanha') {
+    const ant = p.tentativas[p.tentativas.length - 1];
+    linhas = `<p class="pr-titulo"><b>Recomeça amanhã</b></p>
+      <p>${PROMESSA.semanas} semanas novas · fim ${fmtData(p.fim)}</p>
+      <p class="pr-prox">os ${ant.dias} dias de ${fmtData(ant.ini)} a ${fmtData(D.addDays(ant.fim, -1))} ficam no histórico</p>`;
+  } else {
+    const pb = p.proximoBeneficio;
+    const novo = p.desbloqueados.find((b) => b.dia === p.dia);
+    const prox = ehNatal(key) ? '🎄 hoje é Natal — liberado, aproveita. A promessa segue.'
+      : novo ? `✨ <b>novo hoje:</b> ${novo.icone} ${esc(novo.titulo)}`
+      : pb ? `🔓 em ${pb.emDias}d: ${pb.icone} ${esc(pb.titulo)}` : '🏁 último benefício destravado';
+    linhas = `<p class="pr-titulo"><b class="num">dia ${p.dia} de ${p.duracao}</b> · semana ${p.semanaAtual}/${PROMESSA.semanas}</p>
+      ${barraSemanasPromessa(p)}
+      <p>${p.faltam ? `faltam <b class="num">${p.faltam}</b> dias · termina ${fmtData(p.fim)}` : '<b>último dia</b> — termina hoje'}</p>
+      <p class="pr-prox">${prox}</p>`;
+  }
+  const card = el(`<button class="card card-promessa">
+    <h2>Promessa · ${PROMESSA.semanas} semanas sem doce <small>· toque →</small></h2>
+    <div class="pr-corpo">
+      <div class="tempo-anel pr-anel">
+        <svg viewBox="0 0 120 120" class="ta-svg" aria-hidden="true">
+          <defs><linearGradient id="gradPromessa" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#3987e5"/><stop offset="100%" stop-color="#1baf7a"/>
+          </linearGradient></defs>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="var(--grid)" stroke-width="7"/>
+          <circle class="ta-prog" cx="60" cy="60" r="52" fill="none" stroke="url(#gradPromessa)" stroke-width="7"
+            stroke-linecap="round" transform="rotate(-90 60 60)" style="stroke-dasharray:${CIRC * frac} ${CIRC}"/>
+        </svg>
+        <div class="ta-centro">
+          <span class="ta-icone">${p.fase === 'cumprida' ? '🏁' : '🤝'}</span>
+          <span class="ta-dias num pr-dias">${p.fase === 'cumprida' ? p.duracao : '–'}</span>
+          <span class="ta-hms num pr-hms">${p.fase === 'cumprida' ? 'cumprida' : '--:--:--'}</span>
+        </div>
+      </div>
+      <div class="pr-info">${linhas}</div>
+    </div>
+  </button>`);
+  card.onclick = promessaOverlay;
+  return card;
+}
+
+// ticker de 1s do card da promessa — mesmo hojeTimer dos anéis (o render() limpa)
+function iniciarTickPromessa(p) {
+  clearInterval(hojeTimer);
+  if (p.fase === 'cumprida') return;
+  const tick = () => {
+    const card = $('.card-promessa');
+    if (!card || !card.isConnected) { clearInterval(hojeTimer); return; }
+    const t = D.tempoLimpo(p.desdeTs, agoraVivo());
+    card.querySelector('.pr-dias').textContent = t.dias;
+    card.querySelector('.pr-hms').textContent = hms(t);
+  };
+  tick();
+  hojeTimer = setInterval(tick, 1000);
+}
+
+// canteiro das semanas: o jardim da promessa. Uma muda por semana — semana completa vira flor,
+// a da vez cresce dia a dia, as futuras são semente. Determinístico (função pura do estado).
+function canteiroPromessaSVG(p) {
+  const W = 420, H = 150, CHAO = 118, N = PROMESSA.semanas;
+  const passo = (W - 40) / (N - 1);
+  let out = `<ellipse cx="${W / 2}" cy="${CHAO + 34}" rx="${W * 0.62}" ry="42" fill="var(--jardim-solo)"/>`;
+  for (let s = 0; s < N; s++) {
+    const cx = 20 + s * passo;
+    const feitos = feitosNaSemana(p, s);
+    const atual = p.fase === 'ativa' && p.semanaAtual === s + 1;
+    const natal = p.dias.slice(s * 7, s * 7 + 7).some((d) => d.estado === 'natal');
+    if (feitos === 0 && !atual) {
+      out += `<ellipse cx="${cx}" cy="${CHAO + 2}" rx="3.2" ry="2.2" fill="var(--jardim-caule)" opacity="0.35"/>`;
+    } else {
+      const g = atual ? (feitos + 0.5) / 7 : feitos / 7;
+      const altura = 10 + g * 62;
+      const topo = CHAO - altura;
+      const curva = s % 2 ? 4 : -4;
+      out += `<path d="M${cx},${CHAO + 3} Q${cx + curva},${CHAO - altura * 0.5} ${cx},${topo}" stroke="var(--jardim-caule)" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+      const nFolhas = Math.max(1, Math.round(g * 4));
+      for (let i = 0; i < nFolhas; i++) {
+        const fy = CHAO - altura * (0.25 + i * 0.17);
+        const lado = i % 2 ? 1 : -1;
+        out += `<ellipse cx="${cx + lado * 6}" cy="${fy}" rx="6" ry="2.6" transform="rotate(${lado === 1 ? -28 : 28} ${cx + lado * 6} ${fy})" fill="var(--jardim-folha)" opacity="${0.75 + (i % 2) * 0.2}"/>`;
+      }
+      if (feitos === 7) {
+        for (let pt = 0; pt < 6; pt++) {
+          const a = (Math.PI / 3) * pt + s * 0.4;
+          out += `<circle cx="${cx + Math.cos(a) * 6}" cy="${topo + Math.sin(a) * 6}" r="3.9" fill="var(--jardim-petala-${(s % 2) + 1})"/>`;
+        }
+        out += `<circle cx="${cx}" cy="${topo}" r="3.2" fill="var(--jardim-miolo)"/>`;
+      } else {
+        out += `<circle cx="${cx}" cy="${topo}" r="2.6" fill="var(--jardim-folha)"/>`;
+      }
+    }
+    if (natal) out += `<text x="${cx}" y="16" text-anchor="middle" font-size="11">🎄</text>`;
+    out += `<text x="${cx}" y="${H - 6}" text-anchor="middle" font-size="9.5" fill="${atual ? 'var(--ink)' : 'var(--muted)'}" font-weight="${atual ? 700 : 400}">${s + 1}</text>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" class="jardim">${out}</svg>`;
+}
+
+// grade N×7 — o cabeçalho segue o dia da semana do início (após um recomeço, não é mais segunda)
+function gradePromessa(p) {
+  const dow0 = D.parseKey(p.ini).getDay();
+  const cab = Array.from({ length: 7 }, (_, i) => `<span class="pg-cab">${DIA_NOME[(dow0 + i) % 7][0].toUpperCase()}</span>`).join('');
+  let linhas = '';
+  for (let s = 0; s < PROMESSA.semanas; s++) {
+    const cels = p.dias.slice(s * 7, s * 7 + 7).map((d) => {
+      const est = p.fase === 'cumprida' && d.estado !== 'natal' ? 'limpo' : d.estado;
+      return `<span class="pg-cel ${est}">${est === 'natal' ? '🎄' : ''}</span>`;
+    }).join('');
+    linhas += `<span class="pg-sem num">${fmtData(p.dias[s * 7].date)}</span>${cels}`;
+  }
+  return `<div class="pr-grade"><span></span>${cab}${linhas}</div>
+    <div class="pg-leg"><span><i class="pg-cel limpo"></i>sem doce</span><span><i class="pg-cel hoje"></i>hoje</span><span><i class="pg-cel futuro"></i>vem aí</span><span>🎄 Natal liberado</span></div>`;
+}
+
+const FORCA_ROTULO = { forte: 'evidência forte', moderada: 'evidência moderada', fraca: 'evidência fraca' };
+function timelineBeneficios(p) {
+  const box = el('<div class="pr-beneficios"></div>');
+  for (const b of PROMESSA_BENEFICIOS) {
+    const est = b.dia <= p.dia ? 'feito' : p.proximoBeneficio && b.dia === p.proximoBeneficio.dia ? 'proximo' : 'futuro';
+    const quando = est === 'proximo' ? `em ${b.dia - p.dia}d` : `dia ${b.dia}`;
+    const item = el(`<div class="pb-item ${est}">
+      <button class="pb-topo" aria-expanded="false">
+        <span class="pb-dia num">${quando}</span>
+        <span class="pb-tit">${b.icone} ${esc(b.titulo)}<small class="pb-forca">${FORCA_ROTULO[b.forca]}</small></span>
+        <span class="pb-seta">${est === 'feito' ? '✓ ' : ''}›</span>
+      </button>
+      <div class="pb-det" hidden>
+        <p>${esc(b.texto)}</p>
+        <p class="pb-pop">Quem foi estudado: ${esc(b.populacao)}</p>
+        <a class="pb-fonte" href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.fonte)} ↗</a>
+      </div>
+    </div>`);
+    const topo = item.querySelector('.pb-topo');
+    topo.onclick = () => {
+      const det = item.querySelector('.pb-det');
+      det.hidden = !det.hidden;
+      topo.setAttribute('aria-expanded', String(!det.hidden));
+      item.classList.toggle('aberto', !det.hidden);
+    };
+    box.append(item);
+  }
+  return box;
+}
+
+function promessaOverlay() {
+  fecharSOS();
+  clearInterval(contadorTimer);
+  const p = promessaAtual();
+  if (!p) return contadoresOverlay();
+  const CIRC = 2 * Math.PI * 86;
+  const frac = p.fase === 'cumprida' ? 1 : p.fase === 'ativa' ? p.dia / p.duracao : 0;
+  const sub = p.fase === 'cumprida' ? `Cumprida em ${fmtData(p.fim)} — ${p.duracao - p.natal} dias sem doce.`
+    : p.fase === 'recomeca_amanha' ? `Recomeça amanhã: ${fmtData(p.ini)} → ${fmtDataAno(p.fim)}.`
+    : `De ${fmtData(p.ini)} a ${fmtDataAno(p.fim)} · Natal (24–25/12) liberado.`;
+  const info = p.fase === 'ativa'
+    ? [`Dia ${p.dia} de ${p.duracao} · semana ${p.semanaAtual} de ${PROMESSA.semanas}`, p.faltam ? `faltam ${p.faltam} dias` : 'último dia — termina hoje']
+    : p.fase === 'cumprida' ? ['Promessa cumprida ✓', `${p.desbloqueados.length} benefícios destravados`]
+    : ['Placar novo amanhã', `${p.duracao} dias a partir de ${fmtData(p.ini)}`];
+  const tela = el(`<div class="sos-tela tela-promessa">
+    <button class="fechar">✕</button>
+    <h2>${PROMESSA.semanas} semanas sem doce</h2>
+    <p class="nomeacao">${sub}</p>
+    <div class="anel-card">
+      <svg viewBox="0 0 200 200" class="anel-svg">
+        <defs><linearGradient id="gradPrOv" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3987e5"/><stop offset="100%" stop-color="#1baf7a"/>
+        </linearGradient></defs>
+        <circle cx="100" cy="100" r="86" fill="none" stroke="var(--grid)" stroke-width="10"/>
+        <circle class="anel-prog" cx="100" cy="100" r="86" fill="none" stroke="url(#gradPrOv)" stroke-width="10"
+          stroke-linecap="round" transform="rotate(-90 100 100)" style="stroke-dasharray:${CIRC * frac} ${CIRC}"/>
+      </svg>
+      <div class="anel-centro">
+        <span class="anel-icone">${p.fase === 'cumprida' ? '🏁' : '🤝'}</span>
+        <span class="anel-dias num">–</span>
+        <span class="anel-hms num">--:--:--</span>
+      </div>
+      <div class="anel-info">
+        <b>${info[0]}</b>
+        <span class="anel-marco">${info[1]}</span>
+        <span class="anel-sub">tempo sem doce, ao vivo</span>
+      </div>
+    </div>
+    <div class="secao pr-secao">O CANTEIRO</div>
+    ${canteiroPromessaSVG(p)}
+    <p class="pr-nota">Cada semana completa vira flor · a da vez cresce dia a dia · as que faltam ainda são semente.</p>
+    <div class="secao pr-secao">AS ${PROMESSA.semanas} SEMANAS</div>
+    ${gradePromessa(p)}
+    <div class="secao pr-secao">O QUE ACONTECE NO CORPO</div>
+    <p class="pr-nota">Só o que tem estudo por trás, com a força da evidência e quem foi estudado. Toque para ver a fonte.</p>
+    <div id="pr-ben"></div>
+    <div id="pr-tent"></div>
+    <button class="acao-secundaria" id="pr-aneis">🛵 🍫 ver os anéis do Tempo limpo ›</button>
+  </div>`);
+  tela.querySelector('#pr-ben').append(timelineBeneficios(p));
+  if (p.tentativas.length) {
+    tela.querySelector('#pr-tent').append(el(`<div><div class="secao pr-secao">TENTATIVAS ANTERIORES</div>
+      <div class="pr-tentativas">${p.tentativas.map((t) => `<span>${fmtData(t.ini)} → ${fmtData(D.addDays(t.fim, -1))} · <b class="num">${t.dias}</b> dias sem doce</span>`).join('')}</div>
+      <p class="pr-nota">Esses dias aconteceram — o corpo não desconta. É a mesma promessa de novo, com mais experiência.</p></div>`));
+  }
+  tela.querySelector('.fechar').onclick = () => { clearInterval(contadorTimer); tela.remove(); };
+  tela.querySelector('#pr-aneis').onclick = () => contadoresOverlay();
+  document.body.appendChild(tela);
+  protegerVoltar();
+  if (p.fase === 'cumprida') {
+    tela.querySelector('.anel-dias').textContent = p.duracao;
+    tela.querySelector('.anel-hms').textContent = 'cumprida';
+    return;
+  }
+  const tick = () => {
+    const t = D.tempoLimpo(p.desdeTs, agoraVivo());
+    tela.querySelector('.anel-dias').textContent = t.dias;
+    tela.querySelector('.anel-hms').textContent = hms(t);
   };
   tick();
   contadorTimer = setInterval(tick, 1000);
@@ -3665,6 +3975,7 @@ if (params.get('sos')) {
   if (SOS_SCRIPTS[params.get('sos')]) sosScript(params.get('sos'), Number(params.get('passo') || 0));
   else abrirSOS();
 }
+if (params.get('promessa') === 'abrir') promessaOverlay();
 if (params.get('ressaca') && !D.ressacaDoDia(S.getState().events, hojeKey()).on) {
   S.addEvent({ type: 'hangover_on', date: hojeKey() });
 }

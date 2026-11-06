@@ -681,3 +681,29 @@ tempo pra cruzar o tapete) a janela real e ~2h15–2h18. Por isso o alvo e ~2h15
 - Inventário da prateleira de emergência — chore diária que desatualiza e mina a confiança do SOS.
 - Ativação automática do Modo Ressaca — sempre oferta de 1 toque, nunca automática.
 - Cards permanentes novos na tela Hoje — tudo condicional disputa o slot contextual único.
+
+# Feito na v7.39 (nov/2026) — promessa: 13 semanas sem doce
+
+Pedido em 06/11: acompanhar uma promessa de 13 semanas sem doce. Último doce em 25/10 (dom), então
+dia 1 = 26/10 (seg) e dia 91 = 24/01/2027 (dom). Exceção única: Natal, 24 e 25/12, DENTRO das 13
+semanas (89 dias efetivos). Momentânea: tudo liga/desliga por `PROMESSA` em data.js.
+
+- **Hoje**: o card Tempo limpo dá lugar ao card da Promessa enquanto ela vale (anel dia/91 + tempo
+  sem doce ao vivo, "dia X de 91 · semana S/13", barra das 13 semanas, faltam/termina, próximo
+  benefício nomeado). Os anéis 🛵/🍫 seguem a 1 toque pelo overlay. Depois do fim, 3 dias de
+  "cumprida" e a Hoje volta sozinha ao Tempo limpo. Nenhum card novo — princípio 2 respeitado.
+- **Overlay** (`promessaOverlay`): contador, **canteiro** (o jardim reaproveitado: 1 muda por semana,
+  semana completa vira flor, futuras são semente, 🎄 na semana do Natal), grade 13×7, linha do tempo
+  de benefícios com fonte e tentativas anteriores.
+- **Deslize RECOMEÇA as 13 semanas — escolha dele**, apesar do never-miss-twice do resto do app.
+  O que mantém o princípio 1: texto factual, sem culpa, e as tentativas anteriores ficam guardadas
+  com os dias feitos ("o corpo não desconta"). Doce PLANEJADO também recomeça (é zero doce);
+  `D.estadoPromessa` tem regra própria em vez do `ehDeslize`. Durante a promessa: "planejar doce"
+  some do sheet, o aviso never-miss-twice do doce não aparece, o SOS doce mostra o dia e o próximo
+  benefício. No Natal o sheet vira "🎄 liberado" e grava `planejado: true` (não reseta anel/jardim).
+- **Benefícios** (`PROMESSA_BENEFICIOS`): só com estudo revisado, força da evidência e população à
+  vista (dentes, sem "pique" perdido, aviso dos primeiros dias, fígado em crianças → adultos, TG/
+  colesterol, pressão possível, paladar contraditório, hábito ~66d, menos vontade, LDL/gordura em 12
+  sem). **Descartados de propósito**: insulina/glicemia, microbiota, PCR, sono/energia de longo
+  prazo, acne, "vício" (ratos), "paladar em 2 semanas", "hábito em 21 dias". Lista no data.js.
+- Dev: `?promessa=0` (Hoje sem a promessa), `?promessa=abrir` (abre o overlay).

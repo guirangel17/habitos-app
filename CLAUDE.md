@@ -114,6 +114,13 @@ assinatura}}` (v7.23/v7.24 — leitura da semana pela IA, ver seção do balanç
 - **Contrato da noite**: vale da criação até 06h do dia seguinte; fecha com `night_out`.
 - **Dominó quebrado** (dia de ressaca vitorioso) = 3 passos do script + ≥4/5 refeições.
 
+- **Promessa de 13 semanas sem doce (v7.39, TEMPORÁRIA)**: `PROMESSA` em data.js (26/10/2026 →
+  24/01/2027, Natal 24–25/12 liberado). Enquanto ativa, o card da Promessa OCUPA O LUGAR do Tempo
+  limpo na Hoje e volta sozinho 3 dias após o fim — não remova o Tempo limpo achando que sumiu.
+  `D.estadoPromessa` é MAIS RÍGIDA que `ehDeslize` de propósito: doce planejado também conta e
+  qualquer doce fora do Natal recomeça as 13 semanas (decisão do usuário); tentativas anteriores
+  ficam guardadas. Benefícios em `PROMESSA_BENEFICIOS` só com fonte revisada — nunca invente.
+
 ## Princípios de design — NÃO REGREDIR
 
 Estes vieram de feedback real do usuário e de um protocolo clínico. Violar qualquer um é bug:
@@ -470,7 +477,8 @@ lógica de tempo passa por `hojeKey()`/`agora()`, nunca use `new Date()` direto 
 REAL, senão o delta de 90 min entre ts real e relógio simulado esconde o escudo),
 `?checkpoint=1` (abre o guia do próximo checkpoint — CHECKPOINTS em data.js),
 `?semana=YYYY-MM-DD` (sheet do balanço da semana daquele dia),
-`?viagem=YYYY-MM-DD:YYYY-MM-DD` (cadastra viagem em settings — persiste, como o seed).
+`?viagem=YYYY-MM-DD:YYYY-MM-DD` (cadastra viagem em settings — persiste, como o seed),
+`?promessa=0` (Hoje sem a promessa) · `?promessa=abrir` (overlay da promessa).
 
 **Screenshots headless** (o Chrome clampa janela em ~500px; o truque é scale factor 2):
 ```bash

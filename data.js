@@ -471,3 +471,63 @@ export const VIAGEM_GUIA = [
   ['Never miss twice — em qualquer fuso', 'Um dia ruim de viagem não vira a viagem inteira. A PRÓXIMA refeição volta ao razoável — a regra de casa viaja com você.'],
   ['Planeje a volta antes de ir', 'Fresh start: mercado no 1º dia, corrida leve no 2º. Quem volta com a geladeira vazia decide com fome — e fome decide mal.'],
 ];
+
+// ---- Promessa (v7.39): 13 semanas sem doce — momentânea, liga/desliga só por estas datas ----
+// Último doce em 25/10/2026 (dom) → dia 1 = 26/10 (seg), dia 91 = 24/01/2027 (dom). Natal (24–25/12)
+// é a única exceção, DENTRO das 13 semanas. Decisão dele: deslize fora do Natal RECOMEÇA as 13
+// semanas (mais rígido que o never-miss-twice do resto do app — é uma promessa, escolhida por ele).
+// Depois do fim + posFimDias de celebração, a Hoje volta sozinha ao card Tempo limpo.
+export const PROMESSA = { ini: '2026-10-26', semanas: 13, excecoes: ['2026-12-24', '2026-12-25'], posFimDias: 3 };
+
+// Benefícios por dia da tentativa vigente. SÓ o que tem ciência por trás, com a força da evidência e
+// a população do estudo à vista (pesquisa de 06/11/2026). Ficaram de fora DE PROPÓSITO, por falta de
+// evidência ou por ser outra intervenção/população: insulina/glicemia/HbA1c em não diabéticos (Hengist
+// 2024: efeito mínimo), microbiota (idem), PCR/inflamação, sono e "mais energia" no longo prazo, acne
+// (Smith 2007 é dieta de baixa carga glicêmica), "vício"/abstinência tipo droga (Avena 2008 = ratos),
+// "paladar recalibra em 2 semanas" e "hábito em 21 dias". Não adicione item sem fonte revisada.
+export const PROMESSA_BENEFICIOS = [
+  { dia: 1, icone: '🦷', titulo: 'Menos ataques ácidos nos dentes',
+    texto: 'Depois de cada doce, o pH da placa fica abaixo do nível crítico por ~20–60 min (curva de Stephan). Menos vezes de açúcar livre = menos cárie — a frequência pesa tanto quanto a quantidade.',
+    forca: 'forte', populacao: 'revisão sistemática da OMS, várias populações',
+    fonte: 'Moynihan PJ, Kelly SA. J Dent Res 2014;93(1):8-18', url: 'https://pubmed.ncbi.nlm.nih.gov/24323509/' },
+  { dia: 1, icone: '⚡', titulo: 'Você não perde "pique" nenhum',
+    texto: 'O "sugar rush" não existe: açúcar não melhora o humor e, na primeira hora depois, deixa as pessoas mais cansadas e menos alertas. O doce das 15h não estava te dando energia.',
+    forca: 'moderada', populacao: 'meta-análise, 31 estudos, 1.259 adultos (efeito agudo)',
+    fonte: 'Mantantzis K et al. Neurosci Biobehav Rev 2019;101:45-67', url: 'https://doi.org/10.1016/j.neubiorev.2019.03.016' },
+  { dia: 3, icone: '🌊', titulo: 'O pior costuma ser o começo',
+    texto: 'Aviso honesto, não benefício: algumas pessoas relatam vontade forte, dor de cabeça e menos concentração nos primeiros dias, e isso diminui depois. A evidência é fraca — se não sentiu nada, normal.',
+    forca: 'fraca', populacao: 'estudo pequeno, sem controle: adolescentes, 3 dias sem refrigerante',
+    fonte: 'Falbe J et al. Appetite 2019;133:130-137', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6488513/' },
+  { dia: 10, icone: '🫀', titulo: 'Gordura no fígado pode cair rápido',
+    texto: 'Trocar açúcar por amido, sem perder peso, baixou a gordura no fígado de ~7,2% para ~3,8% em 9 dias. O fígado é o primeiro órgão a responder ao açúcar — e também o primeiro a responder à falta dele.',
+    forca: 'moderada', populacao: 'CRIANÇAS e adolescentes com obesidade, sem grupo controle',
+    fonte: 'Schwarz JM et al. Gastroenterology 2017;153(3):743-752', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5813289/' },
+  { dia: 14, icone: '🩸', titulo: 'Triglicerídeos e colesterol em queda',
+    texto: 'Ensaios de 2 semanas ou mais mostram que mais açúcar sobe triglicerídeos e colesterol total/LDL — e menos açúcar faz o caminho inverso. Efeito modesto (TG ~0,11 mmol/L), mas real.',
+    forca: 'moderada', populacao: 'meta-análise de ensaios em adultos (≥2 semanas)',
+    fonte: 'Te Morenga LA et al. Am J Clin Nutr 2014;100(1):65-79', url: 'https://doi.org/10.3945/ajcn.113.081521' },
+  { dia: 42, icone: '🫀', titulo: 'Fígado: agora em adultos',
+    texto: 'Em 6 semanas cortando frutose, adultos com fígado gorduroso reduziram a gordura hepática em ~0,7 ponto percentual. Efeito pequeno, mas de ensaio randomizado duplo-cego.',
+    forca: 'moderada', populacao: '44 adultos com sobrepeso e fígado gorduroso (restrição de frutose)',
+    fonte: 'Simons N et al. Am J Clin Nutr 2021;113(2):391-400', url: 'https://pubmed.ncbi.nlm.nih.gov/33381794/' },
+  { dia: 56, icone: '💓', titulo: 'Possível queda leve da pressão',
+    texto: 'O efeito do açúcar na pressão apareceu mais nos ensaios de 8 semanas ou mais. É "possível", não garantido: quase toda a evidência vem de estudos que ADICIONARAM açúcar.',
+    forca: 'fraca', populacao: 'meta-análise, 12 ensaios de pressão em adultos',
+    fonte: 'Te Morenga LA et al. Am J Clin Nutr 2014;100(1):65-79', url: 'https://doi.org/10.3945/ajcn.113.081521' },
+  { dia: 60, icone: '👅', titulo: 'Paladar: talvez o doce fique mais intenso',
+    texto: 'Um estudo viu doces parecerem MAIS DOCES a partir do 2º–3º mês de pouco açúcar — mas o quanto as pessoas gostavam não mudou. Um ensaio maior, de 6 meses, não achou mudança nenhuma. Honesto: talvez fique mais intenso; não espere deixar de gostar.',
+    forca: 'fraca', populacao: '29 adultos, 3 meses (financiado pela PepsiCo) × 180 adultos, 6 meses (com financiamento da indústria)',
+    fonte: 'Wise PM et al. AJCN 2016;103(1):50-60 · Čad EM et al. AJCN 2026;123(1):101073', url: 'https://doi.org/10.1016/j.ajcnut.2025.09.041' },
+  { dia: 66, icone: '🔁', titulo: 'Ponto típico do hábito automático',
+    texto: 'A mediana para um comportamento novo ficar automático é ~59–66 dias — mas varia de 18 a 254 (até 335) dias entre pessoas. Os "21 dias" são mito. Repetição no mesmo contexto é o que mais acelera.',
+    forca: 'moderada', populacao: '96 voluntários (Lally) · revisão de 20 estudos, 2.601 adultos (Singh)',
+    fonte: 'Lally P et al. Eur J Soc Psychol 2010;40:998-1009 · Singh B et al. Healthcare 2024;12(23):2488', url: 'https://doi.org/10.3390/healthcare12232488' },
+  { dia: 84, icone: '🧠', titulo: 'Menos vontade de doce',
+    texto: 'A vontade de um alimento parece cair quando você o come MENOS VEZES — não só em menor quantidade. É exatamente o que a promessa faz.',
+    forca: 'fraca', populacao: 'meta-análise de dietas hipocalóricas em pessoas com obesidade (outra intervenção)',
+    fonte: 'Kahathuduwa CN et al. Obes Rev 2017;18(10):1090-1101', url: 'https://doi.org/10.1111/obr.12566' },
+  { dia: 91, icone: '🏁', titulo: 'LDL e gordura corporal menores',
+    texto: 'Em 12 semanas com menos de 5% das calorias de açúcar livre, adultos saudáveis baixaram LDL e gordura corporal. No peso, a média é ~0,8 kg a menos — mas só se as calorias do doce não voltarem por outro caminho.',
+    forca: 'moderada', populacao: 'ensaio randomizado em adultos saudáveis · meta-análise de ensaios em adultos',
+    fonte: 'Hengist A et al. Cell Rep Med 2024;5(8):101667 · Te Morenga L et al. BMJ 2013;346:e7492', url: 'https://doi.org/10.1016/j.xcrm.2024.101667' },
+];
