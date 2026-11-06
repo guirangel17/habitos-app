@@ -1,5 +1,5 @@
 // Rotina — painel de execução do Protocolo de Hábitos
-const VERSAO_APP = '7.37'; // manter em sincronia com VERSAO do sw.js
+const VERSAO_APP = '7.38'; // manter em sincronia com VERSAO do sw.js
 // chave pública VAPID (não é secreta — a privada mora só no Secret VAPID_PRIVATE_KEY do repo)
 const VAPID_PUBLIC_KEY = 'BL_iF6KiwVFtImwEIwv1ew0dDN1djLynA-IYKh_73TNft_74xUDhGiTLNIhYDyvSAaix-jU9Y9qj4Igf2yyTSgI';
 import {
@@ -446,7 +446,7 @@ function slotContextual(st, key) {
   if (cpHoje && !D.workoutsDoDia(st.events, key).corrida
       && !D.foiPulado(st.events, key, 'corrida') && !analiseDoCheckpointNoAr) {
     const c = el(`<button class="card card-revisao card-checkpoint">
-      <span><b>🎯 Hoje: ${esc(cpHoje.titulo)}</b><br><small>O dia que define ${esc(cpHoje.define)}. Como executar — 2 min de leitura</small></span>
+      <span><b>🎯 Hoje: ${esc(cpHoje.titulo)}</b><br><small>${esc(cpHoje.chamada || `O dia que define ${cpHoje.define}. Como executar — 2 min de leitura`)}</small></span>
       <span class="seta">→</span></button>`);
     c.onclick = () => sheetCheckpoint(cpHoje);
     return [c];
@@ -1229,7 +1229,7 @@ function sheetCheckpoint(cp) {
     <p class="detalhe-fase">${esc(cp.porque)}</p>
     <div class="exercicios">${cp.passos.map(([ic, t, d]) => `
       <div class="exercicio"><span class="ex-num">${ic}</span><span class="ex-nome">${esc(t)}<small>${esc(d)}</small></span></div>`).join('')}</div>
-    <p style="font-size:.78rem;color:var(--muted);margin-top:12px;line-height:1.45">Terminou? A análise chega sozinha no app (✨ no cronograma) e ${esc(cp.define)} se recalibram a partir do resultado — inclusive a projeção da Pampulha na Evolução.</p>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:12px;line-height:1.45">${esc(cp.rodape || `Terminou? A análise chega sozinha no app (✨ no cronograma) e ${cp.define} se recalibram a partir do resultado — inclusive a projeção da Pampulha na Evolução.`)}</p>
   </div>`);
   abrirSheet(box);
 }
@@ -1656,7 +1656,7 @@ function sheetTreinoDetalhe(kind, plano, key) {
       </div>`}</div>`);
     // checkpoint do plano: o sheet do dia ganha o guia de execução completo
     if (cp) {
-      const b = el('<button class="acao-primaria" style="margin-top:12px">🎯 Plano do checkpoint — como executar ›</button>');
+      const b = el(`<button class="acao-primaria" style="margin-top:12px">${cp.date === PROVA ? '🏁 Plano de prova — leia antes de largar ›' : '🎯 Plano do checkpoint — como executar ›'}</button>`);
       b.onclick = () => sheetCheckpoint(cp);
       box.append(b);
     }
@@ -2229,7 +2229,8 @@ function renderEvolucao(root) {
     }
 
     // história dos checkpoints: alvo × executado — acende quando o primeiro teste rodar
-    const cpLinhas = CHECKPOINTS.map((cp) => ({
+    // a prova tem linha própria (🏁) logo abaixo — fora daqui pra não aparecer duas vezes
+    const cpLinhas = CHECKPOINTS.filter((cp) => cp.date !== PROVA).map((cp) => ({
       cp,
       run: (dadosHistorico?.corridas || [])
         .filter((c) => c.date === cp.date && (c.distanciaKm || 0) >= 4)
@@ -2244,7 +2245,7 @@ function renderEvolucao(root) {
               ? `<span class="num"><b>${run.paceMedio}/km</b>${run.fcMedia ? ` · FC ${run.fcMedia}` : ''} <small style="color:var(--muted)">alvo ${esc(cp.alvo)}</small></span>`
               : `<span style="color:var(--muted);font-size:.78rem">alvo ${esc(cp.alvo)}</span>`}
           </div>`).join('')}
-          <div class="rev-metrica"><span>🏁 ${fmtData(PROVA)} · VOLTA DA PAMPULHA 18k</span><span style="color:var(--muted);font-size:.78rem">alvo 6:15–6:30</span></div>
+          <div class="rev-metrica"><span>🏁 ${fmtData(PROVA)} · VOLTA DA PAMPULHA 18k</span><span style="color:var(--muted);font-size:.78rem">completar · ~2h15 (corte 2h30)</span></div>
         </div>
       </div>`));
     }

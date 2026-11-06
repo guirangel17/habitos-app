@@ -65,6 +65,21 @@ def tempo_run(nome, km, alvo=TEMPO, desc="Contínuo, só frases curtas"):
     return treino_corrida(nome, [aquece10, passo("interval", "distance", km * 1000, alvo, desc), DESAQ()])
 
 
+# v7.38 (06/11/2026): corre/anda 4:1 — o metodo da prova, com o objetivo so de completar dentro
+# do corte de 2h30. Por TEMPO, nao distancia: o relogio apita a cada troca, e e isso que treina o
+# habito. Ciclos ~ km x 7,4 min / 5 min (a ~7:26/km de media).
+CORRE_4_1 = alvo_pace("7:20", "6:55")
+
+
+def corre_anda(nome, ciclos, desc=None):
+    return treino_corrida(nome, [
+        repeticao(ciclos, [
+            passo("interval", "time", 240, CORRE_4_1, "Correndo leve, passada curta"),
+            passo("recovery", "time", 60, None, "Andando RAPIDO, braco ativo"),
+        ]),
+    ], desc)
+
+
 def longao_blocos(nome, blocos, desc=None):
     """blocos = [(km, alvo, descricao), ...]"""
     return treino_corrida(
@@ -161,6 +176,13 @@ CATALOGO = {
         ]),
     ]),
     "Trote leve 4km": facil("Trote leve 4km", 4, Z1, "Tirar a ansiedade — pode caminhar"),
+    # ---- Replanejamento de 06/11/2026: so completar (TODO v7.38) ----
+    "Corre/anda 7km 4:1": corre_anda("Corre/anda 7km 4:1", 11,
+        "Joelho: ate 3/10 de dor durante; manha seguinte nao pode piorar"),
+    "Corre/anda 10km 4:1": corre_anda("Corre/anda 10km 4:1", 16, "Teste o gel no km 6, como na prova"),
+    "Corre/anda 13km 4:1": corre_anda("Corre/anda 13km 4:1", 20,
+        "ENSAIO GERAL: horario da largada, cafe 3h antes, gel km 6 e 12. Media ate ~7:40/km"),
+    "Corre/anda 6km 4:1": corre_anda("Corre/anda 6km 4:1", 9, "Solto - ultimo treino com duracao"),
     "PROVA Pampulha 18km": longao_blocos("PROVA Pampulha 18km",
         [(4, RP_LARGADA, "SEM OLHAR FC — deixa todo mundo passar"),
          (6, RP, "Assenta no ritmo — FC vira guia (<=165)"),
@@ -220,15 +242,15 @@ AGENDA = [
     ("2026-10-22", "Social Run 5km"),
     ("2026-10-29", "Social Run 5km"),
     ("2026-11-05", "Social Run 6km"),
-    ("2026-11-12", "Social Run 6km"),
-    ("2026-11-16", "Longao 14km Z2 taper"),
-    ("2026-11-18", "Tempo Run 5km taper"),
+    # 06/11/2026 (TODO v7.38): objetivo virou so COMPLETAR. Corre/anda 4:1 nas segundas, social de
+    # quinta, bike na quarta (fora do relogio, como todo zero impacto). A prova NAO entra: ele vai
+    # largar em corrida livre (alerta demais da ansiedade) -- o plano de prova mora so no app.
+    ("2026-11-09", "Corre/anda 7km 4:1"),
+    ("2026-11-12", "Social Run 5km"),
+    ("2026-11-16", "Corre/anda 10km 4:1"),
     ("2026-11-19", "Social Run 5km"),
-    ("2026-11-23", "Taper 12km c/ 5km RP"),
-    ("2026-11-25", "Rodagem 4km giro"),
+    ("2026-11-23", "Corre/anda 13km 4:1"),
     ("2026-11-26", "Social Run 5km"),
-    ("2026-11-30", "Taper 10km c/ 3km RP"),
+    ("2026-11-30", "Corre/anda 6km 4:1"),
     ("2026-12-02", "Ativacao pre-prova 3km"),
-    ("2026-12-03", "Trote leve 4km"),
-    ("2026-12-06", "PROVA Pampulha 18km"),
 ]

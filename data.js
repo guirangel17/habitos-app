@@ -222,22 +222,25 @@ export const CORRIDAS = [
   ['2026-10-26', 'leve', 'Zero impacto — bike/natação 40 min. Aqui era o LONGO 16 km'],
   ['2026-10-28', 'leve', 'Zero impacto — bike ou natação 30-40 min. Aqui eram os 5 × 1 km'],
   ['2026-10-29', 'social', 'Social Run 4-5 km contínuo, sem strides'],
-  ['2026-11-02', 'leve', '⏸ VOLTA COMPLETA 18 km SUSPENSA — depende da ressonância. Se a liberação para correr sair até ~20/10 a escada ainda cabe inteira até 06/12; até ~03/11 cabe uma versão reduzida (longão máximo de 13 km). Zero impacto até lá'],
-  ['2026-11-04', 'tiros', '⏸ Depende da ressonância — tiros só voltam depois da liberação médica. 4 × 1 km a 5:21–5:36 — rec. 2min30 ativa'],
-  ['2026-11-05', 'social', 'Social Run 6 km regenerativo'],
-  ['2026-11-09', 'longo', '⏸ Depende da ressonância — a escada de longões se refaz sobre a data real de liberação. LONGO 15 km — travar ritmo'],
-  ['2026-11-11', 'tiros', '⏸ Depende da ressonância. 3 × 1,5 km a 5:31–5:41 — rec. 3 min'],
-  ['2026-11-12', 'social', 'Social Run 6 km leve'],
-  ['2026-11-16', 'longo', '⏸ Depende da ressonância. LONGO 14 km — início da redução'],
-  ['2026-11-18', 'tempo', 'Tempo Run 5 km a 5:46–5:56 controlado'],
-  ['2026-11-19', 'social', 'Social Run 5 km regenerativo'],
-  ['2026-11-23', 'longo', 'TAPER: 12 km com 4-5 km em ritmo de prova no meio'],
-  ['2026-11-25', 'leve', '4 km leve — giro articular'],
-  ['2026-11-26', 'social', 'Social Run 5 km muito leve'],
-  ['2026-11-30', 'longo', 'TAPER: 10 km com 3 km em ritmo de prova no final'],
-  ['2026-12-02', 'leve', '3 km ativação — trote + 3 acelerações de 50 m'],
-  ['2026-12-03', 'leve', 'Trote muito leve / caminhada — tirar a ansiedade'],
-  ['2026-12-06', 'prova', '🏅 VOLTA INTERNACIONAL DA PAMPULHA — 18 KM — alvo 6:15–6:30/km'],
+  ['2026-11-02', 'leve', 'Zero impacto — corrida parada por ordem médica (a Volta Completa de 18 km saiu)'],
+  ['2026-11-04', 'leve', 'Zero impacto — bike ou natação 30-40 min'],
+  ['2026-11-05', 'social', 'Social Run 4-5 km contínuo, sem strides'],
+  // ---- Replanejado em 06/11/2026: objetivo virou só COMPLETAR os 18 km. Ver TODO v7.38. ----
+  // Joelho melhorando, fisio terminando. O corte da prova é 2h30 (regulamento 2026, item 5.c)
+  // e vale em qualquer ponto do percurso (5.d) — andar grande parte não cabe. Método: corre/anda
+  // 4:1 desde o km 0, longões de segunda 7 → 10 → 13, social de quinta e bike na quarta.
+  ['2026-11-09', 'longo', 'LONGÃO 7 km CORRE/ANDA 4:1 — 4 min correndo a ~7:00 + 1 min andando rápido, desde o km 0. Regra do joelho: até 3/10 de dor durante, e a manhã seguinte não pode estar pior. Se piorar, repete este degrau na semana que vem'],
+  ['2026-11-11', 'leve', 'Zero impacto — bike 30-40 min'],
+  ['2026-11-12', 'social', 'Social Run 5 km contínuo, sem strides'],
+  ['2026-11-16', 'longo', 'LONGÃO 10 km CORRE/ANDA 4:1 — mesmo ritmo do de 7 km. Leve o gel e teste no km 6, como na prova'],
+  ['2026-11-18', 'leve', 'Zero impacto — bike 30-40 min'],
+  ['2026-11-19', 'social', 'Social Run 5 km contínuo, sem strides'],
+  ['2026-11-23', 'longo', 'LONGÃO 13 km CORRE/ANDA 4:1 — o maior do ciclo e o ensaio geral: horário da largada, café 3h antes, gel nos km 6 e 12. Média até ~7:40/km = os 18 km cabem no corte com folga'],
+  ['2026-11-25', 'leve', 'Zero impacto — bike 30 min'],
+  ['2026-11-26', 'social', 'Social Run 5 km leve, contínuo'],
+  ['2026-11-30', 'leve', '6 km CORRE/ANDA 4:1 solto — último treino com alguma duração'],
+  ['2026-12-02', 'leve', '3 km ativação — trote leve + 3 acelerações curtas'],
+  ['2026-12-06', 'prova', '🏅 VOLTA INTERNACIONAL DA PAMPULHA — 18 KM — objetivo: COMPLETAR. Corre/anda 4:1, alvo ~2h15 (corte 2h30)'],
 ];
 
 export const TIPO_CORRIDA_ICONE = { prova: '🏅', longo: '🏃', tiros: '⚡', tempo: '⏱️', social: '👥', leve: '🌤️' };
@@ -311,7 +314,9 @@ export const GYM_PERNA_FASES = [
   // 07/10, que saiu na v7.32 — já estava obsoleto antes do joelho. A manutenção de outubro
   // tinha Búlgaro e leg press pesado, contraindicados. Os dois viram esta fase. Espelha
   // CATALOGO_FORCA/FASES_PERNA em garmin/treinos_forca.py — mexeu numa, mexa na outra.
-  ['2026-10-08', '2026-10-29', 'Joelho — amplitude reduzida', 'Ordem médica de 07/10 (suspeita de síndrome patelofemoral ou condromalácia; ressonância pendente): perna PODE, com amplitude reduzida. Prioridade invertida — glúteo médio e abdutores vêm primeiro, porque são o tratamento de primeira linha dos dois diagnósticos, não acessório. Carga leve, repetições altas, NADA de dor durante. Você está tomando diclofenaco: a dor vai estar mascarada, então o limite é a amplitude combinada, não o que você sente.', [
+  // 06/11/2026 (v7.38): estendida até a prova no lugar do Polimento (leg press pesado 3 × 5),
+  // que não cabe com joelho em reabilitação. Perna, até 06/12, é o que a fisio passar.
+  ['2026-10-08', '2026-11-26', 'Joelho — amplitude reduzida', 'Joelho em reabilitação (conflito femoropatelar): perna com amplitude reduzida até a prova. Prioridade invertida — glúteo médio e abdutores vêm primeiro, porque são o tratamento, não acessório. Carga leve, repetições altas, NADA de dor durante. O que a fisio passar tem precedência sobre esta lista.', [
     ['Abdução de Quadril ou Monster Walk', '3 × 15', 'o tratamento — glúteo médio. Vem primeiro de propósito'],
     ['Prancha Lateral com Abdução', '3 × 30 s/lado', 'glúteo médio + core'],
     ['Elevação Pélvica', '3 × 10', 'dominante de quadril, joelho parado — zero carga na patela'],
@@ -322,11 +327,6 @@ export const GYM_PERNA_FASES = [
   ]],
   // FORA desta fase, de propósito: Búlgaro e Afundo (flexão profunda unilateral sob carga),
   // Cadeira Extensora (cadeia aberta — é exatamente o movimento que dói) e Stiff.
-  ['2026-11-05', '2026-11-19', 'Polimento', 'Curto e pesado, sem falha e sem dor muscular. Última sessão pesada de perna: 19/11.', [
-    ['Leg Press pesado curto', '3 × 5', 'força neural SEM dano — última pesada em 19/11'],
-    ['Elevação Pélvica', '2 × 8'],
-    ['Panturrilha em Pé', '3 × 10'],
-  ]],
 ];
 
 // Periodização da musculação (Seção 3) — nota por mês
@@ -339,13 +339,13 @@ export const GYM_FASE_POR_MES = {
   // força máxima começa em 21/09 — sem custo nenhum pro plano, que só cobra força em outubro.
   9: 'Fase: RE-ENTRADA nas semanas de 07/09 e 14/09 — mesmos exercícios, ~70-75% da carga de agosto, 8-10 reps, RIR 3, sem falha e sem sessão até a exaustão. De 21/09 em diante: Força Máxima (no relógio o bloco pesado começou em 03/09 — ver v7.30) — compostos 4-5 × 4-6 a 80-87%, descanso 2-3 min, RIR 2; isoladores 10-12. Deload na semana de 05/10 (o do plano de corrida, que andou junto com o teste de 5 km).',
   10: 'Fase: Manutenção + Potência — compostos 3 × 3-5 pesado (volume −40%) + pliometria leve 2×/sem (40-60 contatos). Semana de 05/10 é DELOAD (metade das séries) — perna fresca pro teste de 07/10. Pliometria só depois do teste, e nunca em dia de tiro.',
-  11: 'Fase: Polimento — 1-2 sessões curtas e pesadas, sem falha, sem DOMS. Última sessão pesada de perna: 19/11.',
+  11: 'Fase: joelho em reabilitação — perna leve com amplitude reduzida (ou o que a fisio passar), superior normal. Nada de perna pesada antes da prova.',
   12: 'Semana da prova: ZERO perna. Upper leve até quarta 02/12 no máximo.',
 };
 
 // Paces e execução por tipo de corrida (Seções 4 e 5 do plano)
 export const CORRIDA_GUIA = {
-  longo: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm — a FC manda, não o pace', sensacao: 'Conversa completa possível', extra: 'Nos longões com ritmo de prova: 6:15–6:30 nos km indicados.' },
+  longo: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm — a FC manda, não o pace', sensacao: 'Conversa completa possível', extra: 'Em novembro os longões são CORRE/ANDA 4:1: o pace vale para os 4 min correndo; o minuto andando é rápido, braço ativo.' },
   social: { pace: '6:50–7:15 /km (Z1/Z2)', fc: '≤ 152 bpm', sensacao: 'Conversa completa — é social de verdade', extra: 'Strides (quando indicados): 100 m progressivos até ~90% e solta.' },
   leve: { pace: '6:50–7:15 /km ou mais leve', fc: '≤ 152 bpm', sensacao: 'Regenerativo — errar para baixo', extra: null },
   // TEMPO RUN recalibrado em 29/07/2026 pelo mesmo teste e o mesmo método dos tiros abaixo:
@@ -365,7 +365,7 @@ export const CORRIDA_GUIA = {
   // km do meio segurados (splits 5:47/5:49/5:45/5:27/5:05), então o 5 km real dele é mais rápido.
   // Ao receber a tabela oficial do plano-hibrido-pampulha.md, confira contra estes valores.
   tiros: { pace: '400 m: 5:11–5:26 · 800 m–1 km: 5:21–5:36 · 1,5 km: 5:31–5:41', fc: 'Mande pelo pace (FC atrasa no tiro); 9/10 no último', sensacao: 'Forte, mas não é sprint', extra: 'Aquecimento INEGOCIÁVEL: 15 min trote + 4 × 100 m progressivos. NUNCA fique parado entre tiros — descanso ativo (trote/caminhada). Desaquecimento 8-10 min.' },
-  prova: { pace: 'Alvo 6:15–6:30 /km (Meta A: 1h52–1h55)', fc: 'Km 0–4: corra por pace, SEM olhar a FC (adrenalina infla 10-20 bpm). Do km 5 em diante: segure ≤ ~165 até o km 10, depois libere', sensacao: 'Prova de 18 km não se ganha no km 2 — se perde lá', extra: 'Gel nos km 6 e 12. Nada de novidade no dia da prova.' },
+  prova: { pace: 'Corre/anda 4:1 — correndo a ~7:00, andando rápido · média ~7:26/km (≈ 2h15)', fc: 'Nos 2 primeiros km, não olhe a FC (a adrenalina infla). Depois, correndo até ~150 na primeira metade', sensacao: 'Objetivo é COMPLETAR dentro do corte de 2h30 — conversa possível nos trechos correndo', extra: 'O plano completo está no botão abaixo. Gel nos km 6 e 12, água em todo posto.' },
 };
 
 // Checkpoints do plano (plano-hibrido-pampulha.md, seção de paces): os dias que recalibram tudo.
@@ -434,6 +434,29 @@ export const CHECKPOINTS = [
       ['🧊', 'Desaquecimento', '8–10 min muito leve.'],
     ],
     vespera: 'Hoje: jantar com carbo e dormir 7–8h. Semana de academia reduzida — o tempo run é a única coisa dura da semana.',
+  },
+  // v7.38 (06/11/2026): o dia da prova virou checkpoint para reaproveitar o slot da véspera e o
+  // guia de execução — ele vai largar com o relógio em corrida LIVRE (alerta demais dá ansiedade),
+  // então o plano mora SÓ aqui, para ler antes. `chamada` e `rodape` substituem os textos de
+  // "recalibra os paces", que não fazem sentido numa prova.
+  {
+    date: '2026-12-06',
+    titulo: 'Volta da Pampulha 18 km — plano de prova',
+    define: 'a medalha',
+    alvo: 'corre/anda 4:1 · ~7:26/km de média (≈ 2h15)',
+    chamada: 'Objetivo: só completar. O plano de prova — 2 min de leitura antes de largar',
+    porque: 'Um objetivo só: terminar dentro do corte. O corte é 2h30 (regulamento, item 5.c) e vale em QUALQUER ponto do percurso (5.d), então a média precisa ficar abaixo de 8:18/km a prova inteira. O plano é corre/anda 4:1 desde o km 0 mirando ~2h15, o que deixa folga mesmo se o corte for contado das 06h00 e não da sua onda.',
+    passos: [
+      ['☕', 'Antes da largada', 'Café 3h antes, o mesmo do longão de 13 km. Nada novo hoje: roupa, tênis e gel, tudo já testado. Confira sua onda no número de peito e chegue cedo.'],
+      ['🐢', 'Largada no fundo do pelotão', 'Deixe todo mundo passar e ande o primeiro minuto. A adrenalina vai pedir 6:30/km, e é assim que o joelho se queima no km 3.'],
+      ['🔁', '4 min correndo + 1 min andando, desde o km 0', 'Sem alerta no relógio: ande sempre que o tempo de prova chegar num minuto terminado em 4 ou 9 (4, 9, 14, 19…) e volte a correr no minuto seguinte. Correndo a ~7:00, leve. Andando RÁPIDO, braço ativo: é na caminhada que se ganha a folga. A pausa entra antes do cansaço, nunca depois.'],
+      ['🦵', 'Passada curta', 'Passos curtos e rápidos (cadência 165+). Na descida, encurte ainda mais ou ande. Passada longa com cadência baixa foi o que carregou a patela em setembro.'],
+      ['📍', 'Pontos de controle', 'Km 6 ≈ 45 min · km 12 ≈ 1h30 · chegada ≈ 2h15. Passou no km 12 com mais de 1h40? Encurte as caminhadas para 30 s. Não aumente.'],
+      ['💧', 'Água e gel', 'Um gole em todo posto, mesmo sem sede: BH em dezembro esquenta rápido. Gel nos km 6 e 12, como nos longões.'],
+      ['🩹', 'Se o joelho apertar', 'Primeiro passe para 3 min correndo + 1 andando. Continua? 2 + 1. Se a dor mudar o seu jeito de pisar, pare: medalha nenhuma vale meses de fisio.'],
+    ],
+    vespera: 'Amanhã é só completar. Jantar com carbo, roupa e número separados, despertador cedo. Leia o plano de prova: 2 minutos.',
+    rodape: 'Terminou? Pega a medalha, bebe água e come alguma coisa. A análise chega sozinha no app.',
   },
 ];
 

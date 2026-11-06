@@ -633,6 +633,39 @@ itens e nenhum duplicado.
 Testes de perna atualizados (os tres que travavam no deload/manutencao), mais dois novos que
 travam o que importa: gluteo medio em primeiro e ausencia de Bulgaro/afundo/extensora na fase.
 
+# Feito na v7.38 (nov/2026) — objetivo virou COMPLETAR: corre/anda 4:1 e plano de prova no app
+
+Contexto (06/11): joelho melhorando, 4 sessoes de fisio restantes. Desde 15/10 o Garmin so tem
+corridas de ~5 km — os sociais e duas continuas (24/10; 01/11 a 6:55 com 31 °C, FC 149). Media de
+~6 km/sem, maior treino ainda o de 8 km de 28/09. Ele definiu: o objetivo e so completar, andando
+se precisar.
+
+**O corte manda no plano.** Regulamento 2026 (atualizado em 28/10): 18K com duracao maxima de
+**2h30** (5.c), e quem estiver fora do tempo em qualquer ponto do percurso e retirado (5.d). Ele
+achava que eram 3h. 2h30 = 8:18/km de media o tempo TODO — "andar grande parte" estoura (1:1 da
+~2h36). O regulamento nao diz se o corte conta das 06h00 ou da onda; no pior caso (2a onda 06h07 +
+tempo pra cruzar o tapete) a janela real e ~2h15–2h18. Por isso o alvo e ~2h15.
+
+- **Metodo corre/anda 4:1** desde o km 0: 4 min correndo a ~7:00 + 1 min andando rapido
+  (≈7:26/km, 2h15). Reservas: 3:1, depois 2:1, se o joelho apertar.
+- **Calendario**: longoes de segunda 7 → 10 → 13 km (09, 16, 23/11) em 4:1, social de quinta de
+  5 km continuo, bike na quarta, 6 km 4:1 em 30/11, ativacao de 3 km em 02/12. Saem o tiro, o
+  tempo run e os taper com bloco em ritmo de prova (que era 6:15–6:30, sem sentido agora) e o
+  trote de 03/12. Regra do joelho nas descricoes: ate 3/10 durante; manha seguinte nao pode
+  piorar, senao repete o degrau.
+- **Perna**: o Polimento (leg press pesado 3 × 5 em novembro) saiu. A fase de joelho vai ate
+  26/11, e o que a fisio passar tem precedencia.
+- **Prova no relogio: corrida LIVRE**, de proposito — ele disse que alerta demais da ansiedade.
+  O plano mora so no app: a prova virou CHECKPOINT (slot da vespera + guia de execucao) com dois
+  campos opcionais novos, `chamada` (texto do card do dia) e `rodape` (fim do guia), porque os
+  textos padrao falavam em "recalibrar paces". Sem alerta, o corre/anda vai pelo cronometro: anda
+  nos minutos que terminam em 4 e 9. Na Evolucao, a prova ficou fora da lista de checkpoints (ja
+  tem a linha 🏁 propria, agora com "completar · ~2h15").
+- Relogio: longoes 4:1 como repeticao de [4 min correndo com pace 6:55–7:20 + 1 min andando],
+  em numero de ciclos (7 km = 11, 10 km = 16, 13 km = 20, 6 km = 9). Desagendados: 09/11 Longao
+  15km, 11/11 Tiros 3x1500, 12/11 Social 6km, 16/11 Longao 14km, 18/11 Tempo taper, 23/11 Taper
+  12km, 25/11 Rodagem giro, 30/11 Taper 10km, 03/12 Trote, 06/12 PROVA, e o POLIMENTO de 12 e 19/11.
+
 # v8 — ideias futuras
 
 - Sincronizar peso automaticamente do Garmin (o FR165 já pesa via app? avaliar export).

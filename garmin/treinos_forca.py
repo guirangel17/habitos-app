@@ -186,8 +186,11 @@ FASES_PERNA = [
     # tinha saido na v7.32 — obsoleto por isso ANTES de o joelho entrar na conta. E a
     # MANUTENCAO de outubro tinha Bulgaro e leg press pesado, contraindicados agora. Os dois
     # blocos viram a sessao de joelho ate 29/10; novembro espera a ressonancia.
+    # 06/11/2026 (v7.38): o POLIMENTO (leg press pesado 3 x 5) saiu -- joelho em reabilitacao.
+    # A sessao de joelho vai ate 26/11; o 05/11 ja tinha passado como polimento e fica.
     ("2026-10-08", "2026-10-29", "QUI Pernas JOELHO (amplitude reduzida)"),
-    ("2026-11-05", "2026-11-19", "QUI Pernas POLIMENTO (nov)"),
+    ("2026-11-05", "2026-11-05", "QUI Pernas POLIMENTO (nov)"),
+    ("2026-11-12", "2026-11-26", "QUI Pernas JOELHO (amplitude reduzida)"),
 ]
 for inicio, fim, nome in FASES_PERNA:
     for dt in _semanal(3, inicio, fim):

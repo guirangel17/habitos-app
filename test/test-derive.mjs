@@ -174,9 +174,9 @@ ok(semT.gymPlan === 5 && semT.gymFeito === 1, `semana treino: academia 1/5 (veio
 ok(semT.corridaPlan === 3 && semT.corridaFeita === 1, `semana treino: corrida 1/3 (veio ${semT.corridaFeita}/${semT.corridaPlan})`);
 
 const cs = D.corridasStats(wEvs, '2026-07-16');
-// 69 desde a v7.36 (era 68): outubro virou janela sem impacto por ordem médica (joelho),
-// com um dia a mais de zero impacto do que havia de treino no bloco que saiu
-ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 69, `corridas: 1/6 até 16/07, 69 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
+// 68 desde a v7.38 (era 69 na v7.36): o replanejamento de novembro (só completar a prova, corre/anda)
+// trocou tiros/tempo/taper por longão + bike + social e tirou o trote de 03/12
+ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 68, `corridas: 1/6 até 16/07, 68 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
 
 // ---- v7.10: remanejamento de treino pro dia certo do plano ----
 // terça 14/07 não tem corrida planejada; o longão de segunda 13/07 ficou sem check
@@ -476,7 +476,8 @@ ok(qui('2026-10-08').fase === 'Joelho — amplitude reduzida', 'perna: 08/10 é 
 ok(qui('2026-10-29').fase === 'Joelho — amplitude reduzida', 'perna: a fase de joelho vai até 29/10');
 ok(qui('2026-10-08').exercicios[0][0].startsWith('Abdução de Quadril'), 'perna: glúteo médio vem PRIMEIRO na fase de joelho — é o tratamento, não acessório');
 ok(!qui('2026-10-08').exercicios.some((e) => /Búlgaro|Afundo|Extensora/.test(e[0])), 'perna: fase de joelho não tem Búlgaro, afundo nem cadeira extensora');
-ok(qui('2026-11-19').fase === 'Polimento' && qui('2026-11-26').fase === null, 'perna: polimento acaba na última pesada, 19/11');
+// v7.38: o Polimento (leg press pesado) saiu — joelho em reabilitação, a fase de joelho vai até a prova
+ok(qui('2026-11-19').fase === 'Joelho — amplitude reduzida' && qui('2026-11-26').fase === 'Joelho — amplitude reduzida' && qui('2026-12-03').fase === null, 'perna: fase de joelho vai até 26/11, sem perna pesada antes da prova');
 ok(D.treinoDoDia('2026-09-24').gym === 'Pernas — Força Máxima' && D.treinoDoDia('2026-08-27').gym.startsWith('Pernas A'), 'perna: o card do dia usa o nome da fase, não "Pernas A" fixo');
 ok(qui('2026-09-24').nota.includes('80-87%') && qui('2026-10-08').nota.includes('amplitude reduzida'), 'perna: cada fase carrega a própria prescrição');
 ok(qui('2026-09-15').fase === null && qui('2026-09-15').exercicios.length > 0, 'terça segue vindo de GYM_TREINOS');
