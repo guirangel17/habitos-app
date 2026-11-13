@@ -1,7 +1,189 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-05T03:50:37-03:00",
+ "atualizadoEm": "2026-11-13T15:13:13-03:00",
  "analises": [
+  {
+   "date": "2026-11-12",
+   "activityId": 25060482579,
+   "geradoEm": "2026-11-13T15:13:50-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-11-12 20:41:38",
+    "distanciaKm": 6.3,
+    "duracaoMin": 47.6,
+    "paceMedio": "7:34",
+    "fcMedia": 135,
+    "fcMax": 186,
+    "cadencia": 98,
+    "elevacaoM": 99,
+    "trainingEffect": {
+     "aerobico": 3.1,
+     "anaerobico": 2.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 30.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:32",
+      "fc": 128
+     },
+     {
+      "km": 2,
+      "pace": "6:58",
+      "fc": 137
+     },
+     {
+      "km": 3,
+      "pace": "8:03",
+      "fc": 135
+     },
+     {
+      "km": 4,
+      "pace": "8:32",
+      "fc": 134
+     },
+     {
+      "km": 5,
+      "pace": "7:32",
+      "fc": 136
+     },
+     {
+      "km": 6,
+      "pace": "7:18",
+      "fc": 133
+     },
+     {
+      "km": 7,
+      "pace": "5:42",
+      "fc": 175
+     }
+    ],
+    "zonasFc": {
+     "z1": 41,
+     "z2": 49,
+     "z3": 7,
+     "z4": 1,
+     "z5": 2
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "social",
+    "nome": "Social Run 5 km contínuo, sem strides",
+    "paceAlvo": "6:50–7:15 /km (Z1/Z2)",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:54",
+    "paceZ2Ha8Sem": "7:15"
+   },
+   "ia": {
+    "resumo": "Corrida de 6,3 km realizada em noite quente (30°C) e com relevante ganho de elevação (99 m em BH). O atleta manteve o controle de esforço na maior parte do treino, registrando FC média de 135 bpm, totalmente alinhada à Z2.",
+    "comparacao_plano": "Planejado: Social Run de 5 km contínuo (pace 6:50–7:15/km, FC ≤ 152 bpm). Executado: 6,3 km a 7:34/km com FC média de 135 bpm. O pace mais baixo reflete adequadamente a resposta fisiológica aos 30°C e ao relevo ondulado, mantendo 90% do tempo nas zonas Z1/Z2. O trecho final apresentou um tiro curto de 300m a 5:42/km com pico de FC em 175 bpm.",
+    "pontos_fortes": [
+     "Excelente gestão de esforço aeróbico sob temperatura elevada (30°C), preservando 90% da rodagem em Z1/Z2.",
+     "Ajuste consciente de ritmo diante da altimetria (99 m de subida), priorizando a meta cardíaca sobre a velocidade."
+    ],
+    "pontos_atencao": [
+     "O trecho final (km 7) teve um pico de intensidade (5:42/km e FC 175 bpm), divergindo da orientação de evitar acelerações na corrida social.",
+     "A distância total estendeu-se em 1,3 km além dos 5 km previstos para a sessão."
+    ],
+    "proxima_dica": "No longão de 10 km (corre/anda 4:1), inicie bem controlado em Z1/Z2 e utilize a pausa de caminhada do km 6 para praticar a ingestão do gel de carboidrato.",
+    "nota_execucao": 8
+   }
+  },
+  {
+   "date": "2026-11-10",
+   "activityId": 25036073736,
+   "geradoEm": "2026-11-13T15:13:26-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-11-10 17:11:05",
+    "distanciaKm": 7.03,
+    "duracaoMin": 48.5,
+    "paceMedio": "6:54",
+    "fcMedia": 143,
+    "fcMax": 154,
+    "cadencia": 149,
+    "elevacaoM": 10,
+    "trainingEffect": {
+     "aerobico": 3.2,
+     "anaerobico": 0.0,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 29.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "6:50",
+      "fc": 131
+     },
+     {
+      "km": 2,
+      "pace": "6:45",
+      "fc": 141
+     },
+     {
+      "km": 3,
+      "pace": "6:50",
+      "fc": 140
+     },
+     {
+      "km": 4,
+      "pace": "6:48",
+      "fc": 146
+     },
+     {
+      "km": 5,
+      "pace": "6:54",
+      "fc": 146
+     },
+     {
+      "km": 6,
+      "pace": "6:53",
+      "fc": 148
+     },
+     {
+      "km": 7,
+      "pace": "7:23",
+      "fc": 148
+     }
+    ],
+    "zonasFc": {
+     "z1": 8,
+     "z2": 90,
+     "z3": 2,
+     "z4": 0,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": null,
+   "historico": {
+    "paceZ2Atual": "6:54",
+    "paceZ2Ha8Sem": "7:15"
+   },
+   "ia": {
+    "resumo": "Rodagem extra de 7,03 km realizada a um pace médio de 6:54/km com excelente controle fisiológico sob calor de 29°C. A frequência cardíaca permaneceu predominantemente em Z2 (90% do tempo), demonstrando eficiência aeróbica e boa gestão do esforço.",
+    "comparacao_plano": "Não havia treino de corrida planejado para este dia. Embora a execução física tenha sido impecável em termos de zona de esforço (FC média de 143 bpm, perfeitamente em Z2), este volume não previsto de 7 km adiciona estresse mecânico à semana.",
+    "pontos_fortes": [
+     "Excelente gestão do estresse térmico: manteve a FC média em 143 bpm (Z2) mesmo sob a temperatura de 29°C, sem deriva excessiva.",
+     "Controle de ritmo maduro nos primeiros 6 km, sustentando splits estáveis entre 6:45 e 6:54/km sem acelerar precocemente."
+    ],
+    "pontos_atencao": [
+     "Volume de impacto em dia livre: avalie a tolerância do pé pela regra das 24h (dor ao dar o primeiro passo da manhã seguinte).",
+     "Perda de ritmo no km 7 (7:23/km), indicando o limite de fadiga sob a temperatura alta de fim de tarde."
+    ],
+    "proxima_dica": "Cumpra a sessão de bike de 30-40 min agendada para amanhã (11/11) em ritmo bem leve, garantindo regeneração ativa com zero impacto.",
+    "nota_execucao": null
+   }
+  },
   {
    "date": "2026-11-01",
    "activityId": 24927307575,

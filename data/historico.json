@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-05T03:50:37-03:00",
+ "atualizadoEm": "2026-11-13T15:13:13-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1254,6 +1254,51 @@
    "paradoPct": 0,
    "ef": 0.97,
    "tipoPlano": null
+  },
+  {
+   "date": "2026-11-05",
+   "activityId": 24981694867,
+   "distanciaKm": 6.07,
+   "paceMedio": "7:30",
+   "paceSeg": 450,
+   "fcMedia": 144,
+   "fcMax": 164,
+   "cadencia": 104,
+   "vo2max": 48.0,
+   "teAerobico": 3.3,
+   "paradoPct": 24,
+   "ef": 0.926,
+   "tipoPlano": "social"
+  },
+  {
+   "date": "2026-11-10",
+   "activityId": 25036073736,
+   "distanciaKm": 7.03,
+   "paceMedio": "6:54",
+   "paceSeg": 414,
+   "fcMedia": 143,
+   "fcMax": 154,
+   "cadencia": 149,
+   "vo2max": 48.0,
+   "teAerobico": 3.2,
+   "paradoPct": 4,
+   "ef": 1.013,
+   "tipoPlano": null
+  },
+  {
+   "date": "2026-11-12",
+   "activityId": 25060482579,
+   "distanciaKm": 6.3,
+   "paceMedio": "7:34",
+   "paceSeg": 454,
+   "fcMedia": 135,
+   "fcMax": 186,
+   "cadencia": 98,
+   "vo2max": 48.0,
+   "teAerobico": 3.1,
+   "paradoPct": 29,
+   "ef": 0.98,
+   "tipoPlano": "social"
   }
  ],
  "forcas": [
@@ -1772,6 +1817,24 @@
    "activityId": 24957485929,
    "minutos": 52,
    "nome": "TER Empurrar"
+  },
+  {
+   "date": "2026-11-05",
+   "activityId": 24980700424,
+   "minutos": 19,
+   "nome": "Força"
+  },
+  {
+   "date": "2026-11-06",
+   "activityId": 24990708816,
+   "minutos": 32,
+   "nome": "SEX Upper C + Core"
+  },
+  {
+   "date": "2026-11-08",
+   "activityId": 25008993959,
+   "minutos": 18,
+   "nome": "Força"
   }
  ],
  "tendencias": {
@@ -1887,16 +1950,20 @@
    {
     "date": "2026-11-01",
     "seg": 415
+   },
+   {
+    "date": "2026-11-10",
+    "seg": 414
    }
   ],
-  "paceZ2Atual": "7:07",
-  "paceZ2Ha8Sem": "7:05",
+  "paceZ2Atual": "6:54",
+  "paceZ2Ha8Sem": "7:15",
   "vo2max": {
-   "atual": 47.0,
-   "ha8Sem": 48.0
+   "atual": 48.0,
+   "ha8Sem": 47.0
   },
-  "cadencia4Sem": 154,
-  "kmPorSemana4Sem": 6.4,
+  "cadencia4Sem": 152,
+  "kmPorSemana4Sem": 10.0,
   "efSerie": [
    {
     "date": "2026-01-12",
@@ -2069,15 +2136,15 @@
    {
     "date": "2026-11-01",
     "ef": 0.97
+   },
+   {
+    "date": "2026-11-10",
+    "ef": 1.013
    }
   ],
-  "efAtual": 0.935,
-  "efHa8Sem": 0.992,
+  "efAtual": 0.956,
+  "efHa8Sem": 0.967,
   "kmSemanas": [
-   {
-    "semana": "2026-08-17",
-    "km": 0
-   },
    {
     "semana": "2026-08-24",
     "km": 0
@@ -2120,7 +2187,11 @@
    },
    {
     "semana": "2026-11-02",
-    "km": 0
+    "km": 6.1
+   },
+   {
+    "semana": "2026-11-09",
+    "km": 13.3
    }
   ],
   "longaoMes": [
@@ -2176,8 +2247,8 @@
    },
    {
     "mes": "2026-11",
-    "km": 5.05,
-    "date": "2026-11-01"
+    "km": 7.03,
+    "date": "2026-11-10"
    }
   ],
   "projecao18k": null

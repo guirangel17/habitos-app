@@ -1,7 +1,182 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-05T03:50:37-03:00",
+ "atualizadoEm": "2026-11-13T15:13:13-03:00",
  "analises": [
+  {
+   "date": "2026-11-06",
+   "activityId": 24990708816,
+   "geradoEm": "2026-11-13T15:13:50-03:00",
+   "sessao": {
+    "minutos": 32,
+    "series": 17,
+    "volumeKg": 2945,
+    "exercicios": [
+     {
+      "nome": "CABLE_CROSSOVER",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 11
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 31
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 32
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -5.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SEATED_DUMBBELL_SHOULDER_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 30
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 30
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 33
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 11
+     },
+     {
+      "nome": "ONE_ARM_CABLE_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 5.0,
+        "s": 91
+       },
+       {
+        "reps": 10,
+        "kg": 5.0,
+        "s": 58
+       },
+       {
+        "reps": 8,
+        "kg": 5.0,
+        "s": 60
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -3.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "FACE_PULL",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 47
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 5
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 34
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "CABLE_OVERHEAD_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 32
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 77
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 9
+     },
+     {
+      "nome": "EZ_BAR_PREACHER_CURL",
+      "categoria": "CURL",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 34
+       },
+       {
+        "reps": 9,
+        "kg": 20.0,
+        "s": 84
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 5.0,
+      "deltaReps": -1
+     },
+     {
+      "nome": "KNEELING_CABLE_CRUNCH",
+      "categoria": "CRUNCH",
+      "series": [
+       {
+        "reps": 8,
+        "kg": null,
+        "s": 62
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": null,
+      "deltaReps": 0
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Retorno impecável à sessão Upper C após 42 dias de hiato, focando na reativação neural de membros superiores com alta eficiência em 32 minutos. A estratégia de ajustar cargas nos cabos garantiu volume efetivo com segurança e sem gerar fadiga excessiva.",
+    "comparacao_plano": "Volume planejado de ~16 séries cumprido com precisão (17 séries executadas). Cargas ajustadas de forma consciente após a pausa de 42 dias, com destaque para a progressão de carga de +5kg na Rosca Scott e boa sustentação nos supinos e desenvolvimentos.",
+    "pontos_fortes": [
+     "Aplicação perfeita do método de progressão dupla na Rosca Scott (EZ_BAR_PREACHER_CURL), subindo 5kg e mantendo 10/9 reps dentro da faixa alvo",
+     "Excelente decisão técnica de re-entrada no Cable Crossover e Elevação Lateral, reduzindo a carga para focar na adaptação neural após 42 dias sem prejudicar a recuperação",
+     "Eficiência e densidade de treino notáveis, completando 17 séries de qualidade em 32 minutos"
+    ],
+    "pontos_atencao": [
+     "No Face Pull, as duas primeiras séries constaram sem carga/reps registradas, realizando apenas 1 série efetiva de 11 reps",
+     "O bloco de core foi encurtado, executando apenas 1 série de Kneeling Cable Crunch e omitindo o Pallof Press planejado"
+    ],
+    "proxima_dica": "Na próxima sessão Upper C, mantenha os 20kg na Rosca Scott buscando bater 11-12 reps e consolide 3 séries completas de Face Pull com 35-40kg; as cargas de agosto retornarão naturalmente em 2 a 3 treinos com os ganhos neurais.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-11-03",
    "activityId": 24957485929,
