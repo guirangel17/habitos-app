@@ -68,7 +68,8 @@
     "Corre/anda 7km 4:1": 1753524955,
     "Corre/anda 10km 4:1": 1753524966,
     "Corre/anda 13km 4:1": 1753524973,
-    "Corre/anda 6km 4:1": 1753524976
+    "Corre/anda 6km 4:1": 1753524976,
+    "SEX Upper COMPLETO (sem abdomen)": 1760926223
   },
   "agendamentos": [
     {
@@ -732,12 +733,6 @@
       "data": "2026-11-10"
     },
     {
-      "chave": "1624796511:2026-11-13",
-      "scheduleId": 1705467390,
-      "nome": "SEX Upper C + Core",
-      "data": "2026-11-13"
-    },
-    {
       "chave": "1624796525:2026-11-14",
       "scheduleId": 1705467396,
       "nome": "SAB Pernas B preventivo",
@@ -1012,6 +1007,12 @@
       "scheduleId": 1832484083,
       "nome": "QUI Pernas JOELHO (amplitude reduzida)",
       "data": "2026-11-26"
+    },
+    {
+      "chave": "1760926223:2026-11-13",
+      "scheduleId": 1839881797,
+      "nome": "SEX Upper COMPLETO (sem abdomen)",
+      "data": "2026-11-13"
     }
   ]
 }
