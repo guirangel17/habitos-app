@@ -1,7 +1,77 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-13T15:13:13-03:00",
+ "atualizadoEm": "2026-11-13T19:18:52-03:00",
  "analises": [
+  {
+   "date": "2026-11-08",
+   "activityId": 25008993959,
+   "geradoEm": "2026-11-13T19:18:53-03:00",
+   "sessao": {
+    "minutos": 18,
+    "series": 7,
+    "volumeKg": 1125,
+    "exercicios": [
+     {
+      "nome": null,
+      "categoria": "UNKNOWN",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 25.0,
+        "s": 34
+       },
+       {
+        "reps": 12,
+        "kg": 25.0,
+        "s": 37
+       },
+       {
+        "reps": 0,
+        "kg": 25.0,
+        "s": 44
+       },
+       {
+        "reps": 12,
+        "kg": 25.0,
+        "s": 35
+       },
+       {
+        "reps": 4,
+        "kg": 25.0,
+        "s": 136
+       },
+       {
+        "reps": 0,
+        "kg": 25.0,
+        "s": 126
+       },
+       {
+        "reps": 6,
+        "kg": 25.0,
+        "s": 122
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão não planejada de 18 minutos totalizando 7 séries e 1.125 kg de volume em um exercício não identificado com 25kg. O estímulo funcionou como um trabalho complementar rápido sem acumular fadiga sistêmica.",
+    "comparacao_plano": "Sem treino de musculação prescrito na planilha para este dia. A realização de um volume enxuto respeita o momento de reabilitação e gestão de carga da semana.",
+    "pontos_fortes": [
+     "Manutenção do volume total baixo e controlado, preservando a recuperação do joelho para os treinos de corrida",
+     "Execução consistente nas séries completas de 11 e 12 repetições mantendo a carga de 25kg"
+    ],
+    "pontos_atencao": [
+     "Registro do exercício consta sem nome/categoria no aplicativo, o que impossibilita o acompanhamento da sobrecarga progressiva",
+     "Presença de séries registradas com 0 repetições entre os sets ativos, sugerindo inconsistência na marcação das pausas"
+    ],
+    "proxima_dica": "Nomeie o exercício no aplicativo e busque estabilizar 3 séries de 10 a 12 repetições com os 25kg antes de pensar em subir a carga na progressão dupla.",
+    "nota_execucao": null
+   }
+  },
   {
    "date": "2026-11-06",
    "activityId": 24990708816,
