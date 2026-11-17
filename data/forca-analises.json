@@ -1,7 +1,182 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-13T19:18:52-03:00",
+ "atualizadoEm": "2026-11-17T20:42:51-03:00",
  "analises": [
+  {
+   "date": "2026-11-17",
+   "activityId": 25113215481,
+   "geradoEm": "2026-11-17T20:42:53-03:00",
+   "sessao": {
+    "minutos": 46,
+    "series": 19,
+    "volumeKg": 4284,
+    "exercicios": [
+     {
+      "nome": "BARBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 44
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 37
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 38
+       },
+       {
+        "reps": 9,
+        "kg": 30.0,
+        "s": 35
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -5.0,
+      "deltaReps": 2
+     },
+     {
+      "nome": "INCLINE_DUMBBELL_BENCH_PRESS",
+      "categoria": "BENCH_PRESS",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 32
+       },
+       {
+        "reps": 10,
+        "kg": 10.0,
+        "s": 30
+       },
+       {
+        "reps": 11,
+        "kg": 10.0,
+        "s": 44
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -5.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "SMITH_MACHINE_OVERHEAD_PRESS",
+      "categoria": "SHOULDER_PRESS",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 8.0,
+        "s": 93
+       },
+       {
+        "reps": 10,
+        "kg": 8.0,
+        "s": 30
+       },
+       {
+        "reps": 11,
+        "kg": 8.0,
+        "s": 54
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -24.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "DUMBBELL_LATERAL_RAISE",
+      "categoria": "LATERAL_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 29
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 40
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 64
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 23.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "TRICEPS_PRESSDOWN",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 12,
+        "kg": 30.0,
+        "s": 84
+       },
+       {
+        "reps": 10,
+        "kg": 30.0,
+        "s": 44
+       },
+       {
+        "reps": 11,
+        "kg": 30.0,
+        "s": 82
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -5.0,
+      "deltaReps": 3
+     },
+     {
+      "nome": "DUMBBELL_LYING_TRICEPS_EXTENSION",
+      "categoria": "TRICEPS_EXTENSION",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 29
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 27
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 31
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Excelente sessão de re-entrada após o período de layoff, Guilherme! Você demonstrou uma gestão de carga muito inteligente, ajustando os pesos para garantir uma execução controlada e dentro das faixas de repetições planejadas, o que é crucial para uma reintrodução segura e eficaz do treinamento.",
+    "comparacao_plano": "A sessão de 'Empurrar' foi executada na íntegra, com todos os 6 exercícios planejados e o volume total de 19 séries. A estratégia de ajustar as cargas para baixo na maioria dos exercícios, conforme o status de 'ajuste', está perfeitamente alinhada com a fase de re-entrada pós-layoff, priorizando a técnica e a adaptação neural.",
+    "pontos_fortes": [
+     "Aderência exemplar à estratégia de re-entrada, com ajustes de carga inteligentes que permitiram manter a qualidade da execução e o volume planejado em todos os exercícios.",
+     "A execução do Barbell Bench Press, Incline Dumbbell Bench Press, Smith Machine Overhead Press, Triceps Pressdown e Dumbbell Lying Triceps Extension foi consistente, com todas as séries dentro ou acima da faixa de repetições alvo, mesmo com cargas ajustadas.",
+     "No Dumbbell Lateral Raise, você aplicou a progressão de carga, o que é um sinal positivo de que o método de progressão dupla está funcionando, mesmo em um contexto de re-entrada gradual."
+    ],
+    "pontos_atencao": [
+     "No Dumbbell Lateral Raise, após o aumento da carga, a última série ficou ligeiramente abaixo da faixa alvo (9 reps vs 10-12). Na próxima sessão, foque em manter todas as séries dentro da faixa para consolidar a nova carga."
+    ],
+    "proxima_dica": "Smith Machine Overhead Press: você bateu 11, 10 e 11 reps com 8kg, atingindo o topo da faixa em duas séries. Na próxima sessão, adicione um pequeno incremento de carga (ex: 2,5kg) e foque em manter as reps dentro da faixa de 9-11. Lembre-se que a carga de agosto retornará gradualmente em 2-3 sessões.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-11-08",
    "activityId": 25008993959,
