@@ -69,7 +69,9 @@
     "Corre/anda 10km 4:1": 1753524966,
     "Corre/anda 13km 4:1": 1753524973,
     "Corre/anda 6km 4:1": 1753524976,
-    "SEX Upper COMPLETO (sem abdomen)": 1760926223
+    "SEX Upper COMPLETO (sem abdomen)": 1760926223,
+    "Corre/anda 4km 4:1": 1765502727,
+    "Corre/anda 5km 4:1": 1765502730
   },
   "agendamentos": [
     {
@@ -889,18 +891,6 @@
       "data": "2026-11-05"
     },
     {
-      "chave": "1624794250:2026-11-19",
-      "scheduleId": 1770946000,
-      "nome": "Social Run 5km",
-      "data": "2026-11-19"
-    },
-    {
-      "chave": "1624794250:2026-11-26",
-      "scheduleId": 1770946023,
-      "nome": "Social Run 5km",
-      "data": "2026-11-26"
-    },
-    {
       "chave": "1663350579:2026-10-12",
       "scheduleId": 1779962230,
       "nome": "Longao 12km",
@@ -979,12 +969,6 @@
       "data": "2026-11-16"
     },
     {
-      "chave": "1753524973:2026-11-23",
-      "scheduleId": 1832484073,
-      "nome": "Corre/anda 13km 4:1",
-      "data": "2026-11-23"
-    },
-    {
       "chave": "1753524976:2026-11-30",
       "scheduleId": 1832484076,
       "nome": "Corre/anda 6km 4:1",
@@ -1013,6 +997,24 @@
       "scheduleId": 1839881797,
       "nome": "SEX Upper COMPLETO (sem abdomen)",
       "data": "2026-11-13"
+    },
+    {
+      "chave": "1765502727:2026-11-21",
+      "scheduleId": 1844501753,
+      "nome": "Corre/anda 4km 4:1",
+      "data": "2026-11-21"
+    },
+    {
+      "chave": "1753524966:2026-11-23",
+      "scheduleId": 1844501755,
+      "nome": "Corre/anda 10km 4:1",
+      "data": "2026-11-23"
+    },
+    {
+      "chave": "1765502730:2026-11-26",
+      "scheduleId": 1844501759,
+      "nome": "Corre/anda 5km 4:1",
+      "data": "2026-11-26"
     }
   ]
 }

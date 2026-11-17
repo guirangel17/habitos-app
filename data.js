@@ -232,12 +232,17 @@ export const CORRIDAS = [
   ['2026-11-09', 'longo', 'LONGÃO 7 km CORRE/ANDA 4:1 — 4 min correndo a ~7:00 + 1 min andando rápido, desde o km 0. Regra do joelho: até 3/10 de dor durante, e a manhã seguinte não pode estar pior. Se piorar, repete este degrau na semana que vem'],
   ['2026-11-11', 'leve', 'Zero impacto — bike 30-40 min'],
   ['2026-11-12', 'social', 'Social Run 5 km contínuo, sem strides'],
-  ['2026-11-16', 'longo', 'LONGÃO 10 km CORRE/ANDA 4:1 — mesmo ritmo do de 7 km. Leve o gel e teste no km 6, como na prova'],
-  ['2026-11-18', 'leve', 'Zero impacto — bike 30-40 min'],
-  ['2026-11-19', 'social', 'Social Run 5 km contínuo, sem strides'],
-  ['2026-11-23', 'longo', 'LONGÃO 13 km CORRE/ANDA 4:1 — o maior do ciclo e o ensaio geral: horário da largada, café 3h antes, gel nos km 6 e 12. Média até ~7:40/km = os 18 km cabem no corte com folga'],
+  ['2026-11-16', 'longo', 'LONGÃO 10 km CORRE/ANDA 4:1 — NÃO ACONTECEU: a fascite plantar voltou nos dois pés (ortopedista em 16/11, Betatrinta de novo). Ver TODO v7.40'],
+  // ---- Replanejado em 17/11/2026 (TODO v7.40): fascite de volta nos dois pés. O Betatrinta tira a
+  // dor por ~2–4 semanas sem curar a fáscia, e essa janela cobre a prova, então "sem dor" deixou de
+  // ser sinal confiável. O critério de liberação é a dor do PRIMEIRO PASSO da manhã, não a da corrida.
+  // A escada encurta: o 13 km sai e o 10 km perdido entra no lugar (7 → 13 seria quase o dobro).
+  ['2026-11-18', 'leve', 'Zero impacto — bike 30-40 min, SÓ se não doer no pé. Doeu, troca por alongamento e exercícios de fáscia em casa'],
+  ['2026-11-19', 'leve', 'Zero impacto — o social sai esta semana (fascite). Exercícios de fáscia em casa'],
+  ['2026-11-21', 'leve', 'TESTE 4 km CORRE/ANDA 4:1 — só se: primeiro passo da manhã sem dor, andando normal o dia todo e 10 elevações de panturrilha numa perna só sem dor, nos dois pés. Não passou? Não corre. O que vale é a manhã de domingo: o primeiro passo não pode estar pior'],
+  ['2026-11-23', 'longo', 'LONGÃO 10 km CORRE/ANDA 4:1 — o maior do ciclo e o ensaio geral: café 3h antes, gel no km 6. Só se o teste de 21/11 passou e a manhã seguinte estava igual ou melhor. Não passou? Repete o teste de 4 km'],
   ['2026-11-25', 'leve', 'Zero impacto — bike 30 min'],
-  ['2026-11-26', 'social', 'Social Run 5 km leve, contínuo'],
+  ['2026-11-26', 'social', 'Social 5 km CORRE/ANDA 4:1 — não contínuo, por causa da fáscia'],
   ['2026-11-30', 'leve', '6 km CORRE/ANDA 4:1 solto — último treino com alguma duração'],
   ['2026-12-02', 'leve', '3 km ativação — trote leve + 3 acelerações curtas'],
   ['2026-12-06', 'prova', '🏅 VOLTA INTERNACIONAL DA PAMPULHA — 18 KM — objetivo: COMPLETAR. Corre/anda 4:1, alvo ~2h15 (corte 2h30)'],

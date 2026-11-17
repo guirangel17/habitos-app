@@ -707,3 +707,23 @@ semanas (89 dias efetivos). Momentânea: tudo liga/desliga por `PROMESSA` em dat
   sem). **Descartados de propósito**: insulina/glicemia, microbiota, PCR, sono/energia de longo
   prazo, acne, "vício" (ratos), "paladar em 2 semanas", "hábito em 21 dias". Lista no data.js.
 - Dev: `?promessa=0` (Hoje sem a promessa), `?promessa=abrir` (abre o overlay).
+
+# Feito na v7.40 (nov/2026) — fascite plantar de volta, nos dois pés
+
+Contado em 17/11: o longão de 10 km de 16/11 não aconteceu, a fascite voltou nos dois pés a ponto
+de ele mal andar. Ortopedista em 16/11 passou **Betatrinta de novo** (corticoide de depósito: tira a
+dor por ~2–4 semanas sem curar a fáscia). A janela vai de ~30/11 a 14/12 e **cobre a prova**, então
+"sem dor" deixou de ser um sinal confiável. Em agosto a volta se sustentou porque a janela já tinha
+fechado; desta vez esse teste não existe. Joelho ~100%, deixou de ser o limitante.
+
+- **Critério de liberação**: dor do PRIMEIRO PASSO da manhã (o sinal da fascite), andar normal o
+  dia todo e 10 elevações de panturrilha numa perna só sem dor, nos dois pés.
+- **Calendário**: 18/11 bike só se não doer; 19/11 o social SAI (zero impacto); entra **21/11 (sáb)
+  TESTE 4 km 4:1**, condicional; **23/11 vira o 10 km perdido** (o 13 km sai: 7 → 13 seria quase o
+  dobro sem a dor como alarme) e passa a ser o ensaio geral; 26/11 social em 4:1, não contínuo.
+  30/11, 02/12 e a prova ficam iguais. Teste não passou: 23/11 repete o teste em vez do 10 km.
+- **Pendente com ele**: perguntar ao ortopedista se pode correr os 18 km em 06/12 com o corticoide.
+- Relógio: desagendados 19/11 Social Run 5km, 23/11 Corre/anda 13km 4:1 e 26/11 Social Run 5km;
+  criados "Corre/anda 4km 4:1" (6 ciclos, 21/11) e "Corre/anda 5km 4:1" (7 ciclos, 26/11);
+  "Corre/anda 10km 4:1" reagendado em 23/11. O 16/11 fica no relógio como histórico.
+- Teste: total de corridas 68 → 69 (entrou o teste de 21/11).

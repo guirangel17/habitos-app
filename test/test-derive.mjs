@@ -176,7 +176,7 @@ ok(semT.corridaPlan === 3 && semT.corridaFeita === 1, `semana treino: corrida 1/
 const cs = D.corridasStats(wEvs, '2026-07-16');
 // 68 desde a v7.38 (era 69 na v7.36): o replanejamento de novembro (só completar a prova, corre/anda)
 // trocou tiros/tempo/taper por longão + bike + social e tirou o trote de 03/12
-ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 68, `corridas: 1/6 até 16/07, 68 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
+ok(cs.feitas === 1 && cs.passadas === 6 && cs.total === 69, `corridas: 1/6 até 16/07, 69 no total (veio ${cs.feitas}/${cs.passadas}/${cs.total})`);
 
 // ---- v7.10: remanejamento de treino pro dia certo do plano ----
 // terça 14/07 não tem corrida planejada; o longão de segunda 13/07 ficou sem check

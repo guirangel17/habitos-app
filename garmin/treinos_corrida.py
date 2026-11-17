@@ -182,6 +182,9 @@ CATALOGO = {
     "Corre/anda 10km 4:1": corre_anda("Corre/anda 10km 4:1", 16, "Teste o gel no km 6, como na prova"),
     "Corre/anda 13km 4:1": corre_anda("Corre/anda 13km 4:1", 20,
         "ENSAIO GERAL: horario da largada, cafe 3h antes, gel km 6 e 12. Media ate ~7:40/km"),
+    "Corre/anda 4km 4:1": corre_anda("Corre/anda 4km 4:1", 6,
+        "TESTE fascite: so se o 1o passo da manha nao doeu. Manha seguinte nao pode piorar"),
+    "Corre/anda 5km 4:1": corre_anda("Corre/anda 5km 4:1", 7, "Social em 4:1 - nao continuo (fascite)"),
     "Corre/anda 6km 4:1": corre_anda("Corre/anda 6km 4:1", 9, "Solto - ultimo treino com duracao"),
     "PROVA Pampulha 18km": longao_blocos("PROVA Pampulha 18km",
         [(4, RP_LARGADA, "SEM OLHAR FC — deixa todo mundo passar"),
@@ -247,10 +250,12 @@ AGENDA = [
     # largar em corrida livre (alerta demais da ansiedade) -- o plano de prova mora so no app.
     ("2026-11-09", "Corre/anda 7km 4:1"),
     ("2026-11-12", "Social Run 5km"),
-    ("2026-11-16", "Corre/anda 10km 4:1"),
-    ("2026-11-19", "Social Run 5km"),
-    ("2026-11-23", "Corre/anda 13km 4:1"),
-    ("2026-11-26", "Social Run 5km"),
+    ("2026-11-16", "Corre/anda 10km 4:1"),  # nao aconteceu (fascite) -- fica como historico
+    # 17/11/2026 (TODO v7.40): fascite voltou nos dois pes. Sai o social de 19/11, entra o teste
+    # de 4 km em 21/11 (sab), o 13 km de 23/11 vira o 10 km perdido e o social de 26/11 vira 4:1.
+    ("2026-11-21", "Corre/anda 4km 4:1"),
+    ("2026-11-23", "Corre/anda 10km 4:1"),
+    ("2026-11-26", "Corre/anda 5km 4:1"),
     ("2026-11-30", "Corre/anda 6km 4:1"),
     ("2026-12-02", "Ativacao pre-prova 3km"),
 ]
