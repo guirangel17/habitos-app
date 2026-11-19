@@ -1,7 +1,125 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-17T20:42:51-03:00",
+ "atualizadoEm": "2026-11-19T17:09:33-03:00",
  "analises": [
+  {
+   "date": "2026-11-18",
+   "activityId": 25125470526,
+   "geradoEm": "2026-11-19T17:09:34-03:00",
+   "sessao": {
+    "minutos": 36,
+    "series": 11,
+    "volumeKg": 3920,
+    "exercicios": [
+     {
+      "nome": "LAT_PULLDOWN",
+      "categoria": "PULL_UP",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 51
+       },
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 40
+       },
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 42
+       },
+       {
+        "reps": 9,
+        "kg": 40.0,
+        "s": 35
+       }
+      ],
+      "status": "igual",
+      "deltaCarga": 0.0,
+      "deltaReps": 0
+     },
+     {
+      "nome": "SEATED_CABLE_ROW",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 32.0,
+        "s": 38
+       },
+       {
+        "reps": 10,
+        "kg": 32.0,
+        "s": 34
+       },
+       {
+        "reps": 9,
+        "kg": 32.0,
+        "s": 31
+       }
+      ],
+      "status": "ajuste",
+      "deltaCarga": -20.5,
+      "deltaReps": 0
+     },
+     {
+      "nome": "CHEST_SUPPORTED_DUMBBELL_ROW",
+      "categoria": "ROW",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 45.5,
+        "s": 33
+       },
+       {
+        "reps": 10,
+        "kg": 45.5,
+        "s": 31
+       },
+       {
+        "reps": 8,
+        "kg": 45.5,
+        "s": 34
+       }
+      ],
+      "status": "carga_up",
+      "deltaCarga": 13.5,
+      "deltaReps": 0
+     },
+     {
+      "nome": "INCLINE_REVERSE_FLYE",
+      "categoria": "FLYE",
+      "series": [
+       {
+        "reps": 4,
+        "kg": null,
+        "s": 639
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Esta sessão de puxada marcou um excelente retorno aos treinos após um período de 56 dias de layoff. A execução dos exercícios de costas foi muito boa, demonstrando uma re-entrada planejada e inteligente.",
+    "comparacao_plano": "O plano para o dia era um treino de puxada para costas e bíceps, totalizando aproximadamente 18 séries. Você executou 11 séries, focando nos exercícios de costas. Os exercícios de bíceps e duas séries do Crucifixo Inverso não foram realizados, o que resultou em um volume total menor que o planejado, mas adequado para a fase de re-entrada.",
+    "pontos_fortes": [
+     "A performance no Lat Pulldown e Seated Cable Row foi muito boa, com você atingindo ou superando o topo da faixa de repetições (11 reps) em alguns sets, o que é excelente para o retorno após o layoff.",
+     "No Chest Supported Dumbbell Row, a progressão dupla funcionou perfeitamente: você subiu a carga e as repetições se ajustaram (11, 10, 8), indicando que o estímulo foi bem aplicado e o corpo está se adaptando rapidamente.",
+     "A decisão de ajustar o volume total da sessão, focando nos principais exercícios de costas, é uma estratégia inteligente para gerenciar a carga de treino na fase de re-entrada, protegendo a recuperação e evitando sobrecarga."
+    ],
+    "pontos_atencao": [
+     "No Incline Reverse Flye, apenas uma série foi executada. O plano era de 3 séries, o que significa que o estímulo completo para a porção posterior do deltoide foi reduzido.",
+     "Os exercícios de bíceps (Rosca Direta e Rosca Martelo) foram pulados. Embora a prioridade seja a re-entrada controlada, é importante garantir que todos os grupos musculares planejados recebam o estímulo adequado ao longo da semana."
+    ],
+    "proxima_dica": "No Lat Pulldown, você bateu 11 repetições em dois sets com 40kg. Na próxima sessão, suba a carga para 42,5kg e volte a mirar na faixa de 9-11 repetições. Tente completar todas as séries do Incline Reverse Flye para garantir o estímulo completo para os deltoides posteriores.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-11-17",
    "activityId": 25113215481,
