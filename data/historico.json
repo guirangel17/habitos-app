@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-19T17:34:07-03:00",
+ "atualizadoEm": "2026-11-19T20:21:15-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1847,6 +1847,12 @@
    "activityId": 25125470526,
    "minutos": 36,
    "nome": "QUA Puxar"
+  },
+  {
+   "date": "2026-11-19",
+   "activityId": 25135111491,
+   "minutos": 42,
+   "nome": "QUI Pernas JOELHO (amplitude red"
   }
  ],
  "tendencias": {

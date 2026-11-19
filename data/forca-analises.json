@@ -1,7 +1,197 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-19T17:09:33-03:00",
+ "atualizadoEm": "2026-11-19T20:21:15-03:00",
  "analises": [
+  {
+   "date": "2026-11-19",
+   "activityId": 25135111491,
+   "geradoEm": "2026-11-19T20:21:16-03:00",
+   "sessao": {
+    "minutos": 42,
+    "series": 20,
+    "volumeKg": 3795,
+    "exercicios": [
+     {
+      "nome": "LATERAL_BAND_WALKS",
+      "categoria": "BANDED_EXERCISES",
+      "series": [
+       {
+        "reps": 15,
+        "kg": 32.0,
+        "s": 154
+       },
+       {
+        "reps": 15,
+        "kg": 32.0,
+        "s": 45
+       },
+       {
+        "reps": 15,
+        "kg": 32.0,
+        "s": 42
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SIDE_PLANK",
+      "categoria": "PLANK",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 30
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 2
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "BARBELL_HIP_THRUST_WITH_BENCH",
+      "categoria": "HIP_RAISE",
+      "series": [
+       {
+        "reps": 0,
+        "kg": null,
+        "s": 3
+       },
+       {
+        "reps": 11,
+        "kg": 10.0,
+        "s": 101
+       },
+       {
+        "reps": 12,
+        "kg": 10.0,
+        "s": 91
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": 0.0,
+      "deltaReps": 1
+     },
+     {
+      "nome": "LEG_CURL",
+      "categoria": "LEG_CURL",
+      "series": [
+       {
+        "reps": 11,
+        "kg": 40.0,
+        "s": 193
+       },
+       {
+        "reps": 0,
+        "kg": 40.0,
+        "s": 4
+       },
+       {
+        "reps": 10,
+        "kg": 40.0,
+        "s": 41
+       }
+      ],
+      "status": "reps_up",
+      "deltaCarga": null,
+      "deltaReps": 1
+     },
+     {
+      "nome": "LEG_PRESS",
+      "categoria": "SQUAT",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 73
+       },
+       {
+        "reps": 10,
+        "kg": 20.0,
+        "s": 110
+       },
+       {
+        "reps": 6,
+        "kg": 20.0,
+        "s": 24
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SEATED_CALF_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 20
+       },
+       {
+        "reps": 11,
+        "kg": 15.0,
+        "s": 98
+       },
+       {
+        "reps": 10,
+        "kg": 15.0,
+        "s": 320
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     },
+     {
+      "nome": "SEATED_DUMBBELL_TOE_RAISE",
+      "categoria": "CALF_RAISE",
+      "series": [
+       {
+        "reps": 15,
+        "kg": 10.0,
+        "s": 124
+       },
+       {
+        "reps": 15,
+        "kg": 10.0,
+        "s": 14
+       }
+      ],
+      "status": "novo",
+      "deltaCarga": null,
+      "deltaReps": null
+     }
+    ]
+   },
+   "ia": {
+    "resumo": "Sessão de reentrada no treino de membros inferiores após 42 dias de intervalo, alinhada à fase de reabilitação do joelho. O treino somou 42 minutos e 20 séries, priorizando a segurança articular e o estímulo neural leve.",
+    "comparacao_plano": "Em virtude do retorno e das diretrizes da fisioterapia, o plano original foi adaptado com sabedoria: Leg Press executado com carga reduzida (20kg), inclusão de trabalho de estabilização pélvica (Lateral Band Walks) e manutenção dos trabalhos de posterior, panturrilha e tibial (Toe Raise), preservando a articulação do joelho e o volume efetivo.",
+    "pontos_fortes": [
+     "Excelente controle de carga na reativação pós-layoff de 42 dias, prevenindo o excesso de microtraumas musculares (DOMS) que comprometeria os treinos de corrida.",
+     "Manutenção da rotina preventiva com o Seated Toe Raise para fortalecimento do tibial anterior, mantendo a canelite sob controle.",
+     "Execução limpa e progressão segura na Elevação Pélvica e Cadeira Flexora dentro da faixa alvo estipulada."
+    ],
+    "pontos_atencao": [
+     "A queda abrupta de duração nas séries 2 e 3 da Prancha Lateral (3s e 2s) indica fadiga precoce do core ou perda de alinhamento postural; vale pausar um pouco mais entre as séries.",
+     "A ausência temporária dos exercícios unipodais dinâmicos (Búlgaro/Afundo) é adequada na reabilitação, mas deve ser reintroduzida gradualmente quando a fisioterapia liberar."
+    ],
+    "proxima_dica": "Na próxima sessão, repita exatamente as mesmas cargas no Leg Press (20kg) e Hip Thrust (10kg); o ganho inicial nesta fase é de eficiência neural e consolidação articular, sem necessidade de subir carga ainda.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-11-18",
    "activityId": 25125470526,
