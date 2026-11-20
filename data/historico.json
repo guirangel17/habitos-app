@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-19T20:21:15-03:00",
+ "atualizadoEm": "2026-11-20T00:05:33-03:00",
  "fcMax": 190,
  "zonas": {
   "z1": [
@@ -1299,6 +1299,21 @@
    "paradoPct": 29,
    "ef": 0.98,
    "tipoPlano": "social"
+  },
+  {
+   "date": "2026-11-19",
+   "activityId": 25136614462,
+   "distanciaKm": 5.28,
+   "paceMedio": "7:33",
+   "paceSeg": 453,
+   "fcMedia": 143,
+   "fcMax": 169,
+   "cadencia": 106,
+   "vo2max": 48.0,
+   "teAerobico": 3.3,
+   "paradoPct": 23,
+   "ef": 0.927,
+   "tipoPlano": "leve"
   }
  ],
  "forcas": [
@@ -2209,7 +2224,7 @@
    },
    {
     "semana": "2026-11-16",
-    "km": 0
+    "km": 5.3
    }
   ],
   "longaoMes": [

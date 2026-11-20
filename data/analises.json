@@ -1,7 +1,96 @@
 {
  "schema": 1,
- "atualizadoEm": "2026-11-13T15:13:13-03:00",
+ "atualizadoEm": "2026-11-20T00:05:33-03:00",
  "analises": [
+  {
+   "date": "2026-11-19",
+   "activityId": 25136614462,
+   "geradoEm": "2026-11-20T00:05:47-03:00",
+   "garmin": {
+    "nome": "Belo Horizonte Running",
+    "inicio": "2026-11-19 20:43:36",
+    "distanciaKm": 5.28,
+    "duracaoMin": 39.8,
+    "paceMedio": "7:33",
+    "fcMedia": 143,
+    "fcMax": 169,
+    "cadencia": 106,
+    "elevacaoM": 90,
+    "trainingEffect": {
+     "aerobico": 3.3,
+     "anaerobico": 0.2,
+     "label": "AEROBIC_BASE",
+     "carga": null
+    },
+    "vo2max": 48.0,
+    "temperaturaC": 31.0,
+    "splits": [
+     {
+      "km": 1,
+      "pace": "7:17",
+      "fc": 135
+     },
+     {
+      "km": 2,
+      "pace": "6:46",
+      "fc": 139
+     },
+     {
+      "km": 3,
+      "pace": "7:46",
+      "fc": 151
+     },
+     {
+      "km": 4,
+      "pace": "8:14",
+      "fc": 142
+     },
+     {
+      "km": 5,
+      "pace": "7:27",
+      "fc": 143
+     },
+     {
+      "km": 6,
+      "pace": "8:24",
+      "fc": 150
+     }
+    ],
+    "zonasFc": {
+     "z1": 19,
+     "z2": 60,
+     "z3": 18,
+     "z4": 3,
+     "z5": 0
+    },
+    "derivaCardiacaPct": null
+   },
+   "plano": {
+    "tipo": "leve",
+    "nome": "Zero impacto — o social sai esta semana (fascite). Exercícios de fáscia em casa",
+    "paceAlvo": "6:50–7:15 /km ou mais leve",
+    "fcAlvo": "≤ 152 bpm",
+    "observacao": null
+   },
+   "historico": {
+    "paceZ2Atual": "6:54",
+    "paceZ2Ha8Sem": "7:15"
+   },
+   "ia": {
+    "resumo": "Corrida leve de 5,28 km realizada sob forte calor de 31°C e relevo com 90 m de ganho de elevação em Belo Horizonte. O foco no controle de esforço foi mantido, resultando em 79% do tempo dentro das zonas Z1 e Z2 com frequência cardíaca média de 143 bpm.",
+    "comparacao_plano": "Com teto de FC estabelecido em 152 bpm, a resposta fisiológica foi exemplar (FC média de 143 bpm). O pace médio de 7:33/km ficou acima do intervalo planejado (6:50-7:15), o que refletiu uma decisão acertada de ajuste ao calor de 31°C e às subidas do percurso para priorizar o teto cardíaco.",
+    "pontos_fortes": [
+     "Excelente controle de ritmo em condições adversas de calor (31°C) e altimetria (90 m), mantendo a FC média confortavelmente em 143 bpm.",
+     "Respeito absoluto ao estímulo aeróbico, acumulando 79% do tempo total nas Zonas 1 e 2."
+    ],
+    "pontos_atencao": [
+     "A cadência média de 106 spm aponta provável oscilação no registro do sensor ou momentos de caminhada intercalada, visto que a sua cadência de referência para este pace fica entre 146 e 156 spm.",
+     "Sensibilidade ao impacto térmico: a corrida a 31°C exige atenção reforçada à reidratação nas horas seguintes para acelerar a recuperação."
+    ],
+    "proxima_dica": "Antes do teste de corre/anda do dia 21/11, aplique a regra das 24h: a liberação só acontece se o primeiro passo da manhã seguinte e o teste de 10 elevações unipedais de panturrilha forem 100% sem dor na fáscia.",
+    "nota_execucao": 9
+   }
+  },
   {
    "date": "2026-11-12",
    "activityId": 25060482579,
